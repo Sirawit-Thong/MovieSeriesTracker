@@ -29,6 +29,7 @@ type CombinedCredit = {
 
 type FilmographyProps = {
   combinedCredits: CombinedCredit[];
+  localizedTitles?: Record<number, string>;
 };
 
 function extractYear(releaseDate: string | null): number {
@@ -113,7 +114,7 @@ function BookmarkButton({mediaType, mediaId}: {mediaType: string; mediaId: numbe
   );
 }
 
-export default function Filmography({combinedCredits}: FilmographyProps) {
+export default function Filmography({combinedCredits, localizedTitles = {}}: FilmographyProps) {
   const t = useTranslations('Person');
   const locale = useLocale();
 
@@ -205,7 +206,7 @@ export default function Filmography({combinedCredits}: FilmographyProps) {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-medium text-foreground/90 group-hover:text-white truncate transition-colors">
-                            {credit.title ?? '—'}
+                            {localizedTitles[credit.mediaId] || credit.title || '—'}
                           </p>
                           <span className={`flex-shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded ${
                             isTv

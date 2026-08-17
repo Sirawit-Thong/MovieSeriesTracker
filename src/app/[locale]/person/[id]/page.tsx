@@ -44,11 +44,9 @@ async function getPersonById(id: number, locale: string) {
   }
 
   // Always re-sync credits from TMDB to ensure completeness.
-  // syncPersonCredits fetches all movie + TV credits and replaces existing ones.
-  // syncCombinedCredits fetches combined credits for the "Known For" and "Filmography" sections.
-  // These handle the case where media-credit-sync only created partial credits
-  // (e.g., only for one movie/TV the user visited earlier).
-  const client = new TmdbClient();
+  // Pass user locale to TMDB so titles come back in the correct language.
+  const tmdbLanguage = locale === 'th' ? 'th-TH' : 'en-US';
+  const client = new TmdbClient({language: tmdbLanguage});
   const [personDetails2] = await Promise.all([
     client.getPersonDetails(person.tmdbId, 'combined_credits'),
     syncPersonCredits(person.tmdbId, client),
@@ -95,11 +93,76 @@ async function getPersonById(id: number, locale: string) {
     }),
   ]);
 
+  // Resolve localized titles for combined credits from our translations table
+  const localizedTitles: Record<number, string> = {};
+  if (fullPerson.combinedCredits.length > 0) {
+    const uniqueMediaIds = [...new Set(fullPerson.combinedCredits.map(c => c.mediaId))];
+    
+    // Batch fetch all movie/TV records and their translations
+    const [movies, tvSeries] = await Promise.all([
+      prisma.movie.findMany({
+        where: { tmdbId: { in: uniqueMediaIds } },
+        select: { id: true, tmdbId: true, title: true },
+      }),
+      prisma.tvSeries.findMany({
+        where: { tmdbId: { in: uniqueMediaIds } },
+        select: { id: true, tmdbId: true, name: true },
+      }),
+    ]);
+
+    // Build lookup maps
+    const movieMap = new Map(movies.map(m => [m.tmdbId, m]));
+    const tvMap = new Map(tvSeries.map(t => [t.tmdbId, t]));
+
+    // Fetch translations for all found media
+    const movieIds = movies.map(m => m.id);
+    const tvIds = tvSeries.map(t => t.id);
+    
+    const [movieTranslations, tvTranslations] = await Promise.all([
+      movieIds.length > 0 ? prisma.translation.findMany({
+        where: { entityType: 'movie', entityId: { in: movieIds } },
+      }) : [],
+      tvIds.length > 0 ? prisma.translation.findMany({
+        where: { entityType: 'tv', entityId: { in: tvIds } },
+      }) : [],
+    ]);
+
+    // Group translations by entityId
+    const movieTranslationsByEntity = new Map<number, typeof movieTranslations>();
+    for (const t of movieTranslations) {
+      const existing = movieTranslationsByEntity.get(t.entityId) || [];
+      existing.push(t);
+      movieTranslationsByEntity.set(t.entityId, existing);
+    }
+    const tvTranslationsByEntity = new Map<number, typeof tvTranslations>();
+    for (const t of tvTranslations) {
+      const existing = tvTranslationsByEntity.get(t.entityId) || [];
+      existing.push(t);
+      tvTranslationsByEntity.set(t.entityId, existing);
+    }
+
+    // Resolve localized titles
+    for (const tmdbId of uniqueMediaIds) {
+      const movie = movieMap.get(tmdbId);
+      if (movie) {
+        const trans = movieTranslationsByEntity.get(movie.id) || [];
+        localizedTitles[tmdbId] = getLocalizedField(trans, locale, 'name', movie.title) ?? movie.title;
+        continue;
+      }
+      const tv = tvMap.get(tmdbId);
+      if (tv) {
+        const trans = tvTranslationsByEntity.get(tv.id) || [];
+        localizedTitles[tmdbId] = getLocalizedField(trans, locale, 'name', tv.name) ?? tv.name;
+      }
+    }
+  }
+
   return {
     ...fullPerson,
     externalIds,
     images,
     translations,
+    localizedTitles,
     localized: {
       name: getLocalizedField(translations, locale, 'name', fullPerson.name),
       biography: getLocalizedField(translations, locale, 'biography', fullPerson.biography),

@@ -1,6 +1,7 @@
 import {setRequestLocale} from 'next-intl/server';
 import {getTranslations} from 'next-intl/server';
 import {getTvSeriesList} from '@/lib/db/media-queries';
+import {resolveLocalizedTitles} from '@/lib/db/resolve-localized-titles';
 import MediaCard from '@/components/media/MediaCard';
 
 export const dynamic = 'force-dynamic';
@@ -25,6 +26,12 @@ export default async function TvSeriesPage({
   const {items, total} = await getTvSeriesList(pageSize, offset);
   const totalPages = Math.ceil(total / pageSize);
 
+  // Resolve localized titles
+  const localizedTitles = await resolveLocalizedTitles(
+    locale,
+    items.map((t) => ({tmdbId: t.tmdbId, type: 'tv' as const})),
+  );
+
   return (
     <div className="min-h-[calc(100vh-4rem)] max-w-7xl mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-white mb-2">{tNav('tvSeries')}</h1>
@@ -44,7 +51,7 @@ export default async function TvSeriesPage({
               <MediaCard
                 key={tv.id}
                 tmdbId={tv.tmdbId}
-                title={tv.name}
+                title={localizedTitles[tv.tmdbId] || tv.name}
                 posterPath={tv.posterPath}
                 voteAverage={tv.voteAverage}
                 type="tv"

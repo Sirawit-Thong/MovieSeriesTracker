@@ -117,6 +117,7 @@ type PersonDetailProps = {
       name: string | null;
       biography: string | null;
     };
+    localizedTitles?: Record<number, string>;
   };
   locale: string;
 };
@@ -307,6 +308,7 @@ export default function PersonDetail({person, locale}: PersonDetailProps) {
             {/* Filmography */}
             <Filmography
               combinedCredits={person.combinedCredits}
+              localizedTitles={person.localizedTitles}
             />
 
             {/* Profile Gallery */}

@@ -2,6 +2,7 @@ import {setRequestLocale} from 'next-intl/server';
 import {useTranslations} from 'next-intl';
 import {Link} from '@/i18n/navigation';
 import MediaSection from '@/components/media/MediaSection';
+import {resolveLocalizedTitles} from '@/lib/db/resolve-localized-titles';
 import {
   getTrendingMovies,
   getTrendingTvSeries,
@@ -54,6 +55,17 @@ export default async function HomePage({
     getTopRatedTvSeries(SECTION_LIMIT),
   ]);
 
+  // Resolve localized titles for all media
+  const allItems = [
+    ...trendingMovies.map((m) => ({tmdbId: m.tmdbId, type: 'movie' as const})),
+    ...trendingTv.map((t) => ({tmdbId: t.tmdbId, type: 'tv' as const})),
+    ...popularMovies.map((m) => ({tmdbId: m.tmdbId, type: 'movie' as const})),
+    ...popularTv.map((t) => ({tmdbId: t.tmdbId, type: 'tv' as const})),
+    ...topRatedMovies.map((m) => ({tmdbId: m.tmdbId, type: 'movie' as const})),
+    ...topRatedTv.map((t) => ({tmdbId: t.tmdbId, type: 'tv' as const})),
+  ];
+  const localizedTitles = await resolveLocalizedTitles(locale, allItems);
+
   return (
     <HomePageContent
       trendingMovies={trendingMovies}
@@ -62,6 +74,7 @@ export default async function HomePage({
       popularTv={popularTv.map(toMediaItem)}
       topRatedMovies={topRatedMovies}
       topRatedTv={topRatedTv.map(toMediaItem)}
+      localizedTitles={localizedTitles}
     />
   );
 }
@@ -73,6 +86,7 @@ type HomePageContentProps = {
   popularTv: MediaItem[];
   topRatedMovies: MediaItem[];
   topRatedTv: MediaItem[];
+  localizedTitles: Record<number, string>;
 };
 
 function HomePageContent({
@@ -82,6 +96,7 @@ function HomePageContent({
   popularTv,
   topRatedMovies,
   topRatedTv,
+  localizedTitles,
 }: HomePageContentProps) {
   const t = useTranslations('Home');
   const tNav = useTranslations('Navigation');
@@ -119,6 +134,7 @@ function HomePageContent({
         items={trendingMovies}
         type="movie"
         horizontal
+        localizedTitles={localizedTitles}
       />
 
       {/* Trending TV Series — horizontal scroll */}
@@ -127,6 +143,7 @@ function HomePageContent({
         items={trendingTv}
         type="tv"
         horizontal
+        localizedTitles={localizedTitles}
       />
 
       {/* Popular Movies — grid */}
@@ -134,6 +151,7 @@ function HomePageContent({
         title={t('popularMovies')}
         items={popularMovies}
         type="movie"
+        localizedTitles={localizedTitles}
       />
 
       {/* Popular TV Series — grid */}
@@ -141,6 +159,7 @@ function HomePageContent({
         title={t('popularTv')}
         items={popularTv}
         type="tv"
+        localizedTitles={localizedTitles}
       />
 
       {/* Top Rated Movies — grid */}
@@ -148,6 +167,7 @@ function HomePageContent({
         title={t('topRatedMovies')}
         items={topRatedMovies}
         type="movie"
+        localizedTitles={localizedTitles}
       />
 
       {/* Top Rated TV Series — grid */}
@@ -155,6 +175,7 @@ function HomePageContent({
         title={t('topRatedTv')}
         items={topRatedTv}
         type="tv"
+        localizedTitles={localizedTitles}
       />
     </div>
   );

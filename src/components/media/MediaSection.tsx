@@ -15,6 +15,8 @@ type MediaSectionProps = {
   type: 'movie' | 'tv';
   /** When true, renders a horizontal scroll container instead of a grid. */
   horizontal?: boolean;
+  /** Map of tmdbId → localized title from translations. */
+  localizedTitles?: Record<number, string>;
 };
 
 /**
@@ -26,6 +28,7 @@ export default function MediaSection({
   items,
   type,
   horizontal = false,
+  localizedTitles = {},
 }: MediaSectionProps) {
   if (!items || items.length === 0) return null;
 
@@ -48,7 +51,7 @@ export default function MediaSection({
               <div key={item.id} className="w-[140px] md:w-[160px] flex-shrink-0">
                 <MediaCard
                   tmdbId={item.tmdbId}
-                  title={item.title ?? item.name ?? ''}
+                  title={localizedTitles[item.tmdbId] || item.title || item.name || ''}
                   posterPath={item.posterPath}
                   voteAverage={item.voteAverage}
                   type={type}
@@ -66,7 +69,7 @@ export default function MediaSection({
               <MediaCard
                 key={item.id}
                 tmdbId={item.tmdbId}
-                title={item.title ?? item.name ?? ''}
+                title={localizedTitles[item.tmdbId] || item.title || item.name || ''}
                 posterPath={item.posterPath}
                 voteAverage={item.voteAverage}
                 type={type}

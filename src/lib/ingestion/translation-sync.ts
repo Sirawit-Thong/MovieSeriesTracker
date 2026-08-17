@@ -176,22 +176,45 @@ export function getLocalizedField(
   field: keyof TranslationData,
   fallback: string | null = null
 ): string | null {
-  // Try to find translation for the exact locale
-  const translation = translations.find((tr) => tr.iso6391 === locale);
+  // Try to find translation for the exact locale, or partial match (e.g. 'th' matches 'th-TH')
+  const findTranslation = (iso: string) =>
+    translations.find((tr) => tr.iso6391 === iso || tr.iso6391.startsWith(iso + '-'));
+
+  const translation = findTranslation(locale);
   if (translation) {
     const data = parseTranslationData(translation.data);
-    if (data && data[field]) {
-      return data[field]!;
+    if (data) {
+      // Direct match
+      if (data[field]) {
+        return data[field]!;
+      }
+      // Cross-match: 'name' → 'title' and 'title' → 'name'
+      // TMDB uses 'title' for movies and 'name' for TV shows,
+      // but our translation data may store it under the other key.
+      if (field === 'name' && data.title) {
+        return data.title;
+      }
+      if (field === 'title' && data.name) {
+        return data.name;
+      }
     }
   }
 
   // Fallback to English if locale is not English
   if (locale !== 'en') {
-    const enTranslation = translations.find((tr) => tr.iso6391 === 'en');
+    const enTranslation = findTranslation('en');
     if (enTranslation) {
       const data = parseTranslationData(enTranslation.data);
-      if (data && data[field]) {
-        return data[field]!;
+      if (data) {
+        if (data[field]) {
+          return data[field]!;
+        }
+        if (field === 'name' && data.title) {
+          return data.title;
+        }
+        if (field === 'title' && data.name) {
+          return data.name;
+        }
       }
     }
   }

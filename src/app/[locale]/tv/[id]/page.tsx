@@ -5,6 +5,7 @@ import {prisma} from '@/lib/db';
 import TvDetail from '@/components/tv/TvDetail';
 import {getLocalizedField} from '@/lib/ingestion/translation-sync';
 import {ensureMediaCredits} from '@/lib/ingestion/media-credit-sync';
+import {resolveLocalizedTitles} from '@/lib/db/resolve-localized-titles';
 
 type TvPageProps = {
   params: Promise<{locale: string; id: string}>;
@@ -141,6 +142,12 @@ async function getTvSeriesById(id: number, locale: string) {
       : [],
   ]);
 
+  // Resolve localized titles for recommendations
+  const recLocalizedTitles = await resolveLocalizedTitles(locale, [
+    ...recMovies.map((m) => ({tmdbId: m.tmdbId, type: 'movie' as const})),
+    ...recTv.map((t) => ({tmdbId: t.tmdbId, type: 'tv' as const})),
+  ]);
+
   return {
     ...series,
     images,
@@ -150,13 +157,13 @@ async function getTvSeriesById(id: number, locale: string) {
     recommendations: [
       ...recMovies.map((m) => ({
         ...m,
-        title: m.title,
+        title: recLocalizedTitles[m.tmdbId] || m.title,
         mediaType: 'movie' as const,
       })),
       ...recTv.map((tv) => ({
         id: tv.id,
         tmdbId: tv.tmdbId,
-        title: tv.name,
+        title: recLocalizedTitles[tv.tmdbId] || tv.name,
         posterPath: tv.posterPath,
         backdropPath: tv.backdropPath,
         voteAverage: tv.voteAverage,
