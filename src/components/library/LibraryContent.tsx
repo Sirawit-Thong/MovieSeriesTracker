@@ -56,7 +56,6 @@ type Translations = {
   sortUpdated: string;
   sortRating: string;
   sortTitle: string;
-  episodeProgress: string;
 };
 
 type Props = {

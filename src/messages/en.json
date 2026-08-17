@@ -160,7 +160,7 @@
     "sortUpdated": "Last Updated",
     "sortRating": "Rating",
     "sortTitle": "Title",
-    "episodeProgress": "Ep {{current}} / {{total}}"
+    "episodeProgress": "Ep {current} / {total}"
   },
   "Watchlist": {
     "title": "My Watchlists",

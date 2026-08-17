@@ -160,7 +160,7 @@
     "sortUpdated": "อัปเดตล่าสุด",
     "sortRating": "คะแนน",
     "sortTitle": "ชื่อ",
-    "episodeProgress": "ตอน {{current}} / {{total}}"
+    "episodeProgress": "ตอน {current} / {total}"
   },
   "Watchlist": {
     "title": "Watchlists ของฉัน",

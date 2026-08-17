@@ -36,7 +36,6 @@ export default async function LibraryPage({
         sortUpdated: t('sortUpdated'),
         sortRating: t('sortRating'),
         sortTitle: t('sortTitle'),
-        episodeProgress: t('episodeProgress'),
       }}
     />
   );
