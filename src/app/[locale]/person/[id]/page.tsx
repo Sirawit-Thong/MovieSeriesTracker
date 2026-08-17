@@ -5,6 +5,7 @@ import {prisma} from '@/lib/db';
 import PersonDetail from '@/components/person/PersonDetail';
 import {getLocalizedField} from '@/lib/ingestion/translation-sync';
 import {ensurePersonCredits} from '@/lib/ingestion/credit-sync';
+import {fetchAndUpsertPerson} from '@/lib/ingestion/person-sync';
 
 type PersonPageProps = {
   params: Promise<{locale: string; id: string}>;
@@ -29,14 +30,27 @@ async function getPersonById(id: number, locale: string) {
 
   if (!person) return null;
 
-  // Check if any credits exist
-  const hasCredits =
-    person.castCredits.length > 0 ||
-    person.crewCredits.length > 0 ||
-    person.combinedCredits.length > 0;
+  // Check if this is a stub person (created by movie/TV credit sync) — upgrade to full record
+  // Note: stub persons DO have cast/crew credit records (the links created by media-credit-sync),
+  // but they lack biography/birthday/translations. So we check for biography, not credits.
+  const personDetails = await prisma.person.findUnique({
+    where: {tmdbId: id},
+    select: {biography: true, birthday: true, placeOfBirth: true},
+  });
+  const personTranslations = await prisma.translation.findMany({
+    where: {entityType: 'person', entityId: person.id},
+    take: 1,
+  });
+  const isStub = !personDetails?.biography && !personDetails?.birthday && !personDetails?.placeOfBirth && personTranslations.length === 0;
 
-  // If no credits, sync from TMDB on demand
-  if (!hasCredits) {
+  if (isStub) {
+    console.log(`[person-page] Upgrading stub person ${id} to full record`);
+    await Promise.all([
+      ensurePersonCredits(person.id, person.tmdbId),
+      fetchAndUpsertPerson(person.tmdbId),
+    ]);
+  } else if (person.castCredits.length === 0 && person.crewCredits.length === 0 && person.combinedCredits.length === 0) {
+    // Person has full data but no credits — sync credits only
     await ensurePersonCredits(person.id, person.tmdbId);
   }
 

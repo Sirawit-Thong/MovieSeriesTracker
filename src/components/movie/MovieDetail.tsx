@@ -10,17 +10,18 @@ import MediaGallery from '@/components/media/MediaGallery';
 import VideoList from '@/components/media/VideoList';
 import ExternalLinks from '@/components/media/ExternalLinks';
 import RecommendationList from '@/components/media/RecommendationList';
+import {translateJob, translateDepartment, translateStatus} from '@/lib/crew-translations';
 
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
 
 /** Release date type labels (TMDB standard). */
-const RELEASE_TYPE_LABELS: Record<number, string> = {
-  1: 'Premiere',
-  2: 'Theatrical (limited)',
-  3: 'Theatrical',
-  4: 'Digital',
-  5: 'Physical',
-  6: 'TV',
+const RELEASE_TYPE_LABELS: Record<number, Record<string, string>> = {
+  1: {en: 'Premiere', th: 'รอบปฐมทัศน์'},
+  2: {en: 'Theatrical (limited)', th: 'เข้าฉาย (จำกัด)'},
+  3: {en: 'Theatrical', th: 'เข้าฉาย'},
+  4: {en: 'Digital', th: 'ดิจิทัล'},
+  5: {en: 'Physical', th: 'สื่อกาย'},
+  6: {en: 'TV', th: 'โทรทัศน์'},
 };
 
 /** Union of all Prisma relation types included by the page query. */
@@ -170,9 +171,9 @@ function formatRuntime(minutes: number | null): string {
 }
 
 /** Format a date string to a locale-friendly display. */
-function formatDate(date: Date | null): string {
+function formatDate(date: Date | null, locale: string = 'en'): string {
   if (!date) return '—';
-  return new Intl.DateTimeFormat('en-US', {
+  return new Intl.DateTimeFormat(locale === 'th' ? 'th-TH' : 'en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -296,12 +297,12 @@ export default function MovieDetail({movie, locale}: MovieDetailProps) {
                 </span>
               )}
               {movie.releaseDate && (
-                <span>{formatDate(movie.releaseDate)}</span>
+                <span>{formatDate(movie.releaseDate, locale)}</span>
               )}
               {movie.runtime && <span>{formatRuntime(movie.runtime)}</span>}
               {movie.status && (
                 <span className="px-2 py-0.5 text-xs bg-primary/20 text-primary rounded-full">
-                  {movie.status}
+                  {translateStatus(movie.status, locale)}
                 </span>
               )}
             </div>
@@ -392,7 +393,7 @@ export default function MovieDetail({movie, locale}: MovieDetailProps) {
                               )}
                               <span>{rd.releaseDate}</span>
                               <span className="text-foreground/40">
-                                ({RELEASE_TYPE_LABELS[rd.type] ?? `Type ${rd.type}`})
+                                ({RELEASE_TYPE_LABELS[rd.type]?.[locale] ?? RELEASE_TYPE_LABELS[rd.type]?.en ?? `Type ${rd.type}`})
                               </span>
                             </span>
                           ))}
@@ -634,6 +635,7 @@ export default function MovieDetail({movie, locale}: MovieDetailProps) {
                     profilePath: c.person.profilePath,
                     character: c.character ?? undefined,
                     order: c.order ?? undefined,
+                    creditId: c.id,
                   }))}
                 />
               </div>
@@ -672,8 +674,8 @@ export default function MovieDetail({movie, locale}: MovieDetailProps) {
                           {credit.person.name}
                         </p>
                         <p className="text-xs text-foreground/50 truncate">
-                          {credit.job}
-                          {credit.department ? ` · ${credit.department}` : ''}
+                          {translateJob(credit.job, locale)}
+                          {credit.department ? ` · ${translateDepartment(credit.department, locale)}` : ''}
                         </p>
                       </div>
                     </Link>

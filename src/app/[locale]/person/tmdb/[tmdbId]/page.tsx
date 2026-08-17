@@ -23,5 +23,5 @@ export default async function TmdbPersonPage({params}: TmdbPersonPageProps) {
     redirect(`/${locale}`);
   }
 
-  redirect(`/${locale}/person/${result.dbId}`);
+  redirect(`/${locale}/person/${result.tmdbId}`);
 }

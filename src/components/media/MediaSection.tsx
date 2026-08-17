@@ -4,13 +4,15 @@ type MediaSectionProps = {
   title: string;
   items: Array<{
     id: number;
+    tmdbId: number;
     title?: string;
     name?: string;
     posterPath: string | null;
     voteAverage: number | null;
+    releaseDate?: string | Date | null;
+    firstAirDate?: string | null;
   }>;
   type: 'movie' | 'tv';
-  locale: string;
   /** When true, renders a horizontal scroll container instead of a grid. */
   horizontal?: boolean;
 };
@@ -23,7 +25,6 @@ export default function MediaSection({
   title,
   items,
   type,
-  locale,
   horizontal = false,
 }: MediaSectionProps) {
   if (!items || items.length === 0) return null;
@@ -46,12 +47,12 @@ export default function MediaSection({
             {items.map((item) => (
               <div key={item.id} className="w-[140px] md:w-[160px] flex-shrink-0">
                 <MediaCard
-                  id={item.id}
+                  tmdbId={item.tmdbId}
                   title={item.title ?? item.name ?? ''}
                   posterPath={item.posterPath}
                   voteAverage={item.voteAverage}
                   type={type}
-                  locale={locale}
+                  releaseDate={item.releaseDate ?? item.firstAirDate}
                 />
               </div>
             ))}
@@ -64,12 +65,12 @@ export default function MediaSection({
             {items.map((item) => (
               <MediaCard
                 key={item.id}
-                id={item.id}
+                tmdbId={item.tmdbId}
                 title={item.title ?? item.name ?? ''}
                 posterPath={item.posterPath}
                 voteAverage={item.voteAverage}
                 type={type}
-                locale={locale}
+                releaseDate={item.releaseDate ?? item.firstAirDate}
               />
             ))}
           </div>

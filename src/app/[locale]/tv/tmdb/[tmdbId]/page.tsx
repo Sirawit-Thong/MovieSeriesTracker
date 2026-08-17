@@ -23,5 +23,5 @@ export default async function TmdbTvPage({params}: TmdbTvPageProps) {
     redirect(`/${locale}`);
   }
 
-  redirect(`/${locale}/tv/${result.dbId}`);
+  redirect(`/${locale}/tv/${result.tmdbId}`);
 }

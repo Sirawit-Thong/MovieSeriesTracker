@@ -1,7 +1,8 @@
 'use client';
 
-import {useTranslations} from 'next-intl';
+import {useLocale, useTranslations} from 'next-intl';
 import {Link} from '@/i18n/navigation';
+import {translateJob, translateDepartment} from '@/lib/crew-translations';
 
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
 
@@ -44,7 +45,6 @@ type FilmographyProps = {
   crewCredits: CrewCreditEntry[];
 };
 
-/** Extract a sortable year from a movie or TV credit. */
 function extractYear(credit: {movie: MovieCredit | null; tvSeries: TvCredit | null}): number {
   if (credit.movie?.releaseDate) {
     return new Date(credit.movie.releaseDate).getFullYear();
@@ -59,28 +59,24 @@ function extractYear(credit: {movie: MovieCredit | null; tvSeries: TvCredit | nu
   return 0;
 }
 
-/** Get the title from a credit (movie or TV). */
 function getCreditTitle(credit: {movie: MovieCredit | null; tvSeries: TvCredit | null}): string {
   if (credit.movie) return credit.movie.title;
   if (credit.tvSeries) return credit.tvSeries.name;
   return '—';
 }
 
-/** Get the TMDB ID from a credit. */
 function getCreditTmdbId(credit: {movie: MovieCredit | null; tvSeries: TvCredit | null}): number | null {
   if (credit.movie) return credit.movie.tmdbId;
   if (credit.tvSeries) return credit.tvSeries.tmdbId;
   return null;
 }
 
-/** Get the route prefix for a credit. */
 function getCreditRoute(credit: {movie: MovieCredit | null; tvSeries: TvCredit | null}): string {
-  if (credit.movie) return '/movie';
-  if (credit.tvSeries) return '/tv';
+  if (credit.movie) return '/movie/tmdb';
+  if (credit.tvSeries) return '/tv/tmdb';
   return '';
 }
 
-/** Get the rating from a credit. */
 function getCreditRating(credit: {movie: MovieCredit | null; tvSeries: TvCredit | null}): number | null {
   if (credit.movie?.voteAverage !== null && credit.movie?.voteAverage !== undefined) {
     return credit.movie.voteAverage;
@@ -91,30 +87,28 @@ function getCreditRating(credit: {movie: MovieCredit | null; tvSeries: TvCredit 
   return null;
 }
 
-/** Format the year from a credit. */
 function formatYear(credit: {movie: MovieCredit | null; tvSeries: TvCredit | null}): string {
   const year = extractYear(credit);
   return year > 0 ? String(year) : '—';
 }
 
-/**
- * Filmography section displaying all credits organized by type:
- * - Acting (Movies)
- * - Acting (TV Series)
- * - Directing
- * - Producing
- * - Other Crew
- *
- * Each row shows year, title, role/character, rating, and links to detail page.
- */
+function getCreditPosterPath(credit: {movie: MovieCredit | null; tvSeries: TvCredit | null}): string | null {
+  if (credit.movie?.posterPath) return credit.movie.posterPath;
+  if (credit.tvSeries?.posterPath) return credit.tvSeries.posterPath;
+  return null;
+}
+
+function isTvCredit(credit: {movie: MovieCredit | null; tvSeries: TvCredit | null}): boolean {
+  return credit.tvSeries !== null;
+}
+
 export default function Filmography({castCredits, crewCredits}: FilmographyProps) {
   const t = useTranslations('Person');
+  const locale = useLocale();
 
-  // Separate cast credits into movies and TV
   const actingMovies = castCredits.filter((c) => c.movie);
   const actingTv = castCredits.filter((c) => c.tvSeries);
 
-  // Separate crew credits by department
   const directingCredits = crewCredits.filter(
     (c) => c.department?.toLowerCase() === 'directing'
   );
@@ -127,7 +121,6 @@ export default function Filmography({castCredits, crewCredits}: FilmographyProps
       c.department?.toLowerCase() !== 'production'
   );
 
-  // Sort each group by year (newest first)
   const sortByYear = <T extends {movie: MovieCredit | null; tvSeries: TvCredit | null}>(
     items: T[]
   ): T[] => [...items].sort((a, b) => extractYear(b) - extractYear(a));
@@ -144,7 +137,6 @@ export default function Filmography({castCredits, crewCredits}: FilmographyProps
     {title: t('otherCrewCredits'), items: sortByYear(otherCrewCredits), isCast: false},
   ];
 
-  // Only render sections that have credits
   const activeSections = sections.filter((s) => s.items.length > 0);
 
   if (activeSections.length === 0) return null;
@@ -166,6 +158,8 @@ export default function Filmography({castCredits, crewCredits}: FilmographyProps
                 const route = getCreditRoute(credit);
                 const tmdbId = getCreditTmdbId(credit);
                 const href = route && tmdbId ? `${route}/${tmdbId}` : '#';
+                const posterPath = getCreditPosterPath(credit);
+                const isTv = isTvCredit(credit);
 
                 return (
                   <Link
@@ -175,16 +169,9 @@ export default function Filmography({castCredits, crewCredits}: FilmographyProps
                   >
                     {/* Thumbnail */}
                     <div className="relative flex-shrink-0 w-10 h-14 rounded overflow-hidden bg-muted">
-                      {credit.movie?.posterPath ? (
+                      {posterPath ? (
                         <img
-                          src={`${TMDB_IMAGE_BASE}/w92${credit.movie.posterPath}`}
-                          alt={getCreditTitle(credit)}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                        />
-                      ) : credit.tvSeries?.posterPath ? (
-                        <img
-                          src={`${TMDB_IMAGE_BASE}/w92${credit.tvSeries.posterPath}`}
+                          src={`${TMDB_IMAGE_BASE}/w92${posterPath}`}
                           alt={getCreditTitle(credit)}
                           className="w-full h-full object-cover"
                           loading="lazy"
@@ -201,11 +188,20 @@ export default function Filmography({castCredits, crewCredits}: FilmographyProps
                       {formatYear(credit)}
                     </span>
 
-                    {/* Title */}
+                    {/* Title + Type badge */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground/90 group-hover:text-white truncate transition-colors">
-                        {getCreditTitle(credit)}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium text-foreground/90 group-hover:text-white truncate transition-colors">
+                          {getCreditTitle(credit)}
+                        </p>
+                        <span className={`flex-shrink-0 text-[10px] font-semibold px-1.5 py-0.5 rounded ${
+                          isTv
+                            ? 'bg-purple-500/20 text-purple-400'
+                            : 'bg-blue-500/20 text-blue-400'
+                        }`}>
+                          {isTv ? 'TV' : 'Movie'}
+                        </span>
+                      </div>
                     </div>
 
                     {/* Character / Department · Job */}
@@ -216,9 +212,9 @@ export default function Filmography({castCredits, crewCredits}: FilmographyProps
                         </span>
                       ) : (
                         <span className="text-sm text-foreground/50 truncate block">
-                          {'job' in credit ? credit.job : null}
+                          {'job' in credit ? translateJob(credit.job, locale) : null}
                           {'department' in credit && credit.department
-                            ? ` · ${credit.department}`
+                            ? ` · ${translateDepartment(credit.department, locale)}`
                             : ''}
                         </span>
                       )}

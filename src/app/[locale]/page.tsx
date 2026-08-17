@@ -16,14 +16,16 @@ const SECTION_LIMIT = 20;
 
 export const dynamic = 'force-dynamic';
 
-function toMediaItem(tv: {id: number; name: string; posterPath: string | null; backdropPath: string | null; voteAverage: number | null; overview: string | null}): MediaItem {
+function toMediaItem(tv: {id: number; tmdbId: number; name: string; posterPath: string | null; backdropPath: string | null; voteAverage: number | null; overview: string | null; firstAirDate: string | null}): MediaItem {
   return {
     id: tv.id,
+    tmdbId: tv.tmdbId,
     title: tv.name,
     posterPath: tv.posterPath,
     backdropPath: tv.backdropPath,
     voteAverage: tv.voteAverage,
     overview: tv.overview,
+    releaseDate: tv.firstAirDate,
   };
 }
 
@@ -54,7 +56,6 @@ export default async function HomePage({
 
   return (
     <HomePageContent
-      locale={locale}
       trendingMovies={trendingMovies}
       trendingTv={trendingTv.map(toMediaItem)}
       popularMovies={popularMovies}
@@ -65,17 +66,7 @@ export default async function HomePage({
   );
 }
 
-type TvMediaItem = {
-  id: number;
-  name: string;
-  posterPath: string | null;
-  backdropPath: string | null;
-  voteAverage: number | null;
-  overview: string | null;
-};
-
 type HomePageContentProps = {
-  locale: string;
   trendingMovies: MediaItem[];
   trendingTv: MediaItem[];
   popularMovies: MediaItem[];
@@ -85,7 +76,6 @@ type HomePageContentProps = {
 };
 
 function HomePageContent({
-  locale,
   trendingMovies,
   trendingTv,
   popularMovies,
@@ -128,7 +118,6 @@ function HomePageContent({
         title={t('trendingMovies')}
         items={trendingMovies}
         type="movie"
-        locale={locale}
         horizontal
       />
 
@@ -137,7 +126,6 @@ function HomePageContent({
         title={t('trendingTv')}
         items={trendingTv}
         type="tv"
-        locale={locale}
         horizontal
       />
 
@@ -146,7 +134,6 @@ function HomePageContent({
         title={t('popularMovies')}
         items={popularMovies}
         type="movie"
-        locale={locale}
       />
 
       {/* Popular TV Series — grid */}
@@ -154,7 +141,6 @@ function HomePageContent({
         title={t('popularTv')}
         items={popularTv}
         type="tv"
-        locale={locale}
       />
 
       {/* Top Rated Movies — grid */}
@@ -162,7 +148,6 @@ function HomePageContent({
         title={t('topRatedMovies')}
         items={topRatedMovies}
         type="movie"
-        locale={locale}
       />
 
       {/* Top Rated TV Series — grid */}
@@ -170,7 +155,6 @@ function HomePageContent({
         title={t('topRatedTv')}
         items={topRatedTv}
         type="tv"
-        locale={locale}
       />
     </div>
   );

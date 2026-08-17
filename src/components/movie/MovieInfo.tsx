@@ -1,4 +1,5 @@
-import {useTranslations} from 'next-intl';
+import {useLocale, useTranslations} from 'next-intl';
+import {translateStatus} from '@/lib/crew-translations';
 
 type MovieInfoProps = {
   movie: {
@@ -35,10 +36,10 @@ function formatRuntime(minutes: number | null): string {
   return h > 0 ? `${h}h ${m}m` : `${m}m`;
 }
 
-/** Format release date. */
-function formatDate(date: Date | null): string {
+/** Format release date using the given locale. */
+function formatDate(date: Date | null, locale: string): string {
   if (!date) return '—';
-  return new Intl.DateTimeFormat('en-US', {
+  return new Intl.DateTimeFormat(locale === 'th' ? 'th-TH' : 'en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -52,16 +53,17 @@ function formatDate(date: Date | null): string {
  */
 export default function MovieInfo({movie}: MovieInfoProps) {
   const t = useTranslations('Movie');
+  const locale = useLocale();
 
   const countries = movie.productionCountries.map((pc) => pc.country);
 
   return (
     <div className="bg-surface rounded-lg border border-border p-6 space-y-5 sticky top-24">
       {/* Status */}
-      <InfoRow label={t('status')} value={movie.status ?? '—'} />
+      <InfoRow label={t('status')} value={translateStatus(movie.status, locale)} />
 
       {/* Release Date */}
-      <InfoRow label={t('releaseDate')} value={formatDate(movie.releaseDate)} />
+      <InfoRow label={t('releaseDate')} value={formatDate(movie.releaseDate, locale)} />
 
       {/* Runtime */}
       <InfoRow label={t('runtime')} value={formatRuntime(movie.runtime)} />

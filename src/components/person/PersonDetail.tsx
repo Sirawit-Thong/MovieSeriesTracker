@@ -244,8 +244,8 @@ export default function PersonDetail({person, locale}: PersonDetailProps) {
                     {knownFor.map((credit) => {
                       const detailHref =
                         credit.mediaType === 'movie'
-                          ? `/movie/${credit.mediaId}`
-                          : `/tv/${credit.mediaId}`;
+                          ? `/movie/tmdb/${credit.mediaId}`
+                          : `/tv/tmdb/${credit.mediaId}`;
                       const posterSrc = credit.posterPath
                         ? `${TMDB_IMAGE_BASE}/w342${credit.posterPath}`
                         : null;

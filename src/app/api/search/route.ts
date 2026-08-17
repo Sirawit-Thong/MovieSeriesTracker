@@ -29,9 +29,9 @@ export async function GET(request: Request) {
   ]);
 
   // Build set of TMDB IDs already in local results (for dedup)
-  const localMovieTmdbIds = new Set(localResults.movies.map((m) => m.id));
-  const localTvTmdbIds = new Set(localResults.tvSeries.map((s) => s.id));
-  const localPersonIds = new Set(localResults.persons.map((p) => p.id));
+  const localMovieTmdbIds = new Set(localResults.movies.map((m) => m.tmdbId));
+  const localTvTmdbIds = new Set(localResults.tvSeries.map((s) => s.tmdbId));
+  const localPersonIds = new Set(localResults.persons.map((p) => p.tmdbId));
 
   // Extract TMDB-only results (not already in local DB)
   const tmdbOnlyMovies: Array<{

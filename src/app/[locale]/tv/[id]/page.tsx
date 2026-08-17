@@ -4,6 +4,7 @@ import {setRequestLocale} from 'next-intl/server';
 import {prisma} from '@/lib/db';
 import TvDetail from '@/components/tv/TvDetail';
 import {getLocalizedField} from '@/lib/ingestion/translation-sync';
+import {ensureMediaCredits} from '@/lib/ingestion/media-credit-sync';
 
 type TvPageProps = {
   params: Promise<{locale: string; id: string}>;
@@ -50,6 +51,35 @@ async function getTvSeriesById(id: number, locale: string) {
 
   if (!series) return null;
 
+  // Ensure cast/crew credits exist — sync from TMDB if empty
+  const hasCredits = series.castCredits.length > 0 || series.crewCredits.length > 0;
+  if (!hasCredits) {
+    await ensureMediaCredits('tv', series.id, id);
+    // Re-fetch series with credits
+    const refreshed = await prisma.tvSeries.findUnique({
+      where: {tmdbId: id},
+      include: {
+        genres: {include: {genre: true}},
+        networks: {include: {network: true}},
+        productionCompanies: {include: {company: true}},
+        productionCountries: {include: {country: true}},
+        spokenLanguages: {include: {language: true}},
+        createdBy: true,
+        seasons: {include: {episodes: {orderBy: {episodeNumber: 'asc'}}}, orderBy: {seasonNumber: 'asc'}},
+        nextEpisodeToAir: true,
+        lastEpisodeToAir: true,
+        castCredits: {include: {person: true}, orderBy: {order: 'asc'}},
+        crewCredits: {include: {person: true}},
+        watchProviders: {include: {provider: true}},
+        contentRatings: true,
+        altTitles: true,
+      },
+    });
+    if (refreshed) {
+      Object.assign(series, refreshed);
+    }
+  }
+
   // Sub-resources: polymorphic tables (use series.id = DB PK)
   const [images, videos, externalIds, translations, recommendations] =
     await Promise.all([
@@ -91,6 +121,7 @@ async function getTvSeriesById(id: number, locale: string) {
             posterPath: true,
             backdropPath: true,
             voteAverage: true,
+            releaseDate: true,
           },
         })
       : [],
@@ -104,6 +135,7 @@ async function getTvSeriesById(id: number, locale: string) {
             posterPath: true,
             backdropPath: true,
             voteAverage: true,
+            firstAirDate: true,
           },
         })
       : [],
@@ -128,6 +160,7 @@ async function getTvSeriesById(id: number, locale: string) {
         posterPath: tv.posterPath,
         backdropPath: tv.backdropPath,
         voteAverage: tv.voteAverage,
+        releaseDate: tv.firstAirDate,
         mediaType: 'tv' as const,
       })),
     ],

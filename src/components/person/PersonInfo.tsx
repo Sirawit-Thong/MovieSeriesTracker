@@ -1,6 +1,7 @@
 'use client';
 
-import {useTranslations} from 'next-intl';
+import {useLocale, useTranslations} from 'next-intl';
+import {translateDepartment} from '@/lib/crew-translations';
 
 type PersonInfoProps = {
   person: {
@@ -14,12 +15,12 @@ type PersonInfoProps = {
   };
 };
 
-/** Format a date string to a locale-friendly display. */
-function formatDate(dateStr: string | null): string {
+/** Format a date string using the given locale. */
+function formatDate(dateStr: string | null, locale: string): string {
   if (!dateStr) return '—';
   try {
     const date = new Date(dateStr);
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat(locale === 'th' ? 'th-TH' : 'en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -50,6 +51,7 @@ function formatGender(gender: number, t: ReturnType<typeof useTranslations>): st
  */
 export default function PersonInfo({person}: PersonInfoProps) {
   const t = useTranslations('Person');
+  const locale = useLocale();
 
   /** Split comma-separated alsoKnownAs into an array. */
   const aliases = person.alsoKnownAs
@@ -62,14 +64,14 @@ export default function PersonInfo({person}: PersonInfoProps) {
   return (
     <div className="bg-surface rounded-lg border border-border p-6 space-y-5 sticky top-24">
       {/* Known For Department */}
-      <InfoRow label={t('knownFor')} value={person.knownForDepartment ?? '—'} />
+      <InfoRow label={t('knownFor')} value={translateDepartment(person.knownForDepartment, locale) || '—'} />
 
       {/* Birthday */}
-      <InfoRow label={t('born')} value={formatDate(person.birthday)} />
+      <InfoRow label={t('born')} value={formatDate(person.birthday, locale)} />
 
       {/* Deathday (if applicable) */}
       {person.deathday && (
-        <InfoRow label={t('died')} value={formatDate(person.deathday)} />
+        <InfoRow label={t('died')} value={formatDate(person.deathday, locale)} />
       )}
 
       {/* Place of Birth */}

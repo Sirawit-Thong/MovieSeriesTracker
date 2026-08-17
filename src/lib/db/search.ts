@@ -9,6 +9,7 @@ const DEFAULT_LIMIT = 10;
 /** Select fields for movie search results. */
 const MOVIE_SELECT = {
   id: true,
+  tmdbId: true,
   title: true,
   originalTitle: true,
   posterPath: true,
@@ -20,6 +21,7 @@ const MOVIE_SELECT = {
 /** Select fields for TV series search results. */
 const TV_SERIES_SELECT = {
   id: true,
+  tmdbId: true,
   name: true,
   originalName: true,
   posterPath: true,

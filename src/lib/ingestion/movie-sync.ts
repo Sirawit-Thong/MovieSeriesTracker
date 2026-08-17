@@ -182,6 +182,10 @@ async function syncMovieSubResources(
   const movie = await prisma.movie.findUnique({ where: { tmdbId: tmdbMovie.id } });
   if (!movie) return;
 
+  // Sync credits (cast/crew) — separate from the main transaction
+  const { syncMediaCredits } = await import('./media-credit-sync');
+  await syncMediaCredits('movie', movie.id, tmdbMovie.id, client);
+
   // Store all sub-resources in a single transaction
   await prisma.$transaction(async (tx) => {
     // --- Alternative Titles ---

@@ -9,6 +9,7 @@ const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
 /** A single movie search result. */
 type MovieResult = {
   id: number;
+  tmdbId: number;
   title: string;
   originalTitle: string;
   posterPath: string | null;
@@ -21,6 +22,7 @@ type MovieResult = {
 /** A single TV series search result. */
 type TvSeriesResult = {
   id: number;
+  tmdbId: number;
   name: string;
   originalName: string;
   posterPath: string | null;
@@ -224,10 +226,10 @@ function MovieResultCard({movie}: MovieResultCardProps) {
     ? new Date(movie.releaseDate).getFullYear()
     : null;
 
-  // Use TMDB lookup route for TMDB-only results, DB ID for local results
+  // Use TMDB lookup route for TMDB-only results, tmdbId for local results
   const href = movie.source === 'tmdb'
     ? `/movie/tmdb/${movie.id}`
-    : `/movie/${movie.id}`;
+    : `/movie/${movie.tmdbId}`;
 
   return (
     <Link
@@ -305,7 +307,7 @@ function TvSeriesResultCard({series}: TvSeriesResultCardProps) {
 
   const href = series.source === 'tmdb'
     ? `/tv/tmdb/${series.id}`
-    : `/tv/${series.id}`;
+    : `/tv/${series.tmdbId}`;
 
   return (
     <Link

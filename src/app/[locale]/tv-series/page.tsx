@@ -43,12 +43,12 @@ export default async function TvSeriesPage({
             {items.map((tv) => (
               <MediaCard
                 key={tv.id}
-                id={tv.id}
+                tmdbId={tv.tmdbId}
                 title={tv.name}
                 posterPath={tv.posterPath}
                 voteAverage={tv.voteAverage}
                 type="tv"
-                locale={locale}
+                releaseDate={tv.firstAirDate}
               />
             ))}
           </div>

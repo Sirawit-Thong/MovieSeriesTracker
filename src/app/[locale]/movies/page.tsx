@@ -44,12 +44,12 @@ export default async function MoviesPage({
             {items.map((movie) => (
               <MediaCard
                 key={movie.id}
-                id={movie.id}
+                tmdbId={movie.tmdbId}
                 title={movie.title}
                 posterPath={movie.posterPath}
                 voteAverage={movie.voteAverage}
                 type="movie"
-                locale={locale}
+                releaseDate={movie.releaseDate}
               />
             ))}
           </div>

@@ -4,32 +4,31 @@ import {Link} from '@/i18n/navigation';
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
 
 type MediaCardProps = {
-  id: number;
+  tmdbId: number;
   title: string;
   posterPath: string | null;
   voteAverage: number | null;
   type: 'movie' | 'tv';
-  locale: string;
+  releaseDate?: string | Date | null;
 };
 
-/**
- * Reusable card for displaying a movie or TV series poster.
- * Links to the detail page and shows a rating badge.
- */
 export default function MediaCard({
-  id,
+  tmdbId,
   title,
   posterPath,
   voteAverage,
   type,
-  locale,
+  releaseDate,
 }: MediaCardProps) {
-  const detailHref = type === 'movie' ? `/movie/${id}` : `/tv/${id}`;
+  const detailHref = type === 'movie' ? `/movie/${tmdbId}` : `/tv/${tmdbId}`;
   const posterSrc = posterPath
     ? `${TMDB_IMAGE_BASE}/w500${posterPath}`
     : null;
   const rating =
     voteAverage !== null ? voteAverage.toFixed(1) : null;
+  const year = releaseDate
+    ? new Date(releaseDate).getFullYear()
+    : null;
 
   return (
     <Link
@@ -71,11 +70,14 @@ export default function MediaCard({
         )}
       </div>
 
-      {/* Title */}
+      {/* Title + Year */}
       <div className="p-3">
         <h3 className="text-sm font-medium text-foreground line-clamp-2 group-hover:text-primary transition-colors">
           {title}
         </h3>
+        {year && year > 0 && (
+          <p className="text-xs text-foreground/40 mt-1">{year}</p>
+        )}
       </div>
     </Link>
   );

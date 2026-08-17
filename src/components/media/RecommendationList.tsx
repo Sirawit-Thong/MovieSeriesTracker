@@ -11,6 +11,7 @@ export type RecommendationItem = {
   backdropPath: string | null;
   voteAverage: number | null;
   mediaType: 'movie' | 'tv';
+  releaseDate?: string | Date | null;
 };
 
 type RecommendationListProps = {
@@ -19,7 +20,7 @@ type RecommendationListProps = {
 
 /**
  * Horizontal scrollable list of recommended/similar media items.
- * Each card shows poster, title, and rating badge.
+ * Each card shows poster, title, year, and rating badge.
  * Links to the appropriate detail page.
  */
 export default function RecommendationList({items}: RecommendationListProps) {
@@ -30,12 +31,15 @@ export default function RecommendationList({items}: RecommendationListProps) {
       <div className="flex gap-3 min-w-max pb-2">
         {items.map((item) => {
           const detailHref =
-            item.mediaType === 'movie' ? `/movie/${item.tmdbId}` : `/tv/${item.tmdbId}`;
+            item.mediaType === 'movie' ? `/movie/tmdb/${item.tmdbId}` : `/tv/tmdb/${item.tmdbId}`;
           const posterSrc = item.posterPath
             ? `${TMDB_IMAGE_BASE}/w342${item.posterPath}`
             : null;
           const rating =
             item.voteAverage !== null ? item.voteAverage.toFixed(1) : null;
+          const year = item.releaseDate
+            ? new Date(item.releaseDate).getFullYear()
+            : null;
 
           return (
             <Link
@@ -68,11 +72,14 @@ export default function RecommendationList({items}: RecommendationListProps) {
                   </div>
                 )}
               </div>
-              {/* Title */}
+              {/* Title + Year */}
               <div className="p-2">
                 <p className="text-xs font-medium text-foreground/90 group-hover:text-white line-clamp-2 transition-colors">
                   {item.title}
                 </p>
+                {year && year > 0 && (
+                  <p className="text-[10px] text-foreground/40 mt-0.5">{year}</p>
+                )}
               </div>
             </Link>
           );

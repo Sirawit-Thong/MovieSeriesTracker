@@ -4,6 +4,7 @@ import {setRequestLocale} from 'next-intl/server';
 import {prisma} from '@/lib/db';
 import MovieDetail from '@/components/movie/MovieDetail';
 import {getLocalizedField} from '@/lib/ingestion/translation-sync';
+import {ensureMediaCredits} from '@/lib/ingestion/media-credit-sync';
 
 type MoviePageProps = {
   params: Promise<{locale: string; id: string}>;
@@ -39,6 +40,32 @@ async function getMovieById(id: number, locale: string) {
   });
 
   if (!movie) return null;
+
+  // Ensure cast/crew credits exist — sync from TMDB if empty
+  const hasCredits = movie.castCredits.length > 0 || movie.crewCredits.length > 0;
+  if (!hasCredits) {
+    await ensureMediaCredits('movie', movie.id, id);
+    // Re-fetch movie with credits
+    const refreshed = await prisma.movie.findUnique({
+      where: {tmdbId: id},
+      include: {
+        genres: {include: {genre: true}},
+        productionCompanies: {include: {company: true}},
+        productionCountries: {include: {country: true}},
+        spokenLanguages: {include: {language: true}},
+        collection: true,
+        castCredits: {include: {person: true}, orderBy: {order: 'asc'}},
+        crewCredits: {include: {person: true}},
+        watchProviders: {include: {provider: true}},
+        releaseDates: true,
+        contentRatings: true,
+        altTitles: true,
+      },
+    });
+    if (refreshed) {
+      Object.assign(movie, refreshed);
+    }
+  }
 
   // Sub-resources: polymorphic tables (use movie.id = DB PK)
   const [images, videos, externalIds, translations, recommendations] =
@@ -81,6 +108,7 @@ async function getMovieById(id: number, locale: string) {
             posterPath: true,
             backdropPath: true,
             voteAverage: true,
+            releaseDate: true,
           },
         })
       : [],
@@ -94,6 +122,7 @@ async function getMovieById(id: number, locale: string) {
             posterPath: true,
             backdropPath: true,
             voteAverage: true,
+            firstAirDate: true,
           },
         })
       : [],
@@ -118,6 +147,7 @@ async function getMovieById(id: number, locale: string) {
         posterPath: tv.posterPath,
         backdropPath: tv.backdropPath,
         voteAverage: tv.voteAverage,
+        releaseDate: tv.firstAirDate,
         mediaType: 'tv' as const,
       })),
     ],

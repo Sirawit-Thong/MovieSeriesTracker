@@ -19,5 +19,5 @@ export default async function TmdbMoviePage({params}: TmdbMoviePageProps) {
     notFound();
   }
 
-  redirect(`/${locale}/movie/${result.dbId}`);
+  redirect(`/${locale}/movie/${result.tmdbId}`);
 }

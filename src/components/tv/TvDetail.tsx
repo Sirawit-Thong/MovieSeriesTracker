@@ -10,6 +10,7 @@ import MediaGallery from '@/components/media/MediaGallery';
 import VideoList from '@/components/media/VideoList';
 import ExternalLinks from '@/components/media/ExternalLinks';
 import RecommendationList from '@/components/media/RecommendationList';
+import {translateJob, translateDepartment, translateStatus} from '@/lib/crew-translations';
 
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
 
@@ -171,11 +172,11 @@ type TvDetailProps = {
 };
 
 /** Format a date string to a locale-friendly display. */
-function formatDate(dateStr: string | null): string {
+function formatDate(dateStr: string | null, locale: string = 'en'): string {
   if (!dateStr) return '—';
   try {
     const date = new Date(dateStr);
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat(locale === 'th' ? 'th-TH' : 'en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -295,11 +296,11 @@ export default function TvDetail({series, locale}: TvDetailProps) {
                 </span>
               )}
               {series.firstAirDate && (
-                <span>{formatDate(series.firstAirDate)}</span>
+                <span>{formatDate(series.firstAirDate, locale)}</span>
               )}
               {series.status && (
                 <span className="px-2 py-0.5 text-xs bg-primary/20 text-primary rounded-full">
-                  {series.status}
+                  {translateStatus(series.status, locale)}
                 </span>
               )}
             </div>
@@ -361,7 +362,7 @@ export default function TvDetail({series, locale}: TvDetailProps) {
                     </h3>
                     {series.nextEpisodeToAir.airDate && (
                       <p className="text-xs text-foreground/40 mt-1">
-                        {formatDate(series.nextEpisodeToAir.airDate)}
+                        {formatDate(series.nextEpisodeToAir.airDate, locale)}
                       </p>
                     )}
                     {series.nextEpisodeToAir.overview && (
@@ -668,6 +669,7 @@ export default function TvDetail({series, locale}: TvDetailProps) {
                     profilePath: c.person.profilePath,
                     character: c.character ?? undefined,
                     order: c.order ?? undefined,
+                    creditId: c.id,
                   }))}
                 />
               </div>
@@ -706,8 +708,8 @@ export default function TvDetail({series, locale}: TvDetailProps) {
                           {credit.person.name}
                         </p>
                         <p className="text-xs text-foreground/50 truncate">
-                          {credit.job}
-                          {credit.department ? ` · ${credit.department}` : ''}
+                          {translateJob(credit.job, locale)}
+                          {credit.department ? ` · ${translateDepartment(credit.department, locale)}` : ''}
                         </p>
                       </div>
                     </Link>
@@ -731,16 +733,16 @@ export default function TvDetail({series, locale}: TvDetailProps) {
           <aside className="w-full lg:w-80 flex-shrink-0">
             <div className="bg-surface rounded-lg border border-border p-6 space-y-5 sticky top-24">
               {/* Status */}
-              <InfoRow label={t('status')} value={series.status ?? '—'} />
+              <InfoRow label={t('status')} value={translateStatus(series.status, locale)} />
 
               {/* Type */}
               <InfoRow label={t('type')} value={series.type ?? '—'} />
 
               {/* First Air Date */}
-              <InfoRow label={t('firstAirDate')} value={formatDate(series.firstAirDate)} />
+              <InfoRow label={t('firstAirDate')} value={formatDate(series.firstAirDate, locale)} />
 
               {/* Last Air Date */}
-              <InfoRow label={t('lastAirDate')} value={formatDate(series.lastAirDate)} />
+              <InfoRow label={t('lastAirDate')} value={formatDate(series.lastAirDate, locale)} />
 
               {/* Seasons / Episodes */}
               <InfoRow

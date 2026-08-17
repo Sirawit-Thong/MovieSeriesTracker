@@ -10,6 +10,7 @@ export type CastMember = {
   profilePath: string | null;
   character?: string;
   order?: number;
+  creditId?: string | number;
 };
 
 type CastListProps = {
@@ -34,7 +35,7 @@ export default function CastList({items}: CastListProps) {
 
           return (
             <Link
-              key={member.id}
+              key={member.creditId ?? `person-${member.id}-${member.order ?? 0}`}
               href={`/person/${member.tmdbId}`}
               className="group w-[120px] md:w-[140px] flex-shrink-0 bg-surface hover:bg-surface-hover rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 hover:scale-[1.03]"
             >
