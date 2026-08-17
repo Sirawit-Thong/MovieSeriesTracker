@@ -532,9 +532,9 @@ export async function ensurePersonCredits(
 
 /**
  * Sync combined credits into the person_combined_credits table.
- * These are used by the "Known For" section on the person detail page.
+ * These are used by the "Known For" and "Filmography" sections on the person detail page.
  */
-async function syncCombinedCredits(
+export async function syncCombinedCredits(
   personId: number,
   combinedCredits: {
     cast: Array<{

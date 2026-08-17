@@ -4,8 +4,9 @@ import {setRequestLocale} from 'next-intl/server';
 import {prisma} from '@/lib/db';
 import PersonDetail from '@/components/person/PersonDetail';
 import {getLocalizedField} from '@/lib/ingestion/translation-sync';
-import {ensurePersonCredits} from '@/lib/ingestion/credit-sync';
+import {syncPersonCredits, syncCombinedCredits} from '@/lib/ingestion/credit-sync';
 import {fetchAndUpsertPerson} from '@/lib/ingestion/person-sync';
+import {TmdbClient} from '@/lib/tmdb/client';
 
 type PersonPageProps = {
   params: Promise<{locale: string; id: string}>;
@@ -13,26 +14,20 @@ type PersonPageProps = {
 
 /**
  * Fetch a person by their TMDB ID with all related cast and crew credits.
- * If no credits exist in the DB, syncs them from TMDB on demand.
+ * Always re-syncs credits from TMDB to ensure completeness —
+ * partial credits from media-credit-sync (when only one movie/TV was visited)
+ * would otherwise be treated as "already synced".
  */
 async function getPersonById(id: number, locale: string) {
-  // First, fetch the person without credits
+  // First, fetch the person
   const person = await prisma.person.findUnique({
     where: {tmdbId: id},
-    select: {
-      id: true,
-      tmdbId: true,
-      castCredits: {select: {id: true}, take: 1},
-      crewCredits: {select: {id: true}, take: 1},
-      combinedCredits: {select: {id: true}, take: 1},
-    },
+    select: {id: true, tmdbId: true},
   });
 
   if (!person) return null;
 
   // Check if this is a stub person (created by movie/TV credit sync) — upgrade to full record
-  // Note: stub persons DO have cast/crew credit records (the links created by media-credit-sync),
-  // but they lack biography/birthday/translations. So we check for biography, not credits.
   const personDetails = await prisma.person.findUnique({
     where: {tmdbId: id},
     select: {biography: true, birthday: true, placeOfBirth: true},
@@ -45,13 +40,22 @@ async function getPersonById(id: number, locale: string) {
 
   if (isStub) {
     console.log(`[person-page] Upgrading stub person ${id} to full record`);
-    await Promise.all([
-      ensurePersonCredits(person.id, person.tmdbId),
-      fetchAndUpsertPerson(person.tmdbId),
-    ]);
-  } else if (person.castCredits.length === 0 && person.crewCredits.length === 0 && person.combinedCredits.length === 0) {
-    // Person has full data but no credits — sync credits only
-    await ensurePersonCredits(person.id, person.tmdbId);
+    await fetchAndUpsertPerson(person.tmdbId);
+  }
+
+  // Always re-sync credits from TMDB to ensure completeness.
+  // syncPersonCredits fetches all movie + TV credits and replaces existing ones.
+  // syncCombinedCredits fetches combined credits for the "Known For" and "Filmography" sections.
+  // These handle the case where media-credit-sync only created partial credits
+  // (e.g., only for one movie/TV the user visited earlier).
+  const client = new TmdbClient();
+  const [personDetails2] = await Promise.all([
+    client.getPersonDetails(person.tmdbId, 'combined_credits'),
+    syncPersonCredits(person.tmdbId, client),
+  ]);
+  // Also sync combined credits (used by Filmography — doesn't require FK to movie/TV)
+  if (personDetails2.combined_credits) {
+    await syncCombinedCredits(person.id, personDetails2.combined_credits);
   }
 
   // Now fetch the full person with all relations

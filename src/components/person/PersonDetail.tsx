@@ -78,11 +78,13 @@ export type PersonWithRelations = {
     character: string | null;
     department: string | null;
     job: string | null;
+    creditId: string | null;
     title: string | null;
     overview: string | null;
     popularity: number | null;
     releaseDate: string | null;
     voteAverage: number | null;
+    voteCount: number | null;
     posterPath: string | null;
     backdropPath: string | null;
     genreIds: string | null;
@@ -304,8 +306,7 @@ export default function PersonDetail({person, locale}: PersonDetailProps) {
 
             {/* Filmography */}
             <Filmography
-              castCredits={person.castCredits}
-              crewCredits={person.crewCredits}
+              combinedCredits={person.combinedCredits}
             />
 
             {/* Profile Gallery */}
