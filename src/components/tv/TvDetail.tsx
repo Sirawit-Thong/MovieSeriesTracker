@@ -160,7 +160,13 @@ export type TvSeriesWithRelations = {
 };
 
 type TvDetailProps = {
-  series: TvSeriesWithRelations;
+  series: TvSeriesWithRelations & {
+    localized?: {
+      name: string | null;
+      overview: string | null;
+      tagline: string | null;
+    };
+  };
   locale: string;
 };
 
@@ -199,6 +205,10 @@ function InfoRow({label, value}: {label: string; value: string}) {
 export default function TvDetail({series, locale}: TvDetailProps) {
   const t = useTranslations('Tv');
 
+  const displayName = series.localized?.name ?? series.name;
+  const displayOverview = series.localized?.overview ?? series.overview;
+  const displayTagline = series.localized?.tagline ?? series.tagline;
+
   const backdropSrc = series.backdropPath
     ? `${TMDB_IMAGE_BASE}/w1280${series.backdropPath}`
     : null;
@@ -223,7 +233,7 @@ export default function TvDetail({series, locale}: TvDetailProps) {
         {backdropSrc ? (
           <Image
             src={backdropSrc}
-            alt={series.name}
+            alt={displayName}
             fill
             priority
             sizes="100vw"
@@ -244,7 +254,7 @@ export default function TvDetail({series, locale}: TvDetailProps) {
             <div className="relative flex-shrink-0 w-[120px] md:w-[200px] aspect-[2/3] rounded-lg overflow-hidden shadow-2xl border border-white/10">
               <Image
                 src={posterSrc}
-                alt={series.name}
+                alt={displayName}
                 fill
                 priority
                 sizes="(max-width: 768px) 120px, 200px"
@@ -256,16 +266,16 @@ export default function TvDetail({series, locale}: TvDetailProps) {
           {/* Title block */}
           <div className="flex flex-col justify-end pb-2 min-w-0">
             <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
-              {series.name}
+              {displayName}
             </h1>
-            {series.originalName !== series.name && (
+            {series.originalName !== displayName && (
               <p className="text-sm md:text-base text-foreground/50 mt-1">
                 {series.originalName}
               </p>
             )}
-            {series.tagline && (
+            {displayTagline && (
               <p className="text-sm md:text-base italic text-foreground/60 mt-2">
-                &ldquo;{series.tagline}&rdquo;
+                &ldquo;{displayTagline}&rdquo;
               </p>
             )}
 
@@ -303,13 +313,13 @@ export default function TvDetail({series, locale}: TvDetailProps) {
           {/* Left: main content */}
           <div className="flex-1 min-w-0">
             {/* Overview */}
-            {series.overview && (
+            {displayOverview && (
               <div className="mb-8">
                 <h2 className="text-lg font-semibold text-foreground mb-3">
                   {t('overview')}
                 </h2>
                 <p className="text-foreground/70 leading-relaxed whitespace-pre-line">
-                  {series.overview}
+                  {displayOverview}
                 </p>
               </div>
             )}

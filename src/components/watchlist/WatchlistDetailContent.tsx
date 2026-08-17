@@ -123,7 +123,7 @@ export default function WatchlistDetailContent({locale, watchlist, translations:
     <div className="min-h-[calc(100vh-4rem)] max-w-4xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
-        <Link href={`/${locale}/watchlists`} className="text-sm text-primary hover:text-primary-hover transition-colors mb-4 inline-block">
+        <Link href="/watchlists" className="text-sm text-primary hover:text-primary-hover transition-colors mb-4 inline-block">
           ← Back to Watchlists
         </Link>
         <h1 className="text-3xl font-bold text-white mb-2">{watchlist.name}</h1>

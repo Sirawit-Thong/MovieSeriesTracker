@@ -277,7 +277,7 @@ export default function WatchlistContent({locale, translations: t}: Props) {
                 </div>
                 <div className="flex items-center gap-2 ml-4">
                   <Link
-                    href={`/${locale}/watchlists/${wl.id}`}
+                    href={`/watchlists/${wl.id}`}
                     className="px-3 py-1.5 text-xs font-medium text-primary hover:text-primary-hover transition-colors"
                   >
                     View

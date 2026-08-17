@@ -73,14 +73,21 @@ export class TmdbClient {
     await this.rateLimiter.acquire();
 
     // Build URL with query parameters
-    const url = new URL(endpoint, this.baseUrl);
+    const baseUrl = this.baseUrl.endsWith('/') ? this.baseUrl : `${this.baseUrl}/`;
+    const endpointPath = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
+    const url = new URL(endpointPath, baseUrl);
     
-    // Add default params
-    url.searchParams.append('language', this.language);
+    // Add API key as query param (TMDB v3 style)
+    if (this.apiKey) {
+      url.searchParams.append('api_key', this.apiKey);
+    }
     
-    // Add optional params
+    // Add default params (params.language overrides this.language if provided)
+    url.searchParams.append('language', (params.language as string) || this.language);
+    
+    // Add optional params (skip language since we already handled it above)
     Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined) {
+      if (key !== 'language' && value !== undefined) {
         url.searchParams.append(key, String(value));
       }
     });
@@ -96,7 +103,6 @@ export class TmdbClient {
         const response = await fetch(url.toString(), {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${this.apiKey}`,
             'Content-Type': 'application/json;charset=utf-8',
           },
           signal: controller.signal,
@@ -614,6 +620,13 @@ export class TmdbClient {
    */
   async getPersonImages(personId: number): Promise<TmdbPersonImagesResponse> {
     return this.request<TmdbPersonImagesResponse>(`/person/${personId}/images`);
+  }
+
+  /**
+   * Get translations for a person
+   */
+  async getPersonTranslations(personId: number): Promise<TmdbTranslationsResponse> {
+    return this.request<TmdbTranslationsResponse>(`/person/${personId}/translations`);
   }
 
   // ============================================================

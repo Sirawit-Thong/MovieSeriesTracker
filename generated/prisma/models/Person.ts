@@ -56,6 +56,7 @@ export type PersonMinAggregateOutputType = {
   placeOfBirth: string | null
   popularity: number | null
   profilePath: string | null
+  lastFetchedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -76,6 +77,7 @@ export type PersonMaxAggregateOutputType = {
   placeOfBirth: string | null
   popularity: number | null
   profilePath: string | null
+  lastFetchedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -96,6 +98,7 @@ export type PersonCountAggregateOutputType = {
   placeOfBirth: number
   popularity: number
   profilePath: number
+  lastFetchedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -132,6 +135,7 @@ export type PersonMinAggregateInputType = {
   placeOfBirth?: true
   popularity?: true
   profilePath?: true
+  lastFetchedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -152,6 +156,7 @@ export type PersonMaxAggregateInputType = {
   placeOfBirth?: true
   popularity?: true
   profilePath?: true
+  lastFetchedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -172,6 +177,7 @@ export type PersonCountAggregateInputType = {
   placeOfBirth?: true
   popularity?: true
   profilePath?: true
+  lastFetchedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -279,6 +285,7 @@ export type PersonGroupByOutputType = {
   placeOfBirth: string | null
   popularity: number | null
   profilePath: string | null
+  lastFetchedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: PersonCountAggregateOutputType | null
@@ -322,6 +329,7 @@ export type PersonWhereInput = {
   placeOfBirth?: Prisma.StringNullableFilter<"Person"> | string | null
   popularity?: Prisma.FloatNullableFilter<"Person"> | number | null
   profilePath?: Prisma.StringNullableFilter<"Person"> | string | null
+  lastFetchedAt?: Prisma.DateTimeNullableFilter<"Person"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Person"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Person"> | Date | string
   castCredits?: Prisma.CastCreditListRelationFilter
@@ -345,6 +353,7 @@ export type PersonOrderByWithRelationInput = {
   placeOfBirth?: Prisma.SortOrderInput | Prisma.SortOrder
   popularity?: Prisma.SortOrderInput | Prisma.SortOrder
   profilePath?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastFetchedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   castCredits?: Prisma.CastCreditOrderByRelationAggregateInput
@@ -371,6 +380,7 @@ export type PersonWhereUniqueInput = Prisma.AtLeast<{
   placeOfBirth?: Prisma.StringNullableFilter<"Person"> | string | null
   popularity?: Prisma.FloatNullableFilter<"Person"> | number | null
   profilePath?: Prisma.StringNullableFilter<"Person"> | string | null
+  lastFetchedAt?: Prisma.DateTimeNullableFilter<"Person"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Person"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Person"> | Date | string
   castCredits?: Prisma.CastCreditListRelationFilter
@@ -394,6 +404,7 @@ export type PersonOrderByWithAggregationInput = {
   placeOfBirth?: Prisma.SortOrderInput | Prisma.SortOrder
   popularity?: Prisma.SortOrderInput | Prisma.SortOrder
   profilePath?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastFetchedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.PersonCountOrderByAggregateInput
@@ -422,6 +433,7 @@ export type PersonScalarWhereWithAggregatesInput = {
   placeOfBirth?: Prisma.StringNullableWithAggregatesFilter<"Person"> | string | null
   popularity?: Prisma.FloatNullableWithAggregatesFilter<"Person"> | number | null
   profilePath?: Prisma.StringNullableWithAggregatesFilter<"Person"> | string | null
+  lastFetchedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Person"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Person"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Person"> | Date | string
 }
@@ -441,6 +453,7 @@ export type PersonCreateInput = {
   placeOfBirth?: string | null
   popularity?: number | null
   profilePath?: string | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   castCredits?: Prisma.CastCreditCreateNestedManyWithoutPersonInput
@@ -464,6 +477,7 @@ export type PersonUncheckedCreateInput = {
   placeOfBirth?: string | null
   popularity?: number | null
   profilePath?: string | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   castCredits?: Prisma.CastCreditUncheckedCreateNestedManyWithoutPersonInput
@@ -486,6 +500,7 @@ export type PersonUpdateInput = {
   placeOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   popularity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   profilePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   castCredits?: Prisma.CastCreditUpdateManyWithoutPersonNestedInput
@@ -509,6 +524,7 @@ export type PersonUncheckedUpdateInput = {
   placeOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   popularity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   profilePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   castCredits?: Prisma.CastCreditUncheckedUpdateManyWithoutPersonNestedInput
@@ -532,6 +548,7 @@ export type PersonCreateManyInput = {
   placeOfBirth?: string | null
   popularity?: number | null
   profilePath?: string | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -551,6 +568,7 @@ export type PersonUpdateManyMutationInput = {
   placeOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   popularity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   profilePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -571,6 +589,7 @@ export type PersonUncheckedUpdateManyInput = {
   placeOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   popularity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   profilePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -591,6 +610,7 @@ export type PersonCountOrderByAggregateInput = {
   placeOfBirth?: Prisma.SortOrder
   popularity?: Prisma.SortOrder
   profilePath?: Prisma.SortOrder
+  lastFetchedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -618,6 +638,7 @@ export type PersonMaxOrderByAggregateInput = {
   placeOfBirth?: Prisma.SortOrder
   popularity?: Prisma.SortOrder
   profilePath?: Prisma.SortOrder
+  lastFetchedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -638,6 +659,7 @@ export type PersonMinOrderByAggregateInput = {
   placeOfBirth?: Prisma.SortOrder
   popularity?: Prisma.SortOrder
   profilePath?: Prisma.SortOrder
+  lastFetchedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -711,6 +733,7 @@ export type PersonCreateWithoutCastCreditsInput = {
   placeOfBirth?: string | null
   popularity?: number | null
   profilePath?: string | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   crewCredits?: Prisma.CrewCreditCreateNestedManyWithoutPersonInput
@@ -733,6 +756,7 @@ export type PersonUncheckedCreateWithoutCastCreditsInput = {
   placeOfBirth?: string | null
   popularity?: number | null
   profilePath?: string | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   crewCredits?: Prisma.CrewCreditUncheckedCreateNestedManyWithoutPersonInput
@@ -770,6 +794,7 @@ export type PersonUpdateWithoutCastCreditsInput = {
   placeOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   popularity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   profilePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   crewCredits?: Prisma.CrewCreditUpdateManyWithoutPersonNestedInput
@@ -792,6 +817,7 @@ export type PersonUncheckedUpdateWithoutCastCreditsInput = {
   placeOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   popularity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   profilePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   crewCredits?: Prisma.CrewCreditUncheckedUpdateManyWithoutPersonNestedInput
@@ -813,6 +839,7 @@ export type PersonCreateWithoutCrewCreditsInput = {
   placeOfBirth?: string | null
   popularity?: number | null
   profilePath?: string | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   castCredits?: Prisma.CastCreditCreateNestedManyWithoutPersonInput
@@ -835,6 +862,7 @@ export type PersonUncheckedCreateWithoutCrewCreditsInput = {
   placeOfBirth?: string | null
   popularity?: number | null
   profilePath?: string | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   castCredits?: Prisma.CastCreditUncheckedCreateNestedManyWithoutPersonInput
@@ -872,6 +900,7 @@ export type PersonUpdateWithoutCrewCreditsInput = {
   placeOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   popularity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   profilePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   castCredits?: Prisma.CastCreditUpdateManyWithoutPersonNestedInput
@@ -894,6 +923,7 @@ export type PersonUncheckedUpdateWithoutCrewCreditsInput = {
   placeOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   popularity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   profilePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   castCredits?: Prisma.CastCreditUncheckedUpdateManyWithoutPersonNestedInput
@@ -915,6 +945,7 @@ export type PersonCreateWithoutCombinedCreditsInput = {
   placeOfBirth?: string | null
   popularity?: number | null
   profilePath?: string | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   castCredits?: Prisma.CastCreditCreateNestedManyWithoutPersonInput
@@ -937,6 +968,7 @@ export type PersonUncheckedCreateWithoutCombinedCreditsInput = {
   placeOfBirth?: string | null
   popularity?: number | null
   profilePath?: string | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   castCredits?: Prisma.CastCreditUncheckedCreateNestedManyWithoutPersonInput
@@ -974,6 +1006,7 @@ export type PersonUpdateWithoutCombinedCreditsInput = {
   placeOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   popularity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   profilePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   castCredits?: Prisma.CastCreditUpdateManyWithoutPersonNestedInput
@@ -996,6 +1029,7 @@ export type PersonUncheckedUpdateWithoutCombinedCreditsInput = {
   placeOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   popularity?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   profilePath?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   castCredits?: Prisma.CastCreditUncheckedUpdateManyWithoutPersonNestedInput
@@ -1067,6 +1101,7 @@ export type PersonSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   placeOfBirth?: boolean
   popularity?: boolean
   profilePath?: boolean
+  lastFetchedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   castCredits?: boolean | Prisma.Person$castCreditsArgs<ExtArgs>
@@ -1091,6 +1126,7 @@ export type PersonSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   placeOfBirth?: boolean
   popularity?: boolean
   profilePath?: boolean
+  lastFetchedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["person"]>
@@ -1111,6 +1147,7 @@ export type PersonSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   placeOfBirth?: boolean
   popularity?: boolean
   profilePath?: boolean
+  lastFetchedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["person"]>
@@ -1131,11 +1168,12 @@ export type PersonSelectScalar = {
   placeOfBirth?: boolean
   popularity?: boolean
   profilePath?: boolean
+  lastFetchedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PersonOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tmdbId" | "adult" | "biography" | "birthday" | "deathday" | "gender" | "homepage" | "imdbId" | "knownForDepartment" | "name" | "alsoKnownAs" | "placeOfBirth" | "popularity" | "profilePath" | "createdAt" | "updatedAt", ExtArgs["result"]["person"]>
+export type PersonOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tmdbId" | "adult" | "biography" | "birthday" | "deathday" | "gender" | "homepage" | "imdbId" | "knownForDepartment" | "name" | "alsoKnownAs" | "placeOfBirth" | "popularity" | "profilePath" | "lastFetchedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["person"]>
 export type PersonInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   castCredits?: boolean | Prisma.Person$castCreditsArgs<ExtArgs>
   crewCredits?: boolean | Prisma.Person$crewCreditsArgs<ExtArgs>
@@ -1168,6 +1206,7 @@ export type $PersonPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     placeOfBirth: string | null
     popularity: number | null
     profilePath: string | null
+    lastFetchedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["person"]>
@@ -1611,6 +1650,7 @@ export interface PersonFieldRefs {
   readonly placeOfBirth: Prisma.FieldRef<"Person", 'String'>
   readonly popularity: Prisma.FieldRef<"Person", 'Float'>
   readonly profilePath: Prisma.FieldRef<"Person", 'String'>
+  readonly lastFetchedAt: Prisma.FieldRef<"Person", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Person", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Person", 'DateTime'>
 }

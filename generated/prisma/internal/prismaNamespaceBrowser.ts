@@ -277,6 +277,7 @@ export const MovieScalarFieldEnum = {
   video: 'video',
   voteAverage: 'voteAverage',
   voteCount: 'voteCount',
+  lastFetchedAt: 'lastFetchedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   collectionId: 'collectionId'
@@ -427,6 +428,7 @@ export const TvSeriesScalarFieldEnum = {
   type: 'type',
   voteAverage: 'voteAverage',
   voteCount: 'voteCount',
+  lastFetchedAt: 'lastFetchedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   lastEpisodeToAirId: 'lastEpisodeToAirId',
@@ -573,6 +575,7 @@ export const PersonScalarFieldEnum = {
   placeOfBirth: 'placeOfBirth',
   popularity: 'popularity',
   profilePath: 'profilePath',
+  lastFetchedAt: 'lastFetchedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

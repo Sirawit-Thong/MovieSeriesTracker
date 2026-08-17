@@ -45,7 +45,7 @@ export default async function PeoplePage({
             {items.map((person) => (
               <Link
                 key={person.id}
-                href={`/${locale}/person/${person.id}`}
+                href={`/person/${person.tmdbId}`}
                 className="group relative flex flex-col rounded-lg overflow-hidden bg-surface border border-border hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 transition-all duration-300 hover:scale-[1.03]"
               >
                 <div className="relative aspect-[2/3] w-full overflow-hidden">

@@ -259,8 +259,8 @@ async function upsertTvSeriesWithNestedData(
   const seriesData = buildSeriesScalarData(tmdbSeries);
   const series = await tx.tvSeries.upsert({
     where: { tmdbId: tmdbSeries.id },
-    create: { tmdbId: tmdbSeries.id, ...seriesData },
-    update: seriesData,
+    create: { tmdbId: tmdbSeries.id, ...seriesData, lastFetchedAt: new Date() },
+    update: { ...seriesData, lastFetchedAt: new Date() },
   });
 
   // 3. Rebuild junction tables (delete all, then create)
@@ -479,8 +479,14 @@ async function syncTvSubResources(
           countryCode: r.iso_3166_1,
           rating: r.rating,
         }));
-      if (ratingData.length > 0) {
-        await tx.tvContentRating.createMany({ data: ratingData });
+      const seenTvRatings = new Set<string>();
+      const uniqueTvRatings = ratingData.filter((r) => {
+        if (seenTvRatings.has(r.countryCode)) return false;
+        seenTvRatings.add(r.countryCode);
+        return true;
+      });
+      if (uniqueTvRatings.length > 0) {
+        await tx.tvContentRating.createMany({ data: uniqueTvRatings });
       }
     }
 
@@ -489,8 +495,14 @@ async function syncTvSubResources(
     if (altTitles?.titles) {
       await tx.tvAlternativeTitle.deleteMany({ where: { tvSeriesId: series.id } });
       if (altTitles.titles.length > 0) {
+        const seenTvAlt = new Set<string>();
+        const uniqueTvAlt = altTitles.titles.filter((t: {iso_3166_1: string}) => {
+          if (!t.iso_3166_1 || seenTvAlt.has(t.iso_3166_1)) return false;
+          seenTvAlt.add(t.iso_3166_1);
+          return true;
+        });
         await tx.tvAlternativeTitle.createMany({
-          data: altTitles.titles.map((t) => ({
+          data: uniqueTvAlt.map((t: {iso_3166_1: string; title: string}) => ({
             tvSeriesId: series.id,
             countryCode: t.iso_3166_1,
             title: t.title,
@@ -641,8 +653,15 @@ async function syncTvSubResources(
             });
           }
         }
-        if (wpData.length > 0) {
-          await tx.tvSeriesWatchProvider.createMany({ data: wpData });
+        // Deduplicate by providerId
+        const seenTvProviders = new Set<number>();
+        const uniqueTvWp = wpData.filter((d) => {
+          if (seenTvProviders.has(d.providerId)) return false;
+          seenTvProviders.add(d.providerId);
+          return true;
+        });
+        if (uniqueTvWp.length > 0) {
+          await tx.tvSeriesWatchProvider.createMany({ data: uniqueTvWp });
         }
       }
     }
@@ -812,8 +831,12 @@ export async function syncTvSeries(
 
   try {
     // Phase 1: Collect all TV series IDs
-    const seriesIds = await collectTvSeriesIds(client, syncOptions, onProgress);
-    console.log(`${LOG_PREFIX} Collected ${seriesIds.length} unique TV series`);
+    const allSeriesIds = await collectTvSeriesIds(client, syncOptions, onProgress);
+    console.log(`${LOG_PREFIX} Collected ${allSeriesIds.length} unique TV series`);
+
+    // Apply limit if set
+    const seriesIds = syncOptions.limit > 0 ? allSeriesIds.slice(0, syncOptions.limit) : allSeriesIds;
+    console.log(`${LOG_PREFIX} Will process ${seriesIds.length} series`);
 
     // Phase 2: Sync in batches
     let totalSynced = 0;
@@ -976,5 +999,38 @@ export async function syncTvSeasonDetails(
       ],
       duration,
     };
+  }
+}
+
+// ============================================================
+// Public API: On-Demand Fetch (single TV series by TMDB ID)
+// ============================================================
+
+/**
+ * Fetch a single TV series from TMDB and upsert it with all nested data.
+ * Used for on-demand fetch when a user clicks on a series not yet in the DB.
+ * Returns the upserted series' internal DB ID, or null on failure.
+ */
+export async function fetchAndUpsertTvSeries(tmdbId: number): Promise<number | null> {
+  const client = new TmdbClient({ language: 'en-US' });
+
+  try {
+    const tmdbSeries = await client.getTvDetails(tmdbId, 'keywords,external_ids');
+    if (!tmdbSeries) return null;
+
+    await prisma.$transaction(
+      async (tx) => {
+        await upsertTvSeriesWithNestedData(tmdbSeries, tx);
+      },
+      { timeout: 30000 }
+    );
+
+    await syncTvSubResources(tmdbSeries, client);
+
+    const series = await prisma.tvSeries.findUnique({ where: { tmdbId } });
+    return series?.id ?? null;
+  } catch (error) {
+    console.error(`${LOG_PREFIX} On-demand fetch failed for TV series ${tmdbId}:`, error);
+    return null;
   }
 }

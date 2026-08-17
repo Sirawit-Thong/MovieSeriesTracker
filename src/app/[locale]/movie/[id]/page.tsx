@@ -3,6 +3,7 @@ import type {Metadata} from 'next';
 import {setRequestLocale, getTranslations} from 'next-intl/server';
 import {prisma} from '@/lib/db';
 import MovieDetail from '@/components/movie/MovieDetail';
+import {getLocalizedField} from '@/lib/ingestion/translation-sync';
 
 type MoviePageProps = {
   params: Promise<{locale: string; id: string}>;
@@ -120,25 +121,33 @@ async function getMovieById(id: number) {
         mediaType: 'tv' as const,
       })),
     ],
+    localized: {
+      title: getLocalizedField(translations, locale, 'title', movie.title),
+      overview: getLocalizedField(translations, locale, 'overview', movie.overview),
+      tagline: getLocalizedField(translations, locale, 'tagline', movie.tagline),
+    },
   };
 }
 
 export async function generateMetadata({
   params,
 }: MoviePageProps): Promise<Metadata> {
-  const {id} = await params;
+  const {locale, id} = await params;
   const movie = await getMovieById(Number(id));
 
   if (!movie) {
     return {title: 'Movie Not Found'};
   }
 
+  const title = movie.localized?.title ?? movie.title;
+  const overview = movie.localized?.overview ?? movie.overview;
+
   return {
-    title: `${movie.title} | Movie Series Tracker`,
-    description: movie.overview?.slice(0, 160) ?? movie.title,
+    title: `${title} | Movie Series Tracker`,
+    description: overview?.slice(0, 160) ?? title,
     openGraph: {
-      title: movie.title,
-      description: movie.overview ?? undefined,
+      title,
+      description: overview ?? undefined,
       images: movie.backdropPath
         ? [`https://image.tmdb.org/t/p/w1280${movie.backdropPath}`]
         : undefined,

@@ -189,8 +189,15 @@ async function syncMovieSubResources(
     if (altTitles?.titles) {
       await tx.movieAlternativeTitle.deleteMany({ where: { movieId: movie.id } });
       if (altTitles.titles.length > 0) {
+        // Deduplicate by countryCode — keep first occurrence
+        const seen = new Set<string>();
+        const unique = altTitles.titles.filter((t) => {
+          if (!t.iso_3166_1 || seen.has(t.iso_3166_1)) return false;
+          seen.add(t.iso_3166_1);
+          return true;
+        });
         await tx.movieAlternativeTitle.createMany({
-          data: altTitles.titles.map((t) => ({
+          data: unique.map((t) => ({
             movieId: movie.id,
             countryCode: t.iso_3166_1,
             title: t.title,
@@ -211,8 +218,15 @@ async function syncMovieSubResources(
           countryCode: r.iso_3166_1,
           rating: r.rating,
         }));
-      if (ratingData.length > 0) {
-        await tx.movieContentRating.createMany({ data: ratingData });
+      // Deduplicate by countryCode
+      const seenRatings = new Set<string>();
+      const uniqueRatings = ratingData.filter((r) => {
+        if (seenRatings.has(r.countryCode)) return false;
+        seenRatings.add(r.countryCode);
+        return true;
+      });
+      if (uniqueRatings.length > 0) {
+        await tx.movieContentRating.createMany({ data: uniqueRatings });
       }
     }
 
@@ -377,8 +391,15 @@ async function syncMovieSubResources(
             });
           }
         }
-        if (wpData.length > 0) {
-          await tx.movieWatchProvider.createMany({ data: wpData });
+        // Deduplicate by providerId — keep first occurrence
+        const seenProviders = new Set<number>();
+        const uniqueWp = wpData.filter((d) => {
+          if (seenProviders.has(d.providerId)) return false;
+          seenProviders.add(d.providerId);
+          return true;
+        });
+        if (uniqueWp.length > 0) {
+          await tx.movieWatchProvider.createMany({ data: uniqueWp });
         }
       }
     }
@@ -445,10 +466,12 @@ async function upsertMovie(tmdbMovie: TmdbMovie, client: TmdbClient): Promise<vo
         tmdbId: tmdbMovie.id,
         ...buildMovieCreateData(tmdbMovie),
         collectionId,
+        lastFetchedAt: new Date(),
       },
       update: {
         ...buildMovieCreateData(tmdbMovie),
         collectionId,
+        lastFetchedAt: new Date(),
       },
     });
 
@@ -672,4 +695,33 @@ export async function syncMovies(
 
 export async function syncMoviesIncremental(): Promise<SyncResult> {
   return syncMovies({ fullSync: false });
+}
+
+// ============================================================
+// Public API: On-Demand Fetch (single movie by TMDB ID)
+// ============================================================
+
+/**
+ * Fetch a single movie from TMDB and upsert it with all nested data.
+ * Used for on-demand fetch when a user clicks on a movie not yet in the DB.
+ * Returns the upserted movie's internal DB ID, or null on failure.
+ */
+export async function fetchAndUpsertMovie(tmdbId: number): Promise<number | null> {
+  const client = new TmdbClient({ language: 'en-US' });
+
+  try {
+    // Fetch full details from TMDB (same as batch sync)
+    const tmdbMovie = await client.getMovieDetails(tmdbId, 'keywords,external_ids');
+    if (!tmdbMovie) return null;
+
+    // Upsert movie + sub-resources (reuse existing functions)
+    await upsertMovie(tmdbMovie, client);
+
+    // Return the internal DB ID
+    const movie = await prisma.movie.findUnique({ where: { tmdbId } });
+    return movie?.id ?? null;
+  } catch (error) {
+    console.error(`${LOG_PREFIX} On-demand fetch failed for movie ${tmdbId}:`, error);
+    return null;
+  }
 }

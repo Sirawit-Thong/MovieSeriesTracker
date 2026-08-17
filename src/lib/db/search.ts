@@ -31,6 +31,7 @@ const TV_SERIES_SELECT = {
 /** Select fields for person search results. */
 const PERSON_SELECT = {
   id: true,
+  tmdbId: true,
   name: true,
   profilePath: true,
   popularity: true,

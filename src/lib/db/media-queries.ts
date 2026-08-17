@@ -185,7 +185,7 @@ export async function getPeopleList(limit = 20, offset = 0) {
   const [items, total] = await Promise.all([
     prisma.person.findMany({
       select: {
-        id: true, name: true, profilePath: true, popularity: true,
+        id: true, tmdbId: true, name: true, profilePath: true, popularity: true,
         knownForDepartment: true,
       },
       orderBy: {popularity: 'desc'},

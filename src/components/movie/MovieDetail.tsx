@@ -141,7 +141,13 @@ type MovieWithRelations = {
 };
 
 type MovieDetailProps = {
-  movie: MovieWithRelations;
+  movie: MovieWithRelations & {
+    localized?: {
+      title: string | null;
+      overview: string | null;
+      tagline: string | null;
+    };
+  };
   locale: string;
 };
 
@@ -180,6 +186,11 @@ function formatDate(date: Date | null): string {
  */
 export default function MovieDetail({movie, locale}: MovieDetailProps) {
   const t = useTranslations('Movie');
+
+  // Use localized fields when available, fallback to original
+  const displayTitle = movie.localized?.title ?? movie.title;
+  const displayOverview = movie.localized?.overview ?? movie.overview;
+  const displayTagline = movie.localized?.tagline ?? movie.tagline;
 
   const backdropSrc = movie.backdropPath
     ? `${TMDB_IMAGE_BASE}/w1280${movie.backdropPath}`
@@ -223,7 +234,7 @@ export default function MovieDetail({movie, locale}: MovieDetailProps) {
         {backdropSrc ? (
           <Image
             src={backdropSrc}
-            alt={movie.title}
+            alt={displayTitle}
             fill
             priority
             sizes="100vw"
@@ -244,7 +255,7 @@ export default function MovieDetail({movie, locale}: MovieDetailProps) {
             <div className="relative flex-shrink-0 w-[120px] md:w-[200px] aspect-[2/3] rounded-lg overflow-hidden shadow-2xl border border-white/10">
               <Image
                 src={posterSrc}
-                alt={movie.title}
+                alt={displayTitle}
                 fill
                 priority
                 sizes="(max-width: 768px) 120px, 200px"
@@ -256,16 +267,16 @@ export default function MovieDetail({movie, locale}: MovieDetailProps) {
           {/* Title block */}
           <div className="flex flex-col justify-end pb-2 min-w-0">
             <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
-              {movie.title}
+              {displayTitle}
             </h1>
-            {movie.originalTitle !== movie.title && (
+            {movie.originalTitle !== displayTitle && (
               <p className="text-sm md:text-base text-foreground/50 mt-1">
                 {movie.originalTitle}
               </p>
             )}
-            {movie.tagline && (
+            {displayTagline && (
               <p className="text-sm md:text-base italic text-foreground/60 mt-2">
-                &ldquo;{movie.tagline}&rdquo;
+                &ldquo;{displayTagline}&rdquo;
               </p>
             )}
 
@@ -304,13 +315,13 @@ export default function MovieDetail({movie, locale}: MovieDetailProps) {
           {/* Left: main content */}
           <div className="flex-1 min-w-0">
             {/* Overview */}
-            {movie.overview && (
+            {displayOverview && (
               <div className="mb-8">
                 <h2 className="text-lg font-semibold text-foreground mb-3">
                   {t('overview')}
                 </h2>
                 <p className="text-foreground/70 leading-relaxed whitespace-pre-line">
-                  {movie.overview}
+                  {displayOverview}
                 </p>
               </div>
             )}

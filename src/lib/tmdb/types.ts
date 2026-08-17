@@ -487,6 +487,8 @@ export interface TmdbTranslationData {
   title?: string;
   name?: string;
   overview?: string;
+  tagline?: string;
+  biography?: string;
 }
 
 export interface TmdbTranslation {

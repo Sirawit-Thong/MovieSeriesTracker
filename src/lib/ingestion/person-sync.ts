@@ -60,14 +60,15 @@ async function upsertPerson(person: TmdbPerson, client: TmdbClient): Promise<voi
 
   await prisma.person.upsert({
     where: { tmdbId: person.id },
-    create: { tmdbId: person.id, ...data },
-    update: data,
+    create: { tmdbId: person.id, ...data, lastFetchedAt: new Date() },
+    update: { ...data, lastFetchedAt: new Date() },
   });
 
-  // --- Sub-Resource Fetching (external IDs + images) ---
-  const [externalIdsResult, imagesResult] = await Promise.allSettled([
+  // --- Sub-Resource Fetching (external IDs + images + translations) ---
+  const [externalIdsResult, imagesResult, translationsResult] = await Promise.allSettled([
     client.getPersonExternalIds(person.id),
     client.getPersonImages(person.id),
+    client.getPersonTranslations(person.id),
   ]);
 
   // Find person's internal DB id
@@ -128,6 +129,24 @@ async function upsertPerson(person: TmdbPerson, client: TmdbClient): Promise<voi
       }));
       if (imgData.length > 0) {
         await tx.mediaImage.createMany({ data: imgData });
+      }
+    }
+
+    // --- Translations ---
+    const translations = translationsResult.status === 'fulfilled' ? translationsResult.value : null;
+    if (translations?.translations) {
+      await tx.translation.deleteMany({ where: { entityType: 'person', entityId: personRecord.id } });
+      const trData = translations.translations.map((t) => ({
+        entityType: 'person' as const,
+        entityId: personRecord.id,
+        iso6391: t.iso_639_1,
+        iso31661: t.iso_3166_1,
+        name: t.name,
+        englishName: t.english_name || null,
+        data: t.data ? JSON.stringify(t.data) : null,
+      }));
+      if (trData.length > 0) {
+        await tx.translation.createMany({ data: trData });
       }
     }
   });
@@ -279,4 +298,30 @@ export async function syncPersons(
 
 export async function syncPersonsIncremental(): Promise<SyncResult> {
   return syncPersons({ fullSync: false });
+}
+
+// ============================================================
+// Public API: On-Demand Fetch (single person by TMDB ID)
+// ============================================================
+
+/**
+ * Fetch a single person from TMDB and upsert them with all nested data.
+ * Used for on-demand fetch when a user clicks on a person not yet in the DB.
+ * Returns the upserted person's internal DB ID, or null on failure.
+ */
+export async function fetchAndUpsertPerson(tmdbId: number): Promise<number | null> {
+  const client = new TmdbClient({ language: 'en-US' });
+
+  try {
+    const tmdbPerson = await client.getPersonDetails(tmdbId);
+    if (!tmdbPerson) return null;
+
+    await upsertPerson(tmdbPerson, client);
+
+    const person = await prisma.person.findUnique({ where: { tmdbId } });
+    return person?.id ?? null;
+  } catch (error) {
+    console.error(`${LOG_PREFIX} On-demand fetch failed for person ${tmdbId}:`, error);
+    return null;
+  }
 }

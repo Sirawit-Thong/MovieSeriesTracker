@@ -178,6 +178,8 @@ model Movie {
   voteAverage      Float?    @map("vote_average")
   voteCount        Int?      @map("vote_count")
 
+  lastFetchedAt DateTime? @map("last_fetched_at")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -384,6 +386,8 @@ model TvSeries {
   type             String?
   voteAverage      Float?   @map("vote_average")
   voteCount        Int?     @map("vote_count")
+
+  lastFetchedAt DateTime? @map("last_fetched_at")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -608,6 +612,8 @@ model Person {
   placeOfBirth       String? @map("place_of_birth")
   popularity         Float?
   profilePath        String? @map("profile_path")
+
+  lastFetchedAt DateTime? @map("last_fetched_at")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

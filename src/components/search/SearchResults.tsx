@@ -15,6 +15,7 @@ type MovieResult = {
   voteAverage: number | null;
   releaseDate: string | null;
   overview: string | null;
+  source?: 'db' | 'tmdb';
 };
 
 /** A single TV series search result. */
@@ -26,15 +27,18 @@ type TvSeriesResult = {
   voteAverage: number | null;
   firstAirDate: string | null;
   overview: string | null;
+  source?: 'db' | 'tmdb';
 };
 
 /** A single person search result. */
 type PersonResult = {
   id: number;
+  tmdbId: number;
   name: string;
   profilePath: string | null;
   popularity: number | null;
   knownForDepartment: string | null;
+  source?: 'db' | 'tmdb';
 };
 
 /** Full search results data. */
@@ -220,9 +224,14 @@ function MovieResultCard({movie}: MovieResultCardProps) {
     ? new Date(movie.releaseDate).getFullYear()
     : null;
 
+  // Use TMDB lookup route for TMDB-only results, DB ID for local results
+  const href = movie.source === 'tmdb'
+    ? `/movie/tmdb/${movie.id}`
+    : `/movie/${movie.id}`;
+
   return (
     <Link
-      href={`/movie/${movie.id}`}
+      href={href}
       className="group relative flex flex-col rounded-lg overflow-hidden bg-surface border border-border hover:border-blue-500/50 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300 hover:scale-[1.03]"
     >
       {/* Poster */}
@@ -245,6 +254,13 @@ function MovieResultCard({movie}: MovieResultCardProps) {
         <div className="absolute top-2 left-2 bg-blue-500/80 backdrop-blur-sm text-[10px] font-bold uppercase tracking-wider text-white px-2 py-0.5 rounded">
           Movie
         </div>
+
+        {/* TMDB badge */}
+        {movie.source === 'tmdb' && (
+          <div className="absolute top-2 right-2 bg-orange-500/80 backdrop-blur-sm text-[10px] font-bold text-white px-2 py-0.5 rounded">
+            TMDB
+          </div>
+        )}
 
         {/* Rating badge */}
         {rating && (
@@ -287,9 +303,13 @@ function TvSeriesResultCard({series}: TvSeriesResultCardProps) {
     ? new Date(series.firstAirDate).getFullYear()
     : null;
 
+  const href = series.source === 'tmdb'
+    ? `/tv/tmdb/${series.id}`
+    : `/tv/${series.id}`;
+
   return (
     <Link
-      href={`/tv/${series.id}`}
+      href={href}
       className="group relative flex flex-col rounded-lg overflow-hidden bg-surface border border-border hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300 hover:scale-[1.03]"
     >
       {/* Poster */}
@@ -312,6 +332,13 @@ function TvSeriesResultCard({series}: TvSeriesResultCardProps) {
         <div className="absolute top-2 left-2 bg-purple-500/80 backdrop-blur-sm text-[10px] font-bold uppercase tracking-wider text-white px-2 py-0.5 rounded">
           TV
         </div>
+
+        {/* TMDB badge */}
+        {series.source === 'tmdb' && (
+          <div className="absolute top-2 right-2 bg-orange-500/80 backdrop-blur-sm text-[10px] font-bold text-white px-2 py-0.5 rounded">
+            TMDB
+          </div>
+        )}
 
         {/* Rating badge */}
         {rating && (
@@ -348,9 +375,13 @@ function PersonResultCard({person}: PersonResultCardProps) {
     ? `${TMDB_IMAGE_BASE}/w500${person.profilePath}`
     : null;
 
+  const href = person.source === 'tmdb'
+    ? `/person/tmdb/${person.tmdbId}`
+    : `/person/${person.tmdbId}`;
+
   return (
     <Link
-      href={`/person/${person.id}`}
+      href={href}
       className="group relative flex flex-col rounded-lg overflow-hidden bg-surface border border-border hover:border-green-500/50 hover:shadow-lg hover:shadow-green-500/10 transition-all duration-300 hover:scale-[1.03]"
     >
       {/* Profile image */}
@@ -373,6 +404,13 @@ function PersonResultCard({person}: PersonResultCardProps) {
         <div className="absolute top-2 left-2 bg-green-500/80 backdrop-blur-sm text-[10px] font-bold uppercase tracking-wider text-white px-2 py-0.5 rounded">
           Person
         </div>
+
+        {/* TMDB badge */}
+        {person.source === 'tmdb' && (
+          <div className="absolute top-2 right-2 bg-orange-500/80 backdrop-blur-sm text-[10px] font-bold text-white px-2 py-0.5 rounded">
+            TMDB
+          </div>
+        )}
       </div>
 
       {/* Name + department */}

@@ -3,6 +3,7 @@ import type {Metadata} from 'next';
 import {setRequestLocale} from 'next-intl/server';
 import {prisma} from '@/lib/db';
 import PersonDetail from '@/components/person/PersonDetail';
+import {getLocalizedField} from '@/lib/ingestion/translation-sync';
 
 type PersonPageProps = {
   params: Promise<{locale: string; id: string}>;

@@ -3,6 +3,7 @@ import type {Metadata} from 'next';
 import {setRequestLocale} from 'next-intl/server';
 import {prisma} from '@/lib/db';
 import TvDetail from '@/components/tv/TvDetail';
+import {getLocalizedField} from '@/lib/ingestion/translation-sync';
 
 type TvPageProps = {
   params: Promise<{locale: string; id: string}>;
@@ -13,7 +14,7 @@ type TvPageProps = {
  * Includes direct relations and polymorphic sub-resources.
  * Returns null if no series is found.
  */
-async function getTvSeriesById(id: number) {
+async function getTvSeriesById(id: number, locale: string) {
   const series = await prisma.tvSeries.findUnique({
     where: {id},
     include: {
@@ -130,25 +131,33 @@ async function getTvSeriesById(id: number) {
         mediaType: 'tv' as const,
       })),
     ],
+    localized: {
+      name: getLocalizedField(translations, locale, 'name', series.name),
+      overview: getLocalizedField(translations, locale, 'overview', series.overview),
+      tagline: getLocalizedField(translations, locale, 'tagline', series.tagline),
+    },
   };
 }
 
 export async function generateMetadata({
   params,
 }: TvPageProps): Promise<Metadata> {
-  const {id} = await params;
-  const series = await getTvSeriesById(Number(id));
+  const {locale, id} = await params;
+  const series = await getTvSeriesById(Number(id), locale);
 
   if (!series) {
     return {title: 'TV Series Not Found'};
   }
 
+  const name = series.localized?.name ?? series.name;
+  const overview = series.localized?.overview ?? series.overview;
+
   return {
-    title: `${series.name} | Movie Series Tracker`,
-    description: series.overview?.slice(0, 160) ?? series.name,
+    title: `${name} | Movie Series Tracker`,
+    description: overview?.slice(0, 160) ?? name,
     openGraph: {
-      title: series.name,
-      description: series.overview ?? undefined,
+      title: name,
+      description: overview ?? undefined,
       images: series.backdropPath
         ? [`https://image.tmdb.org/t/p/w1280${series.backdropPath}`]
         : undefined,
@@ -160,7 +169,7 @@ export default async function TvPage({params}: TvPageProps) {
   const {locale, id} = await params;
   setRequestLocale(locale);
 
-  const series = await getTvSeriesById(Number(id));
+  const series = await getTvSeriesById(Number(id), locale);
 
   if (!series) {
     notFound();

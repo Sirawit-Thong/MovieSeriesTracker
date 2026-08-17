@@ -73,6 +73,7 @@ export type MovieMinAggregateOutputType = {
   video: boolean | null
   voteAverage: number | null
   voteCount: number | null
+  lastFetchedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
   collectionId: number | null
@@ -101,6 +102,7 @@ export type MovieMaxAggregateOutputType = {
   video: boolean | null
   voteAverage: number | null
   voteCount: number | null
+  lastFetchedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
   collectionId: number | null
@@ -129,6 +131,7 @@ export type MovieCountAggregateOutputType = {
   video: number
   voteAverage: number
   voteCount: number
+  lastFetchedAt: number
   createdAt: number
   updatedAt: number
   collectionId: number
@@ -183,6 +186,7 @@ export type MovieMinAggregateInputType = {
   video?: true
   voteAverage?: true
   voteCount?: true
+  lastFetchedAt?: true
   createdAt?: true
   updatedAt?: true
   collectionId?: true
@@ -211,6 +215,7 @@ export type MovieMaxAggregateInputType = {
   video?: true
   voteAverage?: true
   voteCount?: true
+  lastFetchedAt?: true
   createdAt?: true
   updatedAt?: true
   collectionId?: true
@@ -239,6 +244,7 @@ export type MovieCountAggregateInputType = {
   video?: true
   voteAverage?: true
   voteCount?: true
+  lastFetchedAt?: true
   createdAt?: true
   updatedAt?: true
   collectionId?: true
@@ -354,6 +360,7 @@ export type MovieGroupByOutputType = {
   video: boolean
   voteAverage: number | null
   voteCount: number | null
+  lastFetchedAt: Date | null
   createdAt: Date
   updatedAt: Date
   collectionId: number | null
@@ -405,6 +412,7 @@ export type MovieWhereInput = {
   video?: Prisma.BoolFilter<"Movie"> | boolean
   voteAverage?: Prisma.FloatNullableFilter<"Movie"> | number | null
   voteCount?: Prisma.IntNullableFilter<"Movie"> | number | null
+  lastFetchedAt?: Prisma.DateTimeNullableFilter<"Movie"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Movie"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Movie"> | Date | string
   collectionId?: Prisma.IntNullableFilter<"Movie"> | number | null
@@ -446,6 +454,7 @@ export type MovieOrderByWithRelationInput = {
   video?: Prisma.SortOrder
   voteAverage?: Prisma.SortOrderInput | Prisma.SortOrder
   voteCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastFetchedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   collectionId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -490,6 +499,7 @@ export type MovieWhereUniqueInput = Prisma.AtLeast<{
   video?: Prisma.BoolFilter<"Movie"> | boolean
   voteAverage?: Prisma.FloatNullableFilter<"Movie"> | number | null
   voteCount?: Prisma.IntNullableFilter<"Movie"> | number | null
+  lastFetchedAt?: Prisma.DateTimeNullableFilter<"Movie"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Movie"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Movie"> | Date | string
   collectionId?: Prisma.IntNullableFilter<"Movie"> | number | null
@@ -531,6 +541,7 @@ export type MovieOrderByWithAggregationInput = {
   video?: Prisma.SortOrder
   voteAverage?: Prisma.SortOrderInput | Prisma.SortOrder
   voteCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastFetchedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   collectionId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -567,6 +578,7 @@ export type MovieScalarWhereWithAggregatesInput = {
   video?: Prisma.BoolWithAggregatesFilter<"Movie"> | boolean
   voteAverage?: Prisma.FloatNullableWithAggregatesFilter<"Movie"> | number | null
   voteCount?: Prisma.IntNullableWithAggregatesFilter<"Movie"> | number | null
+  lastFetchedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Movie"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Movie"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Movie"> | Date | string
   collectionId?: Prisma.IntNullableWithAggregatesFilter<"Movie"> | number | null
@@ -594,6 +606,7 @@ export type MovieCreateInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collection?: Prisma.CollectionCreateNestedOneWithoutMoviesInput
@@ -634,6 +647,7 @@ export type MovieUncheckedCreateInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collectionId?: number | null
@@ -673,6 +687,7 @@ export type MovieUpdateInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collection?: Prisma.CollectionUpdateOneWithoutMoviesNestedInput
@@ -713,6 +728,7 @@ export type MovieUncheckedUpdateInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collectionId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -753,6 +769,7 @@ export type MovieCreateManyInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collectionId?: number | null
@@ -780,6 +797,7 @@ export type MovieUpdateManyMutationInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -807,6 +825,7 @@ export type MovieUncheckedUpdateManyInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collectionId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -845,6 +864,7 @@ export type MovieCountOrderByAggregateInput = {
   video?: Prisma.SortOrder
   voteAverage?: Prisma.SortOrder
   voteCount?: Prisma.SortOrder
+  lastFetchedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   collectionId?: Prisma.SortOrder
@@ -885,6 +905,7 @@ export type MovieMaxOrderByAggregateInput = {
   video?: Prisma.SortOrder
   voteAverage?: Prisma.SortOrder
   voteCount?: Prisma.SortOrder
+  lastFetchedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   collectionId?: Prisma.SortOrder
@@ -913,6 +934,7 @@ export type MovieMinOrderByAggregateInput = {
   video?: Prisma.SortOrder
   voteAverage?: Prisma.SortOrder
   voteCount?: Prisma.SortOrder
+  lastFetchedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   collectionId?: Prisma.SortOrder
@@ -1192,6 +1214,7 @@ export type MovieCreateWithoutCollectionInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   genres?: Prisma.MovieGenreCreateNestedManyWithoutMovieInput
@@ -1231,6 +1254,7 @@ export type MovieUncheckedCreateWithoutCollectionInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   genres?: Prisma.MovieGenreUncheckedCreateNestedManyWithoutMovieInput
@@ -1299,6 +1323,7 @@ export type MovieScalarWhereInput = {
   video?: Prisma.BoolFilter<"Movie"> | boolean
   voteAverage?: Prisma.FloatNullableFilter<"Movie"> | number | null
   voteCount?: Prisma.IntNullableFilter<"Movie"> | number | null
+  lastFetchedAt?: Prisma.DateTimeNullableFilter<"Movie"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"Movie"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Movie"> | Date | string
   collectionId?: Prisma.IntNullableFilter<"Movie"> | number | null
@@ -1326,6 +1351,7 @@ export type MovieCreateWithoutGenresInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collection?: Prisma.CollectionCreateNestedOneWithoutMoviesInput
@@ -1365,6 +1391,7 @@ export type MovieUncheckedCreateWithoutGenresInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collectionId?: number | null
@@ -1419,6 +1446,7 @@ export type MovieUpdateWithoutGenresInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collection?: Prisma.CollectionUpdateOneWithoutMoviesNestedInput
@@ -1458,6 +1486,7 @@ export type MovieUncheckedUpdateWithoutGenresInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collectionId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1496,6 +1525,7 @@ export type MovieCreateWithoutKeywordsInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collection?: Prisma.CollectionCreateNestedOneWithoutMoviesInput
@@ -1535,6 +1565,7 @@ export type MovieUncheckedCreateWithoutKeywordsInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collectionId?: number | null
@@ -1589,6 +1620,7 @@ export type MovieUpdateWithoutKeywordsInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collection?: Prisma.CollectionUpdateOneWithoutMoviesNestedInput
@@ -1628,6 +1660,7 @@ export type MovieUncheckedUpdateWithoutKeywordsInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collectionId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1666,6 +1699,7 @@ export type MovieCreateWithoutWatchProvidersInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collection?: Prisma.CollectionCreateNestedOneWithoutMoviesInput
@@ -1705,6 +1739,7 @@ export type MovieUncheckedCreateWithoutWatchProvidersInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collectionId?: number | null
@@ -1759,6 +1794,7 @@ export type MovieUpdateWithoutWatchProvidersInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collection?: Prisma.CollectionUpdateOneWithoutMoviesNestedInput
@@ -1798,6 +1834,7 @@ export type MovieUncheckedUpdateWithoutWatchProvidersInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collectionId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1836,6 +1873,7 @@ export type MovieCreateWithoutProductionCompaniesInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collection?: Prisma.CollectionCreateNestedOneWithoutMoviesInput
@@ -1875,6 +1913,7 @@ export type MovieUncheckedCreateWithoutProductionCompaniesInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collectionId?: number | null
@@ -1929,6 +1968,7 @@ export type MovieUpdateWithoutProductionCompaniesInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collection?: Prisma.CollectionUpdateOneWithoutMoviesNestedInput
@@ -1968,6 +2008,7 @@ export type MovieUncheckedUpdateWithoutProductionCompaniesInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collectionId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2006,6 +2047,7 @@ export type MovieCreateWithoutProductionCountriesInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collection?: Prisma.CollectionCreateNestedOneWithoutMoviesInput
@@ -2045,6 +2087,7 @@ export type MovieUncheckedCreateWithoutProductionCountriesInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collectionId?: number | null
@@ -2099,6 +2142,7 @@ export type MovieUpdateWithoutProductionCountriesInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collection?: Prisma.CollectionUpdateOneWithoutMoviesNestedInput
@@ -2138,6 +2182,7 @@ export type MovieUncheckedUpdateWithoutProductionCountriesInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collectionId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2176,6 +2221,7 @@ export type MovieCreateWithoutSpokenLanguagesInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collection?: Prisma.CollectionCreateNestedOneWithoutMoviesInput
@@ -2215,6 +2261,7 @@ export type MovieUncheckedCreateWithoutSpokenLanguagesInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collectionId?: number | null
@@ -2269,6 +2316,7 @@ export type MovieUpdateWithoutSpokenLanguagesInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collection?: Prisma.CollectionUpdateOneWithoutMoviesNestedInput
@@ -2308,6 +2356,7 @@ export type MovieUncheckedUpdateWithoutSpokenLanguagesInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collectionId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2346,6 +2395,7 @@ export type MovieCreateWithoutCollectionMoviesInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collection?: Prisma.CollectionCreateNestedOneWithoutMoviesInput
@@ -2385,6 +2435,7 @@ export type MovieUncheckedCreateWithoutCollectionMoviesInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collectionId?: number | null
@@ -2439,6 +2490,7 @@ export type MovieUpdateWithoutCollectionMoviesInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collection?: Prisma.CollectionUpdateOneWithoutMoviesNestedInput
@@ -2478,6 +2530,7 @@ export type MovieUncheckedUpdateWithoutCollectionMoviesInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collectionId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2516,6 +2569,7 @@ export type MovieCreateWithoutReleaseDatesInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collection?: Prisma.CollectionCreateNestedOneWithoutMoviesInput
@@ -2555,6 +2609,7 @@ export type MovieUncheckedCreateWithoutReleaseDatesInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collectionId?: number | null
@@ -2609,6 +2664,7 @@ export type MovieUpdateWithoutReleaseDatesInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collection?: Prisma.CollectionUpdateOneWithoutMoviesNestedInput
@@ -2648,6 +2704,7 @@ export type MovieUncheckedUpdateWithoutReleaseDatesInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collectionId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2686,6 +2743,7 @@ export type MovieCreateWithoutContentRatingsInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collection?: Prisma.CollectionCreateNestedOneWithoutMoviesInput
@@ -2725,6 +2783,7 @@ export type MovieUncheckedCreateWithoutContentRatingsInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collectionId?: number | null
@@ -2779,6 +2838,7 @@ export type MovieUpdateWithoutContentRatingsInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collection?: Prisma.CollectionUpdateOneWithoutMoviesNestedInput
@@ -2818,6 +2878,7 @@ export type MovieUncheckedUpdateWithoutContentRatingsInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collectionId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2856,6 +2917,7 @@ export type MovieCreateWithoutAltTitlesInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collection?: Prisma.CollectionCreateNestedOneWithoutMoviesInput
@@ -2895,6 +2957,7 @@ export type MovieUncheckedCreateWithoutAltTitlesInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collectionId?: number | null
@@ -2949,6 +3012,7 @@ export type MovieUpdateWithoutAltTitlesInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collection?: Prisma.CollectionUpdateOneWithoutMoviesNestedInput
@@ -2988,6 +3052,7 @@ export type MovieUncheckedUpdateWithoutAltTitlesInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collectionId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3026,6 +3091,7 @@ export type MovieCreateWithoutCastCreditsInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collection?: Prisma.CollectionCreateNestedOneWithoutMoviesInput
@@ -3065,6 +3131,7 @@ export type MovieUncheckedCreateWithoutCastCreditsInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collectionId?: number | null
@@ -3119,6 +3186,7 @@ export type MovieUpdateWithoutCastCreditsInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collection?: Prisma.CollectionUpdateOneWithoutMoviesNestedInput
@@ -3158,6 +3226,7 @@ export type MovieUncheckedUpdateWithoutCastCreditsInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collectionId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3196,6 +3265,7 @@ export type MovieCreateWithoutCrewCreditsInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collection?: Prisma.CollectionCreateNestedOneWithoutMoviesInput
@@ -3235,6 +3305,7 @@ export type MovieUncheckedCreateWithoutCrewCreditsInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   collectionId?: number | null
@@ -3289,6 +3360,7 @@ export type MovieUpdateWithoutCrewCreditsInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collection?: Prisma.CollectionUpdateOneWithoutMoviesNestedInput
@@ -3328,6 +3400,7 @@ export type MovieUncheckedUpdateWithoutCrewCreditsInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   collectionId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3367,6 +3440,7 @@ export type MovieCreateManyCollectionInput = {
   video?: boolean
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -3393,6 +3467,7 @@ export type MovieUpdateWithoutCollectionInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   genres?: Prisma.MovieGenreUpdateManyWithoutMovieNestedInput
@@ -3432,6 +3507,7 @@ export type MovieUncheckedUpdateWithoutCollectionInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   genres?: Prisma.MovieGenreUncheckedUpdateManyWithoutMovieNestedInput
@@ -3471,6 +3547,7 @@ export type MovieUncheckedUpdateManyWithoutCollectionInput = {
   video?: Prisma.BoolFieldUpdateOperationsInput | boolean
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -3628,6 +3705,7 @@ export type MovieSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   video?: boolean
   voteAverage?: boolean
   voteCount?: boolean
+  lastFetchedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   collectionId?: boolean
@@ -3670,6 +3748,7 @@ export type MovieSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   video?: boolean
   voteAverage?: boolean
   voteCount?: boolean
+  lastFetchedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   collectionId?: boolean
@@ -3699,6 +3778,7 @@ export type MovieSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   video?: boolean
   voteAverage?: boolean
   voteCount?: boolean
+  lastFetchedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   collectionId?: boolean
@@ -3728,12 +3808,13 @@ export type MovieSelectScalar = {
   video?: boolean
   voteAverage?: boolean
   voteCount?: boolean
+  lastFetchedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   collectionId?: boolean
 }
 
-export type MovieOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tmdbId" | "adult" | "backdropPath" | "budget" | "homepage" | "imdbId" | "originCountry" | "originalLanguage" | "originalTitle" | "overview" | "popularity" | "posterPath" | "releaseDate" | "revenue" | "runtime" | "status" | "tagline" | "title" | "video" | "voteAverage" | "voteCount" | "createdAt" | "updatedAt" | "collectionId", ExtArgs["result"]["movie"]>
+export type MovieOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tmdbId" | "adult" | "backdropPath" | "budget" | "homepage" | "imdbId" | "originCountry" | "originalLanguage" | "originalTitle" | "overview" | "popularity" | "posterPath" | "releaseDate" | "revenue" | "runtime" | "status" | "tagline" | "title" | "video" | "voteAverage" | "voteCount" | "lastFetchedAt" | "createdAt" | "updatedAt" | "collectionId", ExtArgs["result"]["movie"]>
 export type MovieInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   collection?: boolean | Prisma.Movie$collectionArgs<ExtArgs>
   genres?: boolean | Prisma.Movie$genresArgs<ExtArgs>
@@ -3797,6 +3878,7 @@ export type $MoviePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     video: boolean
     voteAverage: number | null
     voteCount: number | null
+    lastFetchedAt: Date | null
     createdAt: Date
     updatedAt: Date
     collectionId: number | null
@@ -4258,6 +4340,7 @@ export interface MovieFieldRefs {
   readonly video: Prisma.FieldRef<"Movie", 'Boolean'>
   readonly voteAverage: Prisma.FieldRef<"Movie", 'Float'>
   readonly voteCount: Prisma.FieldRef<"Movie", 'Int'>
+  readonly lastFetchedAt: Prisma.FieldRef<"Movie", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Movie", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Movie", 'DateTime'>
   readonly collectionId: Prisma.FieldRef<"Movie", 'Int'>

@@ -75,6 +75,7 @@ export type TvSeriesMinAggregateOutputType = {
   type: string | null
   voteAverage: number | null
   voteCount: number | null
+  lastFetchedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
   lastEpisodeToAirId: number | null
@@ -106,6 +107,7 @@ export type TvSeriesMaxAggregateOutputType = {
   type: string | null
   voteAverage: number | null
   voteCount: number | null
+  lastFetchedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
   lastEpisodeToAirId: number | null
@@ -137,6 +139,7 @@ export type TvSeriesCountAggregateOutputType = {
   type: number
   voteAverage: number
   voteCount: number
+  lastFetchedAt: number
   createdAt: number
   updatedAt: number
   lastEpisodeToAirId: number
@@ -194,6 +197,7 @@ export type TvSeriesMinAggregateInputType = {
   type?: true
   voteAverage?: true
   voteCount?: true
+  lastFetchedAt?: true
   createdAt?: true
   updatedAt?: true
   lastEpisodeToAirId?: true
@@ -225,6 +229,7 @@ export type TvSeriesMaxAggregateInputType = {
   type?: true
   voteAverage?: true
   voteCount?: true
+  lastFetchedAt?: true
   createdAt?: true
   updatedAt?: true
   lastEpisodeToAirId?: true
@@ -256,6 +261,7 @@ export type TvSeriesCountAggregateInputType = {
   type?: true
   voteAverage?: true
   voteCount?: true
+  lastFetchedAt?: true
   createdAt?: true
   updatedAt?: true
   lastEpisodeToAirId?: true
@@ -374,6 +380,7 @@ export type TvSeriesGroupByOutputType = {
   type: string | null
   voteAverage: number | null
   voteCount: number | null
+  lastFetchedAt: Date | null
   createdAt: Date
   updatedAt: Date
   lastEpisodeToAirId: number | null
@@ -428,6 +435,7 @@ export type TvSeriesWhereInput = {
   type?: Prisma.StringNullableFilter<"TvSeries"> | string | null
   voteAverage?: Prisma.FloatNullableFilter<"TvSeries"> | number | null
   voteCount?: Prisma.IntNullableFilter<"TvSeries"> | number | null
+  lastFetchedAt?: Prisma.DateTimeNullableFilter<"TvSeries"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"TvSeries"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"TvSeries"> | Date | string
   lastEpisodeToAirId?: Prisma.IntNullableFilter<"TvSeries"> | number | null
@@ -474,6 +482,7 @@ export type TvSeriesOrderByWithRelationInput = {
   type?: Prisma.SortOrderInput | Prisma.SortOrder
   voteAverage?: Prisma.SortOrderInput | Prisma.SortOrder
   voteCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastFetchedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   lastEpisodeToAirId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -523,6 +532,7 @@ export type TvSeriesWhereUniqueInput = Prisma.AtLeast<{
   type?: Prisma.StringNullableFilter<"TvSeries"> | string | null
   voteAverage?: Prisma.FloatNullableFilter<"TvSeries"> | number | null
   voteCount?: Prisma.IntNullableFilter<"TvSeries"> | number | null
+  lastFetchedAt?: Prisma.DateTimeNullableFilter<"TvSeries"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"TvSeries"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"TvSeries"> | Date | string
   lastEpisodeToAirId?: Prisma.IntNullableFilter<"TvSeries"> | number | null
@@ -569,6 +579,7 @@ export type TvSeriesOrderByWithAggregationInput = {
   type?: Prisma.SortOrderInput | Prisma.SortOrder
   voteAverage?: Prisma.SortOrderInput | Prisma.SortOrder
   voteCount?: Prisma.SortOrderInput | Prisma.SortOrder
+  lastFetchedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   lastEpisodeToAirId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -608,6 +619,7 @@ export type TvSeriesScalarWhereWithAggregatesInput = {
   type?: Prisma.StringNullableWithAggregatesFilter<"TvSeries"> | string | null
   voteAverage?: Prisma.FloatNullableWithAggregatesFilter<"TvSeries"> | number | null
   voteCount?: Prisma.IntNullableWithAggregatesFilter<"TvSeries"> | number | null
+  lastFetchedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"TvSeries"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"TvSeries"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"TvSeries"> | Date | string
   lastEpisodeToAirId?: Prisma.IntNullableWithAggregatesFilter<"TvSeries"> | number | null
@@ -638,6 +650,7 @@ export type TvSeriesCreateInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   createdBy?: Prisma.TvCreatedByCreateNestedManyWithoutTvSeriesInput
@@ -682,6 +695,7 @@ export type TvSeriesUncheckedCreateInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lastEpisodeToAirId?: number | null
@@ -725,6 +739,7 @@ export type TvSeriesUpdateInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.TvCreatedByUpdateManyWithoutTvSeriesNestedInput
@@ -769,6 +784,7 @@ export type TvSeriesUncheckedUpdateInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastEpisodeToAirId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -813,6 +829,7 @@ export type TvSeriesCreateManyInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lastEpisodeToAirId?: number | null
@@ -843,6 +860,7 @@ export type TvSeriesUpdateManyMutationInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -872,6 +890,7 @@ export type TvSeriesUncheckedUpdateManyInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastEpisodeToAirId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -908,6 +927,7 @@ export type TvSeriesCountOrderByAggregateInput = {
   type?: Prisma.SortOrder
   voteAverage?: Prisma.SortOrder
   voteCount?: Prisma.SortOrder
+  lastFetchedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   lastEpisodeToAirId?: Prisma.SortOrder
@@ -951,6 +971,7 @@ export type TvSeriesMaxOrderByAggregateInput = {
   type?: Prisma.SortOrder
   voteAverage?: Prisma.SortOrder
   voteCount?: Prisma.SortOrder
+  lastFetchedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   lastEpisodeToAirId?: Prisma.SortOrder
@@ -982,6 +1003,7 @@ export type TvSeriesMinOrderByAggregateInput = {
   type?: Prisma.SortOrder
   voteAverage?: Prisma.SortOrder
   voteCount?: Prisma.SortOrder
+  lastFetchedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   lastEpisodeToAirId?: Prisma.SortOrder
@@ -1313,6 +1335,7 @@ export type TvSeriesCreateWithoutCreatedByInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   seasons?: Prisma.TvSeasonCreateNestedManyWithoutTvSeriesInput
@@ -1356,6 +1379,7 @@ export type TvSeriesUncheckedCreateWithoutCreatedByInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lastEpisodeToAirId?: number | null
@@ -1414,6 +1438,7 @@ export type TvSeriesUpdateWithoutCreatedByInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   seasons?: Prisma.TvSeasonUpdateManyWithoutTvSeriesNestedInput
@@ -1457,6 +1482,7 @@ export type TvSeriesUncheckedUpdateWithoutCreatedByInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastEpisodeToAirId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1499,6 +1525,7 @@ export type TvSeriesCreateWithoutSeasonsInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   createdBy?: Prisma.TvCreatedByCreateNestedManyWithoutTvSeriesInput
@@ -1542,6 +1569,7 @@ export type TvSeriesUncheckedCreateWithoutSeasonsInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lastEpisodeToAirId?: number | null
@@ -1600,6 +1628,7 @@ export type TvSeriesUpdateWithoutSeasonsInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.TvCreatedByUpdateManyWithoutTvSeriesNestedInput
@@ -1643,6 +1672,7 @@ export type TvSeriesUncheckedUpdateWithoutSeasonsInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastEpisodeToAirId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -1685,6 +1715,7 @@ export type TvSeriesCreateWithoutLastEpisodeToAirInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   createdBy?: Prisma.TvCreatedByCreateNestedManyWithoutTvSeriesInput
@@ -1728,6 +1759,7 @@ export type TvSeriesUncheckedCreateWithoutLastEpisodeToAirInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   nextEpisodeToAirId?: number | null
@@ -1780,6 +1812,7 @@ export type TvSeriesCreateWithoutNextEpisodeToAirInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   createdBy?: Prisma.TvCreatedByCreateNestedManyWithoutTvSeriesInput
@@ -1823,6 +1856,7 @@ export type TvSeriesUncheckedCreateWithoutNextEpisodeToAirInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lastEpisodeToAirId?: number | null
@@ -1895,6 +1929,7 @@ export type TvSeriesScalarWhereInput = {
   type?: Prisma.StringNullableFilter<"TvSeries"> | string | null
   voteAverage?: Prisma.FloatNullableFilter<"TvSeries"> | number | null
   voteCount?: Prisma.IntNullableFilter<"TvSeries"> | number | null
+  lastFetchedAt?: Prisma.DateTimeNullableFilter<"TvSeries"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"TvSeries"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"TvSeries"> | Date | string
   lastEpisodeToAirId?: Prisma.IntNullableFilter<"TvSeries"> | number | null
@@ -1941,6 +1976,7 @@ export type TvSeriesCreateWithoutGenresInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   createdBy?: Prisma.TvCreatedByCreateNestedManyWithoutTvSeriesInput
@@ -1984,6 +2020,7 @@ export type TvSeriesUncheckedCreateWithoutGenresInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lastEpisodeToAirId?: number | null
@@ -2042,6 +2079,7 @@ export type TvSeriesUpdateWithoutGenresInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.TvCreatedByUpdateManyWithoutTvSeriesNestedInput
@@ -2085,6 +2123,7 @@ export type TvSeriesUncheckedUpdateWithoutGenresInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastEpisodeToAirId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2127,6 +2166,7 @@ export type TvSeriesCreateWithoutNetworksInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   createdBy?: Prisma.TvCreatedByCreateNestedManyWithoutTvSeriesInput
@@ -2170,6 +2210,7 @@ export type TvSeriesUncheckedCreateWithoutNetworksInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lastEpisodeToAirId?: number | null
@@ -2228,6 +2269,7 @@ export type TvSeriesUpdateWithoutNetworksInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.TvCreatedByUpdateManyWithoutTvSeriesNestedInput
@@ -2271,6 +2313,7 @@ export type TvSeriesUncheckedUpdateWithoutNetworksInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastEpisodeToAirId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2313,6 +2356,7 @@ export type TvSeriesCreateWithoutProductionCompaniesInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   createdBy?: Prisma.TvCreatedByCreateNestedManyWithoutTvSeriesInput
@@ -2356,6 +2400,7 @@ export type TvSeriesUncheckedCreateWithoutProductionCompaniesInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lastEpisodeToAirId?: number | null
@@ -2414,6 +2459,7 @@ export type TvSeriesUpdateWithoutProductionCompaniesInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.TvCreatedByUpdateManyWithoutTvSeriesNestedInput
@@ -2457,6 +2503,7 @@ export type TvSeriesUncheckedUpdateWithoutProductionCompaniesInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastEpisodeToAirId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2499,6 +2546,7 @@ export type TvSeriesCreateWithoutProductionCountriesInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   createdBy?: Prisma.TvCreatedByCreateNestedManyWithoutTvSeriesInput
@@ -2542,6 +2590,7 @@ export type TvSeriesUncheckedCreateWithoutProductionCountriesInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lastEpisodeToAirId?: number | null
@@ -2600,6 +2649,7 @@ export type TvSeriesUpdateWithoutProductionCountriesInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.TvCreatedByUpdateManyWithoutTvSeriesNestedInput
@@ -2643,6 +2693,7 @@ export type TvSeriesUncheckedUpdateWithoutProductionCountriesInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastEpisodeToAirId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2685,6 +2736,7 @@ export type TvSeriesCreateWithoutSpokenLanguagesInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   createdBy?: Prisma.TvCreatedByCreateNestedManyWithoutTvSeriesInput
@@ -2728,6 +2780,7 @@ export type TvSeriesUncheckedCreateWithoutSpokenLanguagesInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lastEpisodeToAirId?: number | null
@@ -2786,6 +2839,7 @@ export type TvSeriesUpdateWithoutSpokenLanguagesInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.TvCreatedByUpdateManyWithoutTvSeriesNestedInput
@@ -2829,6 +2883,7 @@ export type TvSeriesUncheckedUpdateWithoutSpokenLanguagesInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastEpisodeToAirId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -2871,6 +2926,7 @@ export type TvSeriesCreateWithoutContentRatingsInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   createdBy?: Prisma.TvCreatedByCreateNestedManyWithoutTvSeriesInput
@@ -2914,6 +2970,7 @@ export type TvSeriesUncheckedCreateWithoutContentRatingsInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lastEpisodeToAirId?: number | null
@@ -2972,6 +3029,7 @@ export type TvSeriesUpdateWithoutContentRatingsInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.TvCreatedByUpdateManyWithoutTvSeriesNestedInput
@@ -3015,6 +3073,7 @@ export type TvSeriesUncheckedUpdateWithoutContentRatingsInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastEpisodeToAirId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3057,6 +3116,7 @@ export type TvSeriesCreateWithoutAltTitlesInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   createdBy?: Prisma.TvCreatedByCreateNestedManyWithoutTvSeriesInput
@@ -3100,6 +3160,7 @@ export type TvSeriesUncheckedCreateWithoutAltTitlesInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lastEpisodeToAirId?: number | null
@@ -3158,6 +3219,7 @@ export type TvSeriesUpdateWithoutAltTitlesInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.TvCreatedByUpdateManyWithoutTvSeriesNestedInput
@@ -3201,6 +3263,7 @@ export type TvSeriesUncheckedUpdateWithoutAltTitlesInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastEpisodeToAirId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3243,6 +3306,7 @@ export type TvSeriesCreateWithoutEpisodeGroupsInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   createdBy?: Prisma.TvCreatedByCreateNestedManyWithoutTvSeriesInput
@@ -3286,6 +3350,7 @@ export type TvSeriesUncheckedCreateWithoutEpisodeGroupsInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lastEpisodeToAirId?: number | null
@@ -3344,6 +3409,7 @@ export type TvSeriesUpdateWithoutEpisodeGroupsInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.TvCreatedByUpdateManyWithoutTvSeriesNestedInput
@@ -3387,6 +3453,7 @@ export type TvSeriesUncheckedUpdateWithoutEpisodeGroupsInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastEpisodeToAirId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3429,6 +3496,7 @@ export type TvSeriesCreateWithoutCastCreditsInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   createdBy?: Prisma.TvCreatedByCreateNestedManyWithoutTvSeriesInput
@@ -3472,6 +3540,7 @@ export type TvSeriesUncheckedCreateWithoutCastCreditsInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lastEpisodeToAirId?: number | null
@@ -3530,6 +3599,7 @@ export type TvSeriesUpdateWithoutCastCreditsInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.TvCreatedByUpdateManyWithoutTvSeriesNestedInput
@@ -3573,6 +3643,7 @@ export type TvSeriesUncheckedUpdateWithoutCastCreditsInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastEpisodeToAirId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3615,6 +3686,7 @@ export type TvSeriesCreateWithoutCrewCreditsInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   createdBy?: Prisma.TvCreatedByCreateNestedManyWithoutTvSeriesInput
@@ -3658,6 +3730,7 @@ export type TvSeriesUncheckedCreateWithoutCrewCreditsInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lastEpisodeToAirId?: number | null
@@ -3716,6 +3789,7 @@ export type TvSeriesUpdateWithoutCrewCreditsInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.TvCreatedByUpdateManyWithoutTvSeriesNestedInput
@@ -3759,6 +3833,7 @@ export type TvSeriesUncheckedUpdateWithoutCrewCreditsInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastEpisodeToAirId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3801,6 +3876,7 @@ export type TvSeriesCreateWithoutWatchProvidersInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   createdBy?: Prisma.TvCreatedByCreateNestedManyWithoutTvSeriesInput
@@ -3844,6 +3920,7 @@ export type TvSeriesUncheckedCreateWithoutWatchProvidersInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lastEpisodeToAirId?: number | null
@@ -3902,6 +3979,7 @@ export type TvSeriesUpdateWithoutWatchProvidersInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.TvCreatedByUpdateManyWithoutTvSeriesNestedInput
@@ -3945,6 +4023,7 @@ export type TvSeriesUncheckedUpdateWithoutWatchProvidersInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastEpisodeToAirId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -3988,6 +4067,7 @@ export type TvSeriesCreateManyLastEpisodeToAirInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   nextEpisodeToAirId?: number | null
@@ -4018,6 +4098,7 @@ export type TvSeriesCreateManyNextEpisodeToAirInput = {
   type?: string | null
   voteAverage?: number | null
   voteCount?: number | null
+  lastFetchedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   lastEpisodeToAirId?: number | null
@@ -4047,6 +4128,7 @@ export type TvSeriesUpdateWithoutLastEpisodeToAirInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.TvCreatedByUpdateManyWithoutTvSeriesNestedInput
@@ -4090,6 +4172,7 @@ export type TvSeriesUncheckedUpdateWithoutLastEpisodeToAirInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   nextEpisodeToAirId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -4133,6 +4216,7 @@ export type TvSeriesUncheckedUpdateManyWithoutLastEpisodeToAirInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   nextEpisodeToAirId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -4162,6 +4246,7 @@ export type TvSeriesUpdateWithoutNextEpisodeToAirInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdBy?: Prisma.TvCreatedByUpdateManyWithoutTvSeriesNestedInput
@@ -4205,6 +4290,7 @@ export type TvSeriesUncheckedUpdateWithoutNextEpisodeToAirInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastEpisodeToAirId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -4248,6 +4334,7 @@ export type TvSeriesUncheckedUpdateManyWithoutNextEpisodeToAirInput = {
   type?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   voteAverage?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   voteCount?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  lastFetchedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   lastEpisodeToAirId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -4417,6 +4504,7 @@ export type TvSeriesSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   type?: boolean
   voteAverage?: boolean
   voteCount?: boolean
+  lastFetchedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   lastEpisodeToAirId?: boolean
@@ -4464,6 +4552,7 @@ export type TvSeriesSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   type?: boolean
   voteAverage?: boolean
   voteCount?: boolean
+  lastFetchedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   lastEpisodeToAirId?: boolean
@@ -4497,6 +4586,7 @@ export type TvSeriesSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   type?: boolean
   voteAverage?: boolean
   voteCount?: boolean
+  lastFetchedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   lastEpisodeToAirId?: boolean
@@ -4530,13 +4620,14 @@ export type TvSeriesSelectScalar = {
   type?: boolean
   voteAverage?: boolean
   voteCount?: boolean
+  lastFetchedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   lastEpisodeToAirId?: boolean
   nextEpisodeToAirId?: boolean
 }
 
-export type TvSeriesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tmdbId" | "adult" | "backdropPath" | "firstAirDate" | "homepage" | "inProduction" | "languages" | "episodeRunTime" | "lastAirDate" | "name" | "numberOfEpisodes" | "numberOfSeasons" | "originCountry" | "originalLanguage" | "originalName" | "overview" | "popularity" | "posterPath" | "status" | "tagline" | "type" | "voteAverage" | "voteCount" | "createdAt" | "updatedAt" | "lastEpisodeToAirId" | "nextEpisodeToAirId", ExtArgs["result"]["tvSeries"]>
+export type TvSeriesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tmdbId" | "adult" | "backdropPath" | "firstAirDate" | "homepage" | "inProduction" | "languages" | "episodeRunTime" | "lastAirDate" | "name" | "numberOfEpisodes" | "numberOfSeasons" | "originCountry" | "originalLanguage" | "originalName" | "overview" | "popularity" | "posterPath" | "status" | "tagline" | "type" | "voteAverage" | "voteCount" | "lastFetchedAt" | "createdAt" | "updatedAt" | "lastEpisodeToAirId" | "nextEpisodeToAirId", ExtArgs["result"]["tvSeries"]>
 export type TvSeriesInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   createdBy?: boolean | Prisma.TvSeries$createdByArgs<ExtArgs>
   seasons?: boolean | Prisma.TvSeries$seasonsArgs<ExtArgs>
@@ -4608,6 +4699,7 @@ export type $TvSeriesPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     type: string | null
     voteAverage: number | null
     voteCount: number | null
+    lastFetchedAt: Date | null
     createdAt: Date
     updatedAt: Date
     lastEpisodeToAirId: number | null
@@ -5074,6 +5166,7 @@ export interface TvSeriesFieldRefs {
   readonly type: Prisma.FieldRef<"TvSeries", 'String'>
   readonly voteAverage: Prisma.FieldRef<"TvSeries", 'Float'>
   readonly voteCount: Prisma.FieldRef<"TvSeries", 'Int'>
+  readonly lastFetchedAt: Prisma.FieldRef<"TvSeries", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"TvSeries", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"TvSeries", 'DateTime'>
   readonly lastEpisodeToAirId: Prisma.FieldRef<"TvSeries", 'Int'>

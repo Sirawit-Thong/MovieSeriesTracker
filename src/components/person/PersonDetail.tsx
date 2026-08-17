@@ -109,7 +109,12 @@ export type PersonWithRelations = {
 };
 
 type PersonDetailProps = {
-  person: PersonWithRelations;
+  person: PersonWithRelations & {
+    localized?: {
+      name: string | null;
+      biography: string | null;
+    };
+  };
   locale: string;
 };
 
@@ -128,6 +133,9 @@ function getKnownFor(credits: PersonWithRelations['combinedCredits']) {
  */
 export default function PersonDetail({person, locale}: PersonDetailProps) {
   const t = useTranslations('Person');
+
+  const displayName = person.localized?.name ?? person.name;
+  const displayBiography = person.localized?.biography ?? person.biography;
 
   const profileSrc = person.profilePath
     ? `${TMDB_IMAGE_BASE}/w500${person.profilePath}`
@@ -154,7 +162,7 @@ export default function PersonDetail({person, locale}: PersonDetailProps) {
               {profileSrc ? (
                 <Image
                   src={profileSrc}
-                  alt={person.name}
+                  alt={displayName}
                   fill
                   priority
                   sizes="(max-width: 1024px) 300px, 300px"
@@ -163,7 +171,7 @@ export default function PersonDetail({person, locale}: PersonDetailProps) {
               ) : (
                 <div className="w-full h-full bg-surface flex items-center justify-center">
                   <span className="text-6xl text-foreground/20 font-bold">
-                    {person.name.charAt(0)}
+                    {displayName.charAt(0)}
                   </span>
                 </div>
               )}
@@ -173,7 +181,7 @@ export default function PersonDetail({person, locale}: PersonDetailProps) {
           {/* Name + Biography */}
           <div className="flex-1 min-w-0">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
-              {person.name}
+              {displayName}
             </h1>
 
             {/* Also known as aliases */}
@@ -206,13 +214,13 @@ export default function PersonDetail({person, locale}: PersonDetailProps) {
             </div>
 
             {/* Biography */}
-            {person.biography && (
+            {displayBiography && (
               <div className="mt-8">
                 <h2 className="text-lg font-semibold text-foreground mb-3">
                   {t('biography')}
                 </h2>
                 <p className="text-foreground/70 leading-relaxed whitespace-pre-line">
-                  {person.biography}
+                  {displayBiography}
                 </p>
               </div>
             )}
