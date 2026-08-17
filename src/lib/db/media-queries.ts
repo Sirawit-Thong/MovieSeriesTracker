@@ -119,6 +119,85 @@ export async function getTopRatedTvSeries(limit = 20) {
 }
 
 // ============================================================
+// People Queries
+// ============================================================
+
+/**
+ * Get popular people sorted by popularity descending.
+ */
+export async function getPopularPeople(limit = 20) {
+  return prisma.person.findMany({
+    select: {
+      id: true,
+      name: true,
+      profilePath: true,
+      popularity: true,
+      knownForDepartment: true,
+    },
+    orderBy: {popularity: 'desc'},
+    take: limit,
+  });
+}
+
+// ============================================================
+// Listing Queries (paginated)
+// ============================================================
+
+/**
+ * Get movies for the listing page with pagination.
+ */
+export async function getMoviesList(limit = 20, offset = 0) {
+  const [items, total] = await Promise.all([
+    prisma.movie.findMany({
+      select: {...MEDIA_SELECT, releaseDate: true},
+      orderBy: {popularity: 'desc'},
+      take: limit,
+      skip: offset,
+    }),
+    prisma.movie.count(),
+  ]);
+  return {items, total};
+}
+
+/**
+ * Get TV series for the listing page with pagination.
+ */
+export async function getTvSeriesList(limit = 20, offset = 0) {
+  const [items, total] = await Promise.all([
+    prisma.tvSeries.findMany({
+      select: {
+        id: true, name: true, posterPath: true, backdropPath: true,
+        voteAverage: true, overview: true, firstAirDate: true,
+      },
+      orderBy: {popularity: 'desc'},
+      take: limit,
+      skip: offset,
+    }),
+    prisma.tvSeries.count(),
+  ]);
+  return {items, total};
+}
+
+/**
+ * Get people for the listing page with pagination.
+ */
+export async function getPeopleList(limit = 20, offset = 0) {
+  const [items, total] = await Promise.all([
+    prisma.person.findMany({
+      select: {
+        id: true, name: true, profilePath: true, popularity: true,
+        knownForDepartment: true,
+      },
+      orderBy: {popularity: 'desc'},
+      take: limit,
+      skip: offset,
+    }),
+    prisma.person.count(),
+  ]);
+  return {items, total};
+}
+
+// ============================================================
 // Unified Types
 // ============================================================
 
