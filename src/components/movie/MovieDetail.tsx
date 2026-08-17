@@ -11,6 +11,7 @@ import VideoList from '@/components/media/VideoList';
 import ExternalLinks from '@/components/media/ExternalLinks';
 import RecommendationList from '@/components/media/RecommendationList';
 import {translateJob, translateDepartment, translateStatus} from '@/lib/crew-translations';
+import AddToLibraryButton from '@/components/library/AddToLibraryButton';
 
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
 
@@ -305,6 +306,11 @@ export default function MovieDetail({movie, locale}: MovieDetailProps) {
                   {translateStatus(movie.status, locale)}
                 </span>
               )}
+            </div>
+
+            {/* Add to Library button */}
+            <div className="mt-4">
+              <AddToLibraryButton entityType="MOVIE" entityId={movie.id} />
             </div>
           </div>
         </div>

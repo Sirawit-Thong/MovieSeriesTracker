@@ -5,8 +5,7 @@
     "tvSeries": "TV Series",
     "people": "People",
     "search": "Search",
-    "library": "My Library",
-    "watchlists": "Watchlists"
+    "library": "My Library"
   },
   "Common": {
     "loading": "Loading...",
@@ -47,6 +46,7 @@
     "backToHome": "Back to Home"
   },
   "Tv": {
+    "addToLibrary": "Add to My Library",
     "overview": "Overview",
     "genres": "Genres",
     "cast": "Cast",
@@ -85,6 +85,7 @@
     "title": "Title"
   },
   "Movie": {
+    "addToLibrary": "Add to My Library",
     "overview": "Overview",
     "genres": "Genres",
     "financial": "Financial",
@@ -160,7 +161,16 @@
     "sortUpdated": "Last Updated",
     "sortRating": "Rating",
     "sortTitle": "Title",
-    "episodeProgress": "Ep {current} / {total}"
+    "episodeProgress": "Ep {current} / {total}",
+    "searchTmdb": "Search movies and TV series...",
+    "searchTmdbPlaceholder": "Search TMDB to add to your library...",
+    "addToLibrary": "Add to My Library",
+    "inLibrary": "In Library",
+    "added": "Added!",
+    "changeStatus": "Change Status",
+    "removeFromLibrary": "Remove from Library",
+    "confirmRemove": "Remove this from your library?",
+    "saved": "Saved to library"
   },
   "Watchlist": {
     "title": "My Watchlists",

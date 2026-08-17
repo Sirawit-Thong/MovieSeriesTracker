@@ -1,5 +1,5 @@
 // Library API Route
-// GET /api/library — list user's annotated media with details
+// GET /api/library — list user's annotated media + watchlist items with details
 
 import {NextResponse} from 'next/server';
 import {auth} from '@/lib/auth/config';
@@ -18,6 +18,7 @@ export async function GET(request: Request) {
   const search = searchParams.get('search');
   const sortBy = searchParams.get('sortBy') ?? 'updatedAt';
 
+  // Fetch annotations
   const annotations = await prisma.userAnnotation.findMany({
     where: {
       userId: session.user.id,
@@ -31,31 +32,63 @@ export async function GET(request: Request) {
         : {updatedAt: 'desc'},
   });
 
-  // Batch fetch movie/TV data
-  const movieIds = annotations
+  // Fetch watchlist items (treated as WANT_TO_WATCH if not already annotated)
+  const watchlistItems = await prisma.watchlistItem.findMany({
+    where: {
+      watchlist: {userId: session.user.id},
+      ...(entityType ? {entityType: entityType === 'MOVIE' ? 'MOVIE' : 'TV'} : {}),
+    },
+    include: {watchlist: {select: {name: true}}},
+  });
+
+  // Build set of already-annotated entity keys to avoid duplicates
+  const annotatedKeys = new Set(
+    annotations.map((a) => `${a.entityType}:${a.entityId}`)
+  );
+
+  // Filter out watchlist items that are already annotated
+  const unannotatedWatchlistItems = watchlistItems.filter(
+    (wi) => !annotatedKeys.has(`${wi.entityType}:${wi.entityId}`)
+  );
+
+  // Batch fetch movie/TV data for annotations
+  const annMovieIds = annotations
     .filter((a) => a.entityType === 'MOVIE')
     .map((a) => a.entityId);
-  const tvIds = annotations
+  const annTvIds = annotations
     .filter((a) => a.entityType === 'TV')
     .map((a) => a.entityId);
 
+  // Batch fetch movie/TV data for unannotated watchlist items
+  const wlMovieIds = unannotatedWatchlistItems
+    .filter((a) => a.entityType === 'MOVIE')
+    .map((a) => a.entityId);
+  const wlTvIds = unannotatedWatchlistItems
+    .filter((a) => a.entityType === 'TV')
+    .map((a) => a.entityId);
+
+  const allMovieIds = [...new Set([...annMovieIds, ...wlMovieIds])];
+  const allTvIds = [...new Set([...annTvIds, ...wlTvIds])];
+
   const [movies, tvSeries] = await Promise.all([
-    movieIds.length > 0
+    allMovieIds.length > 0
       ? prisma.movie.findMany({
-          where: {id: {in: movieIds}},
+          where: {id: {in: allMovieIds}},
           select: {
             id: true, title: true, posterPath: true, backdropPath: true,
             voteAverage: true, overview: true, releaseDate: true, runtime: true,
+            tmdbId: true,
           },
         })
       : [],
-    tvIds.length > 0
+    allTvIds.length > 0
       ? prisma.tvSeries.findMany({
-          where: {id: {in: tvIds}},
+          where: {id: {in: allTvIds}},
           select: {
             id: true, name: true, posterPath: true, backdropPath: true,
             voteAverage: true, overview: true, firstAirDate: true,
             numberOfSeasons: true, numberOfEpisodes: true,
+            tmdbId: true,
           },
         })
       : [],
@@ -65,17 +98,40 @@ export async function GET(request: Request) {
   const tvMap = new Map(tvSeries.map((tv) => [tv.id, tv]));
 
   // Merge annotation + media data
-  const result = annotations.map((a) => ({
+  const annotatedResults = annotations.map((a) => ({
     ...a,
+    source: 'annotation' as const,
     movie: a.entityType === 'MOVIE' ? movieMap.get(a.entityId) ?? null : null,
     tvSeries: a.entityType === 'TV' ? tvMap.get(a.entityId) ?? null : null,
   }));
 
+  // Merge watchlist items + media data (with WANT_TO_WATCH status)
+  const watchlistResults = unannotatedWatchlistItems.map((wi) => ({
+    id: -wi.id, // Negative ID to distinguish from annotations
+    userId: session.user!.id,
+    entityType: wi.entityType,
+    entityId: wi.entityId,
+    watchStatus: 'WANT_TO_WATCH' as const,
+    personalRating: null,
+    currentEpisode: null,
+    totalEpisodes: null,
+    notes: null,
+    watchDate: null,
+    createdAt: wi.createdAt,
+    updatedAt: wi.createdAt,
+    source: 'watchlist' as const,
+    watchlistName: wi.watchlist.name,
+    movie: wi.entityType === 'MOVIE' ? movieMap.get(wi.entityId) ?? null : null,
+    tvSeries: wi.entityType === 'TV' ? tvMap.get(wi.entityId) ?? null : null,
+  }));
+
+  const allResults = [...annotatedResults, ...watchlistResults];
+
   // Filter by search term
-  let filtered = result;
+  let filtered = allResults;
   if (search) {
     const q = search.toLowerCase();
-    filtered = result.filter((a) => {
+    filtered = allResults.filter((a) => {
       if (a.entityType === 'MOVIE' && a.movie) {
         return a.movie.title.toLowerCase().includes(q);
       }

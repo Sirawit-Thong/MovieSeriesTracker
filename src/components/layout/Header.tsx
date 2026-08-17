@@ -14,7 +14,6 @@ const NAV_LINKS = [
 
 const AUTH_NAV_LINKS = [
   {key: 'library' as const, href: '/library'},
-  {key: 'watchlists' as const, href: '/watchlists'},
 ];
 
 const isAdmin = (session: ReturnType<typeof useSession>['data']) => {

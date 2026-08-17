@@ -5,8 +5,7 @@
     "tvSeries": "ซีรีส์",
     "people": "บุคคล",
     "search": "ค้นหา",
-    "library": "คลังของฉัน",
-    "watchlists": "รายการที่ดู"
+    "library": "คลังของฉัน"
   },
   "Common": {
     "loading": "กำลังโหลด...",
@@ -47,6 +46,7 @@
     "backToHome": "กลับหน้าแรก"
   },
   "Tv": {
+    "addToLibrary": "เพิ่มในคลังของฉัน",
     "overview": "เรื่องย่อ",
     "genres": "หมวดหมู่",
     "cast": "นักแสดง",
@@ -85,6 +85,7 @@
     "title": "ชื่อ"
   },
   "Movie": {
+    "addToLibrary": "เพิ่มในคลังของฉัน",
     "overview": "เรื่องย่อ",
     "genres": "หมวดหมู่",
     "financial": "รายได้",
@@ -160,7 +161,16 @@
     "sortUpdated": "อัปเดตล่าสุด",
     "sortRating": "คะแนน",
     "sortTitle": "ชื่อ",
-    "episodeProgress": "ตอน {current} / {total}"
+    "episodeProgress": "ตอน {current} / {total}",
+    "searchTmdb": "ค้นหาภาพยนตร์และซีรีส์...",
+    "searchTmdbPlaceholder": "ค้นหาจาก TMDB เพื่อเพิ่มในคลัง...",
+    "addToLibrary": "เพิ่มในคลังของฉัน",
+    "inLibrary": "อยู่ในคลังแล้ว",
+    "added": "เพิ่มแล้ว!",
+    "changeStatus": "เปลี่ยนสถานะ",
+    "removeFromLibrary": "ลบจากคลัง",
+    "confirmRemove": "ลบรายการนี้ออกจากคลังของคุณ?",
+    "saved": "บันทึกลงคลังแล้ว"
   },
   "Watchlist": {
     "title": "Watchlists ของฉัน",
