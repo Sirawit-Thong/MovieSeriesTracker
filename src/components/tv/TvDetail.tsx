@@ -12,8 +12,19 @@ import ExternalLinks from '@/components/media/ExternalLinks';
 import RecommendationList from '@/components/media/RecommendationList';
 import {translateJob, translateDepartment, translateStatus} from '@/lib/crew-translations';
 import AddToLibraryButton from '@/components/library/AddToLibraryButton';
+import SyncButton from '@/components/shared/SyncButton';
 
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
+
+/** Deduplicate an array of credits by person.id, keeping the first occurrence. */
+function deduplicateByPersonId<T extends {person: {id: number}}>(items: T[]): T[] {
+  const seen = new Set<number>();
+  return items.filter((item) => {
+    if (seen.has(item.person.id)) return false;
+    seen.add(item.person.id);
+    return true;
+  });
+}
 
 /** Union of all Prisma relation types included by the page query. */
 export type TvSeriesWithRelations = {
@@ -224,8 +235,8 @@ export default function TvDetail({series, locale}: TvDetailProps) {
   const companies = series.productionCompanies.map((pc) => pc.company);
   const countries = series.productionCountries.map((pc) => pc.country);
   const languages = series.spokenLanguages.map((sl) => sl.language);
-  const cast = series.castCredits;
-  const crew = series.crewCredits;
+  const cast = deduplicateByPersonId(series.castCredits);
+  const crew = deduplicateByPersonId(series.crewCredits);
 
   return (
     <div className="min-h-screen">
@@ -307,8 +318,9 @@ export default function TvDetail({series, locale}: TvDetailProps) {
             </div>
 
             {/* Add to Library button */}
-            <div className="mt-4">
+            <div className="mt-4 flex items-center gap-2">
               <AddToLibraryButton entityType="TV" entityId={series.id} />
+              <SyncButton type="tv" tmdbId={series.tmdbId} />
             </div>
           </div>
         </div>

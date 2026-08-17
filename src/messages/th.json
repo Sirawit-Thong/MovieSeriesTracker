@@ -13,7 +13,8 @@
     "noResults": "ไม่พบผลลัพธ์",
     "back": "กลับ",
     "next": "ถัดไป",
-    "previous": "ก่อนหน้า"
+    "previous": "ก่อนหน้า",
+    "syncData": "ซิงค์"
   },
   "Footer": {
     "copyright": "สงวนลิขสิทธิ์",

@@ -12,6 +12,7 @@ import ExternalLinks from '@/components/media/ExternalLinks';
 import RecommendationList from '@/components/media/RecommendationList';
 import {translateJob, translateDepartment, translateStatus} from '@/lib/crew-translations';
 import AddToLibraryButton from '@/components/library/AddToLibraryButton';
+import SyncButton from '@/components/shared/SyncButton';
 
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
 
@@ -24,6 +25,16 @@ const RELEASE_TYPE_LABELS: Record<number, Record<string, string>> = {
   5: {en: 'Physical', th: 'สื่อกาย'},
   6: {en: 'TV', th: 'โทรทัศน์'},
 };
+
+/** Deduplicate an array of credits by person.id, keeping the first occurrence. */
+function deduplicateByPersonId<T extends {person: {id: number}}>(items: T[]): T[] {
+  const seen = new Set<number>();
+  return items.filter((item) => {
+    if (seen.has(item.person.id)) return false;
+    seen.add(item.person.id);
+    return true;
+  });
+}
 
 /** Union of all Prisma relation types included by the page query. */
 type MovieWithRelations = {
@@ -206,8 +217,8 @@ export default function MovieDetail({movie, locale}: MovieDetailProps) {
   const companies = movie.productionCompanies.map((pc) => pc.company);
   const countries = movie.productionCountries.map((pc) => pc.country);
   const languages = movie.spokenLanguages.map((sl) => sl.language);
-  const cast = movie.castCredits;
-  const crew = movie.crewCredits;
+  const cast = deduplicateByPersonId(movie.castCredits);
+  const crew = deduplicateByPersonId(movie.crewCredits);
 
   // Group release dates by country
   const releaseDatesByCountry = movie.releaseDates.reduce<Record<string, typeof movie.releaseDates>>(
@@ -309,8 +320,9 @@ export default function MovieDetail({movie, locale}: MovieDetailProps) {
             </div>
 
             {/* Add to Library button */}
-            <div className="mt-4">
+            <div className="mt-4 flex items-center gap-2">
               <AddToLibraryButton entityType="MOVIE" entityId={movie.id} />
+              <SyncButton type="movie" tmdbId={movie.tmdbId} />
             </div>
           </div>
         </div>

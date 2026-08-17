@@ -1,8 +1,8 @@
 'use client';
 
-import {useState, useRef, useEffect} from 'react';
+import {useState, useRef, useEffect, useCallback} from 'react';
 import {useTranslations} from 'next-intl';
-import {Link, usePathname} from '@/i18n/navigation';
+import {Link, usePathname, useRouter} from '@/i18n/navigation';
 import {useSession, signOut} from 'next-auth/react';
 import LanguageSwitcher from './LanguageSwitcher';
 
@@ -27,7 +27,9 @@ export default function Header() {
   const {data: session} = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [headerSearch, setHeaderSearch] = useState('');
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   // Close user menu on outside click
   useEffect(() => {
@@ -41,6 +43,14 @@ export default function Header() {
       return () => document.removeEventListener('mousedown', handleClickOutside);
     }
   }, [userMenuOpen]);
+
+  const handleHeaderSearch = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    const q = headerSearch.trim();
+    if (q) {
+      router.push(`/search?q=${encodeURIComponent(q)}`);
+    }
+  }, [headerSearch, router]);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
@@ -100,6 +110,24 @@ export default function Header() {
             );
           })}
         </nav>
+
+        {/* Desktop Search */}
+        <form onSubmit={handleHeaderSearch} className="hidden md:flex items-center">
+          <div className="relative">
+            <input
+              type="text"
+              value={headerSearch}
+              onChange={(e) => setHeaderSearch(e.target.value)}
+              placeholder={t('search')}
+              className="w-48 lg:w-64 pl-8 pr-3 py-1.5 text-sm bg-surface border border-border rounded-lg
+                text-foreground placeholder:text-foreground/40 focus:outline-none focus:border-primary/50
+                focus:ring-1 focus:ring-primary/20 transition-all"
+            />
+            <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-foreground/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </form>
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-3">
@@ -217,6 +245,23 @@ export default function Header() {
       {mobileMenuOpen && (
         <div className="md:hidden bg-background border-t border-border">
           <nav className="flex flex-col p-4 gap-1">
+            {/* Mobile Search */}
+            <form onSubmit={handleHeaderSearch} className="mb-2">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={headerSearch}
+                  onChange={(e) => setHeaderSearch(e.target.value)}
+                  placeholder={t('search')}
+                  className="w-full pl-8 pr-3 py-2.5 text-sm bg-surface border border-border rounded-lg
+                    text-foreground placeholder:text-foreground/40 focus:outline-none focus:border-primary/50
+                    focus:ring-1 focus:ring-primary/20 transition-all"
+                />
+                <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-foreground/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+            </form>
             {NAV_LINKS.map(({key, href}) => {
               const isActive =
                 pathname === href || pathname.startsWith(href + '/');

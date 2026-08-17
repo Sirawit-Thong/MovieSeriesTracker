@@ -7,6 +7,7 @@ import PersonInfo from './PersonInfo';
 import Filmography from './Filmography';
 import MediaGallery from '@/components/media/MediaGallery';
 import ExternalLinks from '@/components/media/ExternalLinks';
+import SyncButton from '@/components/shared/SyncButton';
 
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
 
@@ -211,6 +212,11 @@ export default function PersonDetail({person, locale}: PersonDetailProps) {
                 mediaType="person"
                 homepage={person.homepage}
               />
+            </div>
+
+            {/* Sync button */}
+            <div className="mt-4">
+              <SyncButton type="person" tmdbId={person.tmdbId} />
             </div>
 
             {/* Biography */}

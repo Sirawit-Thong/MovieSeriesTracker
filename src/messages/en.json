@@ -13,7 +13,8 @@
     "noResults": "No results found",
     "back": "Back",
     "next": "Next",
-    "previous": "Previous"
+    "previous": "Previous",
+    "syncData": "Sync"
   },
   "Footer": {
     "copyright": "All rights reserved",
