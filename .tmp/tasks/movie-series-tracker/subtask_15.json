@@ -1,0 +1,38 @@
+{
+  "id": "movie-series-tracker-15",
+  "seq": "15",
+  "title": "Full-Text Search Across All Entities",
+  "status": "completed",
+  "depends_on": ["07", "08", "09", "10"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "context_files": [
+    "C:/Users/thong/.config/opencode/context/core/standards/code-quality.md",
+    "C:/Users/thong/.config/opencode/context/core/standards/typescript.md",
+    "C:/Users/thong/.config/opencode/context/development/principles/api-design.md"
+  ],
+  "reference_files": [
+    "D:/dev/MovieSeriesTracker/api/tmdb/08-search/README.md"
+  ],
+  "acceptance_criteria": [
+    "Search page with input field and debounced search (300ms)",
+    "Search queries SQLite using LIKE on movie title, tv series name, person name",
+    "Results grouped by type: Movies, TV Series, People",
+    "Each result shows: poster/profile image, title/name, type badge, rating",
+    "Results link to respective detail pages",
+    "Empty state when no results found",
+    "Loading state while searching",
+    "Search URL is shareable (query param: ?q=searchterm)",
+    "API route: GET /api/search?q=query",
+    "All text uses i18n translation keys"
+  ],
+  "deliverables": [
+    "src/app/[locale]/search/page.tsx",
+    "src/app/api/search/route.ts",
+    "src/components/search/SearchBar.tsx",
+    "src/components/search/SearchResults.tsx",
+    "src/lib/db/search.ts"
+  ],
+  "completed_at": "2026-08-17T00:00:00Z",
+  "completion_summary": "Implemented full-text search with debounced SearchBar, SearchResults, API route, DB queries, and i18n translations"
+}

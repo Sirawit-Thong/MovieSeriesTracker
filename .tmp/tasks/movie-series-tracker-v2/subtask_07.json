@@ -1,0 +1,30 @@
+{
+  "id": "v2-07",
+  "seq": "07",
+  "title": "Extended Data Ingestion — Review, List, Certification, Config Sync",
+  "status": "pending",
+  "phase": "phase-3",
+  "depends_on": ["v2-04"],
+  "suggested_agent": "CoderAgent",
+  "reference_files": [
+    "D:/dev/MovieSeriesTracker/src/lib/tmdb/client.ts",
+    "D:/dev/MovieSeriesTracker/src/lib/ingestion/seed-reference.ts"
+  ],
+  "acceptance_criteria": [
+    "review-sync.ts: Fetch and store reviews for movies and TV series",
+    "list-sync.ts: Fetch and store TMDB lists and their items",
+    "certification-sync.ts: Fetch and store all certifications by country",
+    "config-sync.ts: Fetch and store API configuration, countries, languages, timezones, primary translations",
+    "seed-reference.ts extended to also seed certifications and config",
+    "TmdbClient extended with new endpoint methods",
+    "Error handling for all sync services"
+  ],
+  "deliverables": [
+    "src/lib/ingestion/review-sync.ts (new)",
+    "src/lib/ingestion/list-sync.ts (new)",
+    "src/lib/ingestion/certification-sync.ts (new)",
+    "src/lib/ingestion/config-sync.ts (new)",
+    "src/lib/ingestion/seed-reference.ts (extended)",
+    "src/lib/tmdb/client.ts (new methods)"
+  ]
+}

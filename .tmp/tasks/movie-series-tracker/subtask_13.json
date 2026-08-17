@@ -1,0 +1,39 @@
+{
+  "id": "movie-series-tracker-13",
+  "seq": "13",
+  "title": "TV Series Detail Page - Seasons & Episodes",
+  "status": "completed",
+  "agent_id": "coder-agent",
+  "started_at": "2026-08-17T00:00:00Z",
+  "completed_at": "2026-08-17T00:05:00Z",
+  "completion_summary": "Implemented TV series detail page with seasons/episodes. Created 4 files: page.tsx (server), TvDetail.tsx (hero+metadata+sidebar), SeasonList.tsx (accordion), EpisodeList.tsx (compact cards). Added 22 i18n keys in en/th.",
+  "depends_on": ["08", "10"],
+  "parallel": false,
+  "suggested_agent": "OpenFrontendSpecialist",
+  "context_files": [
+    "C:/Users/thong/.config/opencode/context/core/standards/code-quality.md",
+    "C:/Users/thong/.config/opencode/context/core/standards/typescript.md",
+    "C:/Users/thong/.config/opencode/context/core/essential-patterns.md"
+  ],
+  "reference_files": [
+    "D:/dev/MovieSeriesTracker/api/tmdb/06-tv/README.md"
+  ],
+  "acceptance_criteria": [
+    "TV detail page shows: name, original_name, tagline, overview",
+    "Shows: poster_path, backdrop_path, vote_average, vote_count",
+    "Shows: first_air_date, last_air_to_date, status, type",
+    "Shows: number_of_seasons, number_of_episodes, episode_run_time",
+    "Shows: genres, networks (with logos), created_by",
+    "Shows: seasons list with poster, episode_count, air_date",
+    "Season expandable to show episode list with: air_date, episode_number, name, overview, still_path, vote_average",
+    "Shows: in_production status, next_episode_to_air",
+    "Shows: languages, origin_country, production_companies",
+    "All text uses i18n translation keys"
+  ],
+  "deliverables": [
+    "src/app/[locale]/tv/[id]/page.tsx",
+    "src/components/tv/TvDetail.tsx",
+    "src/components/tv/SeasonList.tsx",
+    "src/components/tv/EpisodeList.tsx"
+  ]
+}

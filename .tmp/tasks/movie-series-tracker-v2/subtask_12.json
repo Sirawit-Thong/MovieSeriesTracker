@@ -1,0 +1,38 @@
+{
+  "id": "v2-12",
+  "seq": "12",
+  "title": "Extended Detail Pages — Show All TMDB Sub-resources",
+  "status": "pending",
+  "phase": "phase-5",
+  "depends_on": ["v2-05", "v2-06"],
+  "suggested_agent": "CoderAgent",
+  "reference_files": [
+    "D:/dev/MovieSeriesTracker/src/components/movie/MovieDetail.tsx",
+    "D:/dev/MovieSeriesTracker/src/components/tv/TvDetail.tsx",
+    "D:/dev/MovieSeriesTracker/src/components/person/PersonDetail.tsx"
+  ],
+  "acceptance_criteria": [
+    "MovieDetail.tsx extended: alternative titles tab, content ratings tab, images gallery, videos section, translations dropdown, release dates timeline, external IDs links, recommendations carousel, similar movies grid",
+    "TvDetail.tsx extended: translations, images gallery, videos, external IDs, recommendations, similar, content ratings, episode groups",
+    "PersonDetail.tsx extended: images gallery, external IDs links, person changes timeline",
+    "CollectionDetail.tsx created: collection info + images",
+    "CompanyDetail.tsx created: company info + alternative names + logos",
+    "NetworkDetail.tsx created: network info + logos",
+    "Review section added to movie/TV detail pages",
+    "All new sections use tabs or expandable accordions",
+    "Lazy loading for images and heavy sections",
+    "All text uses i18n translation keys"
+  ],
+  "deliverables": [
+    "src/components/movie/MovieDetail.tsx (extended)",
+    "src/components/tv/TvDetail.tsx (extended)",
+    "src/components/person/PersonDetail.tsx (extended)",
+    "src/components/collection/CollectionDetail.tsx (new)",
+    "src/components/company/CompanyDetail.tsx (new)",
+    "src/components/network/NetworkDetail.tsx (new)",
+    "src/components/media/ReviewSection.tsx (new)",
+    "src/components/media/ImageGallery.tsx (new)",
+    "src/components/media/VideoPlayer.tsx (new)",
+    "src/components/media/RecommendationsCarousel.tsx (new)"
+  ]
+}

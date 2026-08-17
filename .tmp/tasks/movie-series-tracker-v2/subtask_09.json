@@ -1,0 +1,34 @@
+{
+  "id": "v2-09",
+  "seq": "09",
+  "title": "Auth API Routes — Register, Login, Profile",
+  "status": "pending",
+  "phase": "phase-1",
+  "depends_on": ["v2-08"],
+  "suggested_agent": "CoderAgent",
+  "reference_files": [
+    "D:/dev/MovieSeriesTracker/src/lib/auth/password.ts",
+    "D:/dev/MovieSeriesTracker/src/lib/auth/config.ts"
+  ],
+  "acceptance_criteria": [
+    "POST /api/auth/register: Create new user with email, name, password",
+    "Password hashed with bcrypt (12 rounds)",
+    "Email validation (format, uniqueness)",
+    "Name validation (min 2 chars)",
+    "Password validation (min 8 chars)",
+    "Returns user object (without password) on success",
+    "GET /api/auth/profile: Get current user profile",
+    "PUT /api/auth/profile: Update current user profile (name, image)",
+    "PUT /api/auth/password: Change password (current + new)",
+    "All routes protected with getServerSession",
+    "Input validation with zod",
+    "Error responses with proper HTTP status codes"
+  ],
+  "deliverables": [
+    "src/app/api/auth/register/route.ts",
+    "src/app/api/auth/profile/route.ts",
+    "src/app/api/auth/password/route.ts",
+    "src/lib/auth/password.ts (bcrypt helpers)",
+    "src/lib/validations/auth.ts (zod schemas)"
+  ]
+}

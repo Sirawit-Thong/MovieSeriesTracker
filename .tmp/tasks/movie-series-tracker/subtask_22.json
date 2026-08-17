@@ -1,0 +1,30 @@
+{
+  "id": "movie-series-tracker-22",
+  "seq": "22",
+  "title": "Vercel Deployment Configuration",
+  "status": "completed",
+  "agent_id": "coder-agent",
+  "started_at": "2026-08-17T00:00:00Z",
+  "completed_at": "2026-08-17T00:01:00Z",
+  "summary": "Created vercel.json, .env.example, DEPLOY.md and updated prisma.config.ts for PostgreSQL/SQLite dual support",
+  "depends_on": ["01"],
+  "parallel": true,
+  "suggested_agent": "CoderAgent",
+  "context_files": [
+    "C:/Users/thong/.config/opencode/context/core/standards/code-quality.md"
+  ],
+  "reference_files": [],
+  "acceptance_criteria": [
+    "vercel.json configured for Next.js App Router",
+    "Environment variable template for Vercel deployment",
+    "Database strategy for production (PostgreSQL adapter via Prisma)",
+    "Build command succeeds: next build",
+    "Deployment script or instructions documented",
+    "vercel.json rewrites configured for i18n locale routing"
+  ],
+  "deliverables": [
+    "vercel.json",
+    ".env.example",
+    "DEPLOY.md"
+  ]
+}

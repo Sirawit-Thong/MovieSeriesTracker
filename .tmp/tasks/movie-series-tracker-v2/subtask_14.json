@@ -1,0 +1,33 @@
+{
+  "id": "v2-14",
+  "seq": "14",
+  "title": "PostgreSQL Migration + Docker + Vercel Update",
+  "status": "pending",
+  "phase": "phase-1",
+  "depends_on": ["v2-01"],
+  "suggested_agent": "CoderAgent",
+  "reference_files": [
+    "D:/dev/MovieSeriesTracker/docker-compose.yml",
+    "D:/dev/MovieSeriesTracker/Dockerfile",
+    "D:/dev/MovieSeriesTracker/vercel.json",
+    "D:/dev/MovieSeriesTracker/prisma.config.ts"
+  ],
+  "acceptance_criteria": [
+    "docker-compose.yml updated with PostgreSQL service",
+    "PostgreSQL volume for data persistence",
+    "DATABASE_URL updated to use PostgreSQL connection string",
+    "prisma.config.ts supports both SQLite (local dev) and PostgreSQL (production)",
+    "Dockerfile updated for PostgreSQL driver",
+    "vercel.json updated for PostgreSQL",
+    ".env.example updated with both SQLite and PostgreSQL examples",
+    "prisma migrate dev creates proper migration files",
+    "Database seeding works with PostgreSQL"
+  ],
+  "deliverables": [
+    "docker-compose.yml (updated)",
+    "Dockerfile (updated)",
+    "vercel.json (updated)",
+    "prisma.config.ts (updated)",
+    ".env.example (updated)"
+  ]
+}

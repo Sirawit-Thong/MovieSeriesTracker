@@ -1,0 +1,1081 @@
+// Movie Series Tracker - Prisma Schema
+// PostgreSQL provider for local development (Docker)
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================
+// Reference Entities
+// ============================================================
+
+model Genre {
+  id       Int             @id
+  name     String
+  movies   MovieGenre[]
+  tvSeries TvSeriesGenre[]
+
+  @@map("genres")
+}
+
+model Keyword {
+  id     Int            @id
+  name   String
+  movies MovieKeyword[]
+
+  @@map("keywords")
+}
+
+model WatchProvider {
+  providerId      Int                     @id @map("provider_id")
+  providerName    String                  @map("provider_name")
+  logoPath        String                  @map("logo_path")
+  displayPriority Int                     @map("display_priority")
+  movies          MovieWatchProvider[]
+  tvSeries        TvSeriesWatchProvider[]
+
+  @@map("watch_providers")
+}
+
+model Collection {
+  id               Int               @id
+  name             String
+  posterPath       String?           @map("poster_path")
+  backdropPath     String?           @map("backdrop_path")
+  overview         String?
+  originalLanguage String?           @map("original_language")
+  originalName     String?           @map("original_name")
+  movies           Movie[]
+  collectionMovies CollectionMovie[]
+
+  @@map("collections")
+}
+
+model ProductionCompany {
+  id              Int                         @id
+  logoPath        String                      @map("logo_path")
+  name            String
+  originCountry   String                      @map("origin_country")
+  description     String?
+  headquarters    String?
+  homepage        String?
+  parentCompanyId Int?                        @map("parent_company_id")
+  parentCompany   ProductionCompany?          @relation("CompanyParentCompany", fields: [parentCompanyId], references: [id])
+  childCompanies  ProductionCompany[]         @relation("CompanyParentCompany")
+  movies          MovieProductionCompany[]
+  tvSeries        TvSeriesProductionCompany[]
+
+  @@map("production_companies")
+}
+
+model ProductionCountry {
+  iso31661 String                      @id @map("iso_3166_1")
+  name     String
+  movies   MovieProductionCountry[]
+  tvSeries TvSeriesProductionCountry[]
+
+  @@map("production_countries")
+}
+
+model SpokenLanguage {
+  englishName String                   @id @map("english_name")
+  iso6391     String                   @map("iso_639_1")
+  name        String
+  movies      MovieSpokenLanguage[]
+  tvSeries    TvSeriesSpokenLanguage[]
+
+  @@map("spoken_languages")
+}
+
+// ============================================================
+// Configuration & Reference Data
+// ============================================================
+
+model Configuration {
+  id             Int      @id @default(1)
+  imageUrl       String   @map("image_base_url")
+  secureImageUrl String   @map("secure_image_base_url")
+  backdropSizes  String   @map("backdrop_sizes")
+  logoSizes      String   @map("logo_sizes")
+  posterSizes    String   @map("poster_sizes")
+  profileSizes   String   @map("profile_sizes")
+  stillSizes     String   @map("still_sizes")
+  updatedAt      DateTime @updatedAt
+
+  @@map("configuration")
+}
+
+model Country {
+  iso31661    String @id @map("iso_3166_1")
+  englishName String @map("english_name")
+  nativeName  String @map("native_name")
+
+  @@map("countries")
+}
+
+model Language {
+  iso6391     String @id @map("iso_639_1")
+  englishName String @map("english_name")
+  name        String
+
+  @@map("languages")
+}
+
+model Timezone {
+  id          Int    @id @default(autoincrement())
+  iso31661    String @map("iso_3166_1")
+  englishName String @map("english_name")
+
+  @@map("timezones")
+}
+
+// ============================================================
+// Certification
+// ============================================================
+
+model Certification {
+  id            Int    @id @default(autoincrement())
+  countryCode   String @map("country_code")
+  certification String
+  meaning       String
+  order         Int
+  mediaType     String
+
+  @@unique([countryCode, certification, mediaType])
+  @@map("certifications")
+}
+
+// ============================================================
+// Movie Model with ALL TMDB Fields
+// ============================================================
+
+model Movie {
+  id               Int       @id @default(autoincrement())
+  tmdbId           Int       @unique
+  adult            Boolean   @default(false)
+  backdropPath     String?   @map("backdrop_path")
+  budget           Int?      @default(0)
+  homepage         String?
+  imdbId           String?   @map("imdb_id")
+  originCountry    String?   @map("origin_country")
+  originalLanguage String    @map("original_language")
+  originalTitle    String    @map("original_title")
+  overview         String?
+  popularity       Float?
+  posterPath       String?   @map("poster_path")
+  releaseDate      DateTime? @map("release_date")
+  revenue          Int?      @default(0)
+  runtime          Int?
+  status           String?
+  tagline          String?
+  title            String
+  video            Boolean   @default(false)
+  voteAverage      Float?    @map("vote_average")
+  voteCount        Int?      @map("vote_count")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  collectionId Int?
+  collection   Collection? @relation(fields: [collectionId], references: [id])
+
+  genres              MovieGenre[]
+  keywords            MovieKeyword[]
+  watchProviders      MovieWatchProvider[]
+  productionCompanies MovieProductionCompany[]
+  productionCountries MovieProductionCountry[]
+  spokenLanguages     MovieSpokenLanguage[]
+  castCredits         CastCredit[]
+  crewCredits         CrewCredit[]
+  releaseDates        MovieReleaseDate[]
+  collectionMovies    CollectionMovie[]
+  altTitles           MovieAlternativeTitle[]
+  contentRatings      MovieContentRating[]
+
+  @@index([tmdbId])
+  @@index([title])
+  @@index([releaseDate])
+  @@index([popularity(sort: Desc)])
+  @@index([voteAverage(sort: Desc)])
+  @@index([title, releaseDate])
+  @@map("movies")
+}
+
+// ============================================================
+// Many-to-Many Junction Tables
+// ============================================================
+
+model MovieGenre {
+  movieId Int
+  genreId Int
+  movie   Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  genre   Genre @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@id([movieId, genreId])
+  @@map("movie_genres")
+}
+
+model MovieKeyword {
+  movieId   Int
+  keywordId Int
+  movie     Movie   @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  keyword   Keyword @relation(fields: [keywordId], references: [id], onDelete: Cascade)
+
+  @@id([movieId, keywordId])
+  @@map("movie_keywords")
+}
+
+model MovieWatchProvider {
+  movieId      Int
+  providerId   Int
+  providerType String?       @default("flatrate") @map("provider_type")
+  movie        Movie         @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  provider     WatchProvider @relation(fields: [providerId], references: [providerId], onDelete: Cascade)
+
+  @@id([movieId, providerId])
+  @@map("movie_watch_providers")
+}
+
+model MovieProductionCompany {
+  movieId   Int
+  companyId Int
+  movie     Movie             @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  company   ProductionCompany @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@id([movieId, companyId])
+  @@map("movie_production_companies")
+}
+
+model MovieProductionCountry {
+  movieId  Int
+  iso31661 String            @map("iso_3166_1")
+  movie    Movie             @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  country  ProductionCountry @relation(fields: [iso31661], references: [iso31661], onDelete: Cascade)
+
+  @@id([movieId, iso31661])
+  @@map("movie_production_countries")
+}
+
+model MovieSpokenLanguage {
+  movieId     Int
+  englishName String         @map("english_name")
+  movie       Movie          @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  language    SpokenLanguage @relation(fields: [englishName], references: [englishName], onDelete: Cascade)
+
+  @@id([movieId, englishName])
+  @@map("movie_spoken_languages")
+}
+
+model CollectionMovie {
+  collectionId Int
+  movieId      Int
+  position     Int?
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  movie        Movie      @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@id([collectionId, movieId])
+  @@map("collection_movies")
+}
+
+// ============================================================
+// Movie Release Dates
+// ============================================================
+
+model MovieReleaseDate {
+  id            Int     @id @default(autoincrement())
+  movieId       Int
+  countryCode   String  @map("country_code")
+  certification String?
+  releaseDate   String  @map("release_date")
+  type          Int
+  descriptors   String?
+  movie         Movie   @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@index([movieId])
+  @@map("movie_release_dates")
+}
+
+// ============================================================
+// Movie Content Ratings & Alternative Titles
+// ============================================================
+
+model MovieContentRating {
+  id          Int    @id @default(autoincrement())
+  movieId     Int
+  countryCode String @map("country_code")
+  rating      String
+  movie       Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@unique([movieId, countryCode])
+  @@map("movie_content_ratings")
+}
+
+model MovieAlternativeTitle {
+  id          Int     @id @default(autoincrement())
+  movieId     Int
+  countryCode String  @map("country_code")
+  title       String
+  type        String?
+  movie       Movie   @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@unique([movieId, countryCode])
+  @@map("movie_alternative_titles")
+}
+
+// ============================================================
+// TV Series Models
+// ============================================================
+
+model TvCreatedBy {
+  id          Int     @id @default(autoincrement())
+  tmdbId      Int     @map("tmdb_id")
+  creditId    String  @map("credit_id")
+  name        String
+  gender      Int
+  profilePath String? @map("profile_path")
+
+  tvSeriesId Int      @map("tv_series_id")
+  tvSeries   TvSeries @relation(fields: [tvSeriesId], references: [id], onDelete: Cascade)
+
+  @@index([tmdbId])
+  @@map("tv_created_by")
+}
+
+model TvNetwork {
+  id            Int               @id
+  logoPath      String            @map("logo_path")
+  name          String
+  originCountry String            @map("origin_country")
+  headquarters  String?
+  homepage      String?
+  tvSeries      TvSeriesNetwork[]
+
+  @@map("tv_networks")
+}
+
+model TvSeries {
+  id               Int      @id @default(autoincrement())
+  tmdbId           Int      @unique
+  adult            Boolean  @default(false)
+  backdropPath     String?  @map("backdrop_path")
+  firstAirDate     String?  @map("first_air_date")
+  homepage         String?
+  inProduction     Boolean? @map("in_production")
+  languages        String?
+  episodeRunTime   String?  @map("episode_run_time")
+  lastAirDate      String?  @map("last_air_date")
+  name             String
+  numberOfEpisodes Int?     @map("number_of_episodes")
+  numberOfSeasons  Int?     @map("number_of_seasons")
+  originCountry    String?
+  originalLanguage String   @map("original_language")
+  originalName     String   @map("original_name")
+  overview         String?
+  popularity       Float?
+  posterPath       String?  @map("poster_path")
+  status           String?
+  tagline          String?
+  type             String?
+  voteAverage      Float?   @map("vote_average")
+  voteCount        Int?     @map("vote_count")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations — created by
+  createdBy TvCreatedBy[]
+
+  // Relations — seasons
+  seasons TvSeason[]
+
+  // Relations — last/next episode to air
+  lastEpisodeToAirId Int?       @map("last_episode_to_air_id")
+  lastEpisodeToAir   TvEpisode? @relation("TvSeriesLastEpisode", fields: [lastEpisodeToAirId], references: [id])
+  nextEpisodeToAirId Int?       @map("next_episode_to_air_id")
+  nextEpisodeToAir   TvEpisode? @relation("TvSeriesNextEpisode", fields: [nextEpisodeToAirId], references: [id])
+
+  // Relations — many-to-many
+  genres              TvSeriesGenre[]
+  networks            TvSeriesNetwork[]
+  productionCompanies TvSeriesProductionCompany[]
+  productionCountries TvSeriesProductionCountry[]
+  spokenLanguages     TvSeriesSpokenLanguage[]
+
+  // Relations — credits
+  castCredits CastCredit[]
+  crewCredits CrewCredit[]
+
+  // Relations — new
+  contentRatings TvContentRating[]
+  episodeGroups  EpisodeGroup[]
+  altTitles      TvAlternativeTitle[]
+  watchProviders TvSeriesWatchProvider[]
+
+  @@index([tmdbId])
+  @@index([name])
+  @@index([firstAirDate])
+  @@index([popularity(sort: Desc)])
+  @@index([voteAverage(sort: Desc)])
+  @@index([name, firstAirDate])
+  @@map("tv_series")
+}
+
+model TvSeason {
+  id           Int     @id @default(autoincrement())
+  tmdbId       Int     @unique
+  airDate      String? @map("air_date")
+  episodeCount Int?    @map("episode_count")
+  name         String
+  overview     String?
+  posterPath   String? @map("poster_path")
+  seasonNumber Int     @map("season_number")
+  voteAverage  Float?  @map("vote_average")
+
+  tvSeriesId Int      @map("tv_series_id")
+  tvSeries   TvSeries @relation(fields: [tvSeriesId], references: [id], onDelete: Cascade)
+
+  episodes TvEpisode[]
+
+  @@index([tmdbId])
+  @@map("tv_seasons")
+}
+
+model TvEpisode {
+  id             Int     @id @default(autoincrement())
+  tmdbId         Int     @unique
+  airDate        String? @map("air_date")
+  episodeNumber  Int     @map("episode_number")
+  episodeType    String? @map("episode_type")
+  name           String
+  overview       String?
+  productionCode String? @map("production_code")
+  runtime        Int?
+  seasonNumber   Int     @map("season_number")
+  showId         Int     @map("show_id")
+  stillPath      String? @map("still_path")
+  voteAverage    Float?  @map("vote_average")
+  voteCount      Int?    @map("vote_count")
+
+  tvSeasonId Int      @map("tv_season_id")
+  tvSeason   TvSeason @relation(fields: [tvSeasonId], references: [id], onDelete: Cascade)
+
+  // Reverse relations for last/next episode to air
+  lastEpisodeOfSeries TvSeries[] @relation("TvSeriesLastEpisode")
+  nextEpisodeOfSeries TvSeries[] @relation("TvSeriesNextEpisode")
+
+  // Episode group relations
+  episodeGroupEpisodes EpisodeGroupEpisode[]
+
+  @@index([tmdbId])
+  @@map("tv_episodes")
+}
+
+// ============================================================
+// TV Series Many-to-Many Junction Tables
+// ============================================================
+
+model TvSeriesGenre {
+  tvSeriesId Int
+  genreId    Int
+  tvSeries   TvSeries @relation(fields: [tvSeriesId], references: [id], onDelete: Cascade)
+  genre      Genre    @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@id([tvSeriesId, genreId])
+  @@map("tv_series_genres")
+}
+
+model TvSeriesNetwork {
+  tvSeriesId Int
+  networkId  Int
+  tvSeries   TvSeries  @relation(fields: [tvSeriesId], references: [id], onDelete: Cascade)
+  network    TvNetwork @relation(fields: [networkId], references: [id], onDelete: Cascade)
+
+  @@id([tvSeriesId, networkId])
+  @@map("tv_series_networks")
+}
+
+model TvSeriesProductionCompany {
+  tvSeriesId Int
+  companyId  Int
+  tvSeries   TvSeries          @relation(fields: [tvSeriesId], references: [id], onDelete: Cascade)
+  company    ProductionCompany @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@id([tvSeriesId, companyId])
+  @@map("tv_series_production_companies")
+}
+
+model TvSeriesProductionCountry {
+  tvSeriesId Int
+  iso31661   String            @map("iso_3166_1")
+  tvSeries   TvSeries          @relation(fields: [tvSeriesId], references: [id], onDelete: Cascade)
+  country    ProductionCountry @relation(fields: [iso31661], references: [iso31661], onDelete: Cascade)
+
+  @@id([tvSeriesId, iso31661])
+  @@map("tv_series_production_countries")
+}
+
+model TvSeriesSpokenLanguage {
+  tvSeriesId  Int
+  englishName String         @map("english_name")
+  tvSeries    TvSeries       @relation(fields: [tvSeriesId], references: [id], onDelete: Cascade)
+  language    SpokenLanguage @relation(fields: [englishName], references: [englishName], onDelete: Cascade)
+
+  @@id([tvSeriesId, englishName])
+  @@map("tv_series_spoken_languages")
+}
+
+// ============================================================
+// TV Content Ratings & Alternative Titles
+// ============================================================
+
+model TvContentRating {
+  id          Int      @id @default(autoincrement())
+  tvSeriesId  Int
+  countryCode String   @map("country_code")
+  rating      String
+  tvSeries    TvSeries @relation(fields: [tvSeriesId], references: [id], onDelete: Cascade)
+
+  @@unique([tvSeriesId, countryCode])
+  @@map("tv_content_ratings")
+}
+
+model TvAlternativeTitle {
+  id          Int      @id @default(autoincrement())
+  tvSeriesId  Int
+  countryCode String   @map("country_code")
+  title       String
+  tvSeries    TvSeries @relation(fields: [tvSeriesId], references: [id], onDelete: Cascade)
+
+  @@unique([tvSeriesId, countryCode])
+  @@map("tv_alternative_titles")
+}
+
+// ============================================================
+// Episode Groups
+// ============================================================
+
+model EpisodeGroup {
+  id           String   @id
+  tvSeriesId   Int
+  name         String
+  description  String?
+  type         Int
+  episodeCount Int      @map("episode_count")
+  groupCount   Int      @map("group_count")
+  networkId    Int?     @map("network_id")
+  tvSeries     TvSeries @relation(fields: [tvSeriesId], references: [id], onDelete: Cascade)
+
+  episodes EpisodeGroupEpisode[]
+
+  @@map("episode_groups")
+}
+
+model EpisodeGroupEpisode {
+  id         Int          @id @default(autoincrement())
+  groupId    String
+  episodeId  Int
+  groupOrder Int?         @map("group_order")
+  group      EpisodeGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  episode    TvEpisode    @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, episodeId])
+  @@map("episode_group_episodes")
+}
+
+// ============================================================
+// Person Model with ALL TMDB Fields
+// ============================================================
+
+model Person {
+  id                 Int     @id @default(autoincrement())
+  tmdbId             Int     @unique
+  adult              Boolean @default(false)
+  biography          String?
+  birthday           String?
+  deathday           String?
+  gender             Int
+  homepage           String?
+  imdbId             String? @map("imdb_id")
+  knownForDepartment String? @map("known_for_department")
+  name               String
+  alsoKnownAs        String? @map("also_known_as")
+  placeOfBirth       String? @map("place_of_birth")
+  popularity         Float?
+  profilePath        String? @map("profile_path")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  castCredits     CastCredit[]
+  crewCredits     CrewCredit[]
+  combinedCredits PersonCombinedCredit[]
+
+  @@index([tmdbId])
+  @@index([name])
+  @@index([popularity(sort: Desc)])
+  @@map("persons")
+}
+
+// ============================================================
+// Cast & Crew Credit Models
+// ============================================================
+
+model CastCredit {
+  id           Int     @id @default(autoincrement())
+  personId     Int
+  movieId      Int?
+  tvSeriesId   Int?
+  character    String?
+  creditId     String? @map("credit_id")
+  order        Int?
+  gender       Int?
+  popularity   Float?
+  profilePath  String? @map("profile_path")
+  originalName String? @map("original_name")
+
+  person   Person    @relation(fields: [personId], references: [id], onDelete: Cascade)
+  movie    Movie?    @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  tvSeries TvSeries? @relation(fields: [tvSeriesId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([personId])
+  @@index([movieId])
+  @@index([tvSeriesId])
+  @@index([personId, movieId])
+  @@index([personId, tvSeriesId])
+  @@map("cast_credits")
+}
+
+model CrewCredit {
+  id           Int     @id @default(autoincrement())
+  personId     Int
+  movieId      Int?
+  tvSeriesId   Int?
+  department   String?
+  job          String?
+  creditId     String? @map("credit_id")
+  gender       Int?
+  popularity   Float?
+  profilePath  String? @map("profile_path")
+  originalName String? @map("original_name")
+
+  person   Person    @relation(fields: [personId], references: [id], onDelete: Cascade)
+  movie    Movie?    @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  tvSeries TvSeries? @relation(fields: [tvSeriesId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([personId])
+  @@index([movieId])
+  @@index([tvSeriesId])
+  @@index([personId, movieId])
+  @@index([personId, tvSeriesId])
+  @@map("crew_credits")
+}
+
+// ============================================================
+// Person Combined Credits
+// ============================================================
+
+model PersonCombinedCredit {
+  id           Int      @id @default(autoincrement())
+  personId     Int
+  mediaType    String
+  mediaId      Int
+  character    String?
+  department   String?
+  job          String?
+  creditId     String?  @map("credit_id")
+  title        String?
+  overview     String?
+  popularity   Float?
+  releaseDate  String?  @map("release_date")
+  voteAverage  Float?   @map("vote_average")
+  voteCount    Int?     @map("vote_count")
+  posterPath   String?  @map("poster_path")
+  backdropPath String?  @map("backdrop_path")
+  genreIds     String?  @map("genre_ids")
+  adult        Boolean? @default(false)
+  video        Boolean? @default(false)
+
+  person Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@unique([personId, mediaType, mediaId])
+  @@map("person_combined_credits")
+}
+
+// ============================================================
+// External IDs (polymorphic — query by entityType + entityId)
+// ============================================================
+
+model ExternalId {
+  id          Int     @id @default(autoincrement())
+  entityType  String
+  entityId    Int
+  imdbId      String? @map("imdb_id")
+  tvdbId      Int?    @map("tvdb_id")
+  freebaseId  String? @map("freebase_id")
+  freebaseMid String? @map("freebase_mid")
+  wikidataId  String? @map("wikidata_id")
+  facebookId  String? @map("facebook_id")
+  instagramId String? @map("instagram_id")
+  twitterId   String? @map("twitter_id")
+  tvrageId    Int?    @map("tvrage_id")
+  tiktokId    String? @map("tiktok_id")
+  youtubeId   String? @map("youtube_id")
+
+  @@unique([entityType, entityId])
+  @@index([entityType, entityId])
+  @@map("external_ids")
+}
+
+// ============================================================
+// Media Images (polymorphic — query by entityType + entityId)
+// ============================================================
+
+model MediaImage {
+  id          Int     @id @default(autoincrement())
+  entityType  String
+  entityId    Int
+  filePath    String  @map("file_path")
+  aspectRatio Float?  @map("aspect_ratio")
+  height      Int?
+  width       Int?
+  language    String? @map("iso_639_1")
+  voteAverage Float?  @map("vote_average")
+  voteCount   Int?    @map("vote_count")
+  imageType   String?
+  fileType    String? @map("file_type")
+
+  @@index([entityType, entityId])
+  @@map("media_images")
+}
+
+// ============================================================
+// Media Videos (polymorphic — query by entityType + entityId)
+// ============================================================
+
+model MediaVideo {
+  id          Int       @id @default(autoincrement())
+  entityType  String
+  entityId    Int
+  key         String
+  name        String
+  site        String
+  type        String?
+  language    String?   @map("iso_639_1")
+  publishedAt DateTime? @map("published_at")
+  official    Boolean?  @default(false)
+
+  @@index([entityType, entityId])
+  @@map("media_videos")
+}
+
+// ============================================================
+// Translations (polymorphic — query by entityType + entityId)
+// ============================================================
+
+model Translation {
+  id          Int     @id @default(autoincrement())
+  entityType  String
+  entityId    Int
+  iso6391     String  @map("iso_639_1")
+  iso31661    String  @map("iso_3166_1")
+  name        String
+  englishName String? @map("english_name")
+  data        String?
+
+  @@unique([entityType, entityId, iso6391, iso31661])
+  @@index([entityType, entityId])
+  @@map("translations")
+}
+
+// ============================================================
+// Recommendations (polymorphic — query by sourceType + sourceId)
+// ============================================================
+
+model Recommendation {
+  id         Int    @id @default(autoincrement())
+  sourceType String
+  sourceId   Int
+  targetType String
+  targetId   Int
+  position   Int?
+
+  @@unique([sourceType, sourceId, targetId])
+  @@index([sourceType, sourceId])
+  @@map("recommendations")
+}
+
+// ============================================================
+// Reviews (polymorphic — query by mediaType + mediaId)
+// ============================================================
+
+model Review {
+  id             String    @id
+  author         String
+  authorName     String?   @map("author_name")
+  authorUsername String?   @map("author_username")
+  authorAvatar   String?   @map("author_avatar_path")
+  authorRating   Int?      @map("author_rating")
+  content        String
+  language       String?   @map("iso_639_1")
+  mediaType      String    @map("media_type")
+  mediaId        Int       @map("media_id")
+  mediaTitle     String?   @map("media_title")
+  url            String?
+  createdAt      DateTime? @map("created_at")
+  updatedAt      DateTime? @map("updated_at")
+
+  @@index([mediaType, mediaId])
+  @@map("reviews")
+}
+
+// ============================================================
+// User Annotations & Watchlists
+// ============================================================
+
+enum WatchStatus {
+  WATCHED
+  WATCHING
+  WANT_TO_WATCH
+  DROPPED
+}
+
+model UserAnnotation {
+  id             Int          @id @default(autoincrement())
+  userId         String
+  entityType     String
+  entityId       Int
+  watchStatus    WatchStatus?
+  personalRating Int?
+  currentEpisode Int?         @map("current_episode")
+  totalEpisodes  Int?         @map("total_episodes")
+  notes          String?
+  watchDate      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, entityType, entityId])
+  @@index([userId])
+  @@index([userId, entityType])
+  @@map("user_annotations")
+}
+
+model Watchlist {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+  userId      String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items WatchlistItem[]
+
+  @@index([userId])
+  @@map("watchlists")
+}
+
+model WatchlistItem {
+  id          Int    @id @default(autoincrement())
+  watchlistId Int
+  entityType  String
+  entityId    Int
+
+  createdAt DateTime @default(now())
+
+  watchlist Watchlist @relation(fields: [watchlistId], references: [id], onDelete: Cascade)
+
+  @@unique([watchlistId, entityType, entityId])
+  @@index([watchlistId])
+  @@map("watchlist_items")
+}
+
+// ============================================================
+// TMDB Account Data
+// ============================================================
+
+model TmdbAccount {
+  id           Int     @id @default(autoincrement())
+  tmdbId       Int     @unique
+  username     String
+  name         String?
+  avatarHash   String? @map("avatar_hash")
+  avatarPath   String? @map("avatar_path")
+  iso6391      String? @map("iso_639_1")
+  iso31661     String? @map("iso_3166_1")
+  includeAdult Boolean @default(false) @map("include_adult")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  favorites     TmdbFavorite[]
+  ratings       TmdbRating[]
+  tmdbWatchlist TmdbWatchlist[]
+  lists         TmdbList[]
+
+  @@map("tmdb_accounts")
+}
+
+model TmdbFavorite {
+  id         Int    @id @default(autoincrement())
+  accountId  Int
+  entityType String
+  mediaId    Int
+
+  account TmdbAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, entityType, mediaId])
+  @@map("tmdb_favorites")
+}
+
+model TmdbRating {
+  id         Int    @id @default(autoincrement())
+  accountId  Int
+  entityType String
+  mediaId    Int
+  rating     Int
+
+  account TmdbAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, entityType, mediaId])
+  @@map("tmdb_ratings")
+}
+
+model TmdbWatchlist {
+  id         Int    @id @default(autoincrement())
+  accountId  Int
+  entityType String
+  mediaId    Int
+
+  account TmdbAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, entityType, mediaId])
+  @@map("tmdb_watchlists")
+}
+
+model TmdbList {
+  id            Int     @id @default(autoincrement())
+  tmdbId        Int     @unique
+  accountId     Int
+  name          String
+  description   String?
+  createdBy     String? @map("created_by")
+  itemCount     Int?    @map("item_count")
+  favoriteCount Int?    @map("favorite_count")
+  language      String? @map("iso_639_1")
+  listType      String  @map("list_type")
+  posterPath    String? @map("poster_path")
+
+  account TmdbAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("tmdb_lists")
+}
+
+// ============================================================
+// Trending Items
+// ============================================================
+
+model TrendingItem {
+  id         Int      @id @default(autoincrement())
+  mediaType  String
+  mediaId    Int
+  timeWindow String
+  position   Int?
+  fetchedAt  DateTime @default(now())
+
+  @@unique([mediaType, mediaId, timeWindow])
+  @@index([timeWindow, position])
+  @@map("trending_items")
+}
+
+// ============================================================
+// TV Series Watch Providers (junction)
+// ============================================================
+
+model TvSeriesWatchProvider {
+  tvSeriesId   Int
+  providerId   Int
+  providerType String?       @default("flatrate") @map("provider_type")
+  tvSeries     TvSeries      @relation(fields: [tvSeriesId], references: [id], onDelete: Cascade)
+  provider     WatchProvider @relation(fields: [providerId], references: [providerId], onDelete: Cascade)
+
+  @@id([tvSeriesId, providerId])
+  @@map("tv_series_watch_providers")
+}
+
+// ============================================================
+// Authentication & Authorization
+// ============================================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime? @map("email_verified")
+  name          String?
+  passwordHash  String?   @map("password_hash")
+  image         String?
+  role          String    @default("USER")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  accounts Account[]
+  sessions Session[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}

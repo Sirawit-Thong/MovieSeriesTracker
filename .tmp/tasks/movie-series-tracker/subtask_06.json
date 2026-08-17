@@ -1,0 +1,36 @@
+{
+  "id": "movie-series-tracker-06",
+  "seq": "06",
+  "title": "Data Ingestion - Reference Data Seeding",
+  "status": "completed",
+  "agent_id": "coder-agent",
+  "started_at": "2026-08-17T00:00:00Z",
+  "completed_at": "2026-08-17T00:05:00Z",
+  "completion_summary": "Created seed-reference.ts, prisma/seed.ts, db/index.ts singleton, reference-data.ts service. Added getAllWatchProviders to TmdbClient. Idempotent upserts. Added tsx + prisma.seed config.",
+  "depends_on": ["04", "05"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "context_files": [
+    "C:/Users/thong/.config/opencode/context/core/standards/code-quality.md",
+    "C:/Users/thong/.config/opencode/context/core/standards/typescript.md"
+  ],
+  "reference_files": [
+    "D:/dev/MovieSeriesTracker/api/tmdb/14-genre/README.md",
+    "D:/dev/MovieSeriesTracker/api/tmdb/15-keyword/README.md",
+    "D:/dev/MovieSeriesTracker/api/tmdb/20-watch-providers/README.md"
+  ],
+  "acceptance_criteria": [
+    "Seed script fetches all movie genres from TMDB and stores in Genre table",
+    "Seed script fetches all TV genres from TMDB and stores in Genre table",
+    "Seed script fetches all watch providers and stores in WatchProvider table",
+    "Seed script is idempotent (re-running does not duplicate data)",
+    "Seed script can be run via 'npx prisma db seed' or custom npm script",
+    "All reference data persists correctly in SQLite database",
+    "TypeScript service layer for reference data operations"
+  ],
+  "deliverables": [
+    "src/lib/ingestion/seed-reference.ts",
+    "prisma/seed.ts",
+    "src/lib/db/reference-data.ts"
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "id": "movie-series-tracker-07",
+  "seq": "07",
+  "title": "Data Ingestion - Movie Sync Service",
+  "status": "completed",
+  "agent_id": "coder-agent",
+  "started_at": "2026-08-17T00:00:00Z",
+  "completed_at": "2026-08-17T00:05:00Z",
+  "completion_summary": "Created movie sync service with full+top-rated fetch, all TMDB fields, nested data, transaction batching, rate-limit compliance, and progress tracking",
+  "depends_on": ["05", "06"],
+  "parallel": false,
+  "suggested_agent": "CoderAgent",
+  "context_files": [
+    "C:/Users/thong/.config/opencode/context/core/standards/code-quality.md",
+    "C:/Users/thong/.config/opencode/context/core/standards/typescript.md"
+  ],
+  "reference_files": [
+    "D:/dev/MovieSeriesTracker/api/tmdb/05-movie/README.md",
+    "D:/dev/MovieSeriesTracker/api/tmdb/09-discover/README.md"
+  ],
+  "acceptance_criteria": [
+    "Full sync fetches popular + top-rated movies from TMDB discover endpoint",
+    "Movie sync stores ALL fields: adult, backdrop_path, budget, genres, homepage, id, imdb_id, origin_country, original_language, original_title, overview, popularity, poster_path, release_date, revenue, runtime, status, tagline, title, video, vote_average, vote_count",
+    "Nested data stored: belongs_to_collection, production_companies, production_countries, spoken_languages",
+    "Upsert logic prevents duplicates on re-sync",
+    "Progress tracking and logging during sync",
+    "Handles TMDB rate limits gracefully",
+    "Incremental sync support (only fetch new/updated movies)"
+  ],
+  "deliverables": [
+    "src/lib/ingestion/movie-sync.ts",
+    "src/lib/ingestion/types.ts"
+  ]
+}

@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="64" fill="#0f172a"/>
+  <rect x="40" y="128" width="432" height="272" rx="16" fill="#1e293b"/>
+  <!-- Film reel left -->
+  <circle cx="136" cy="264" r="52" fill="#3b82f6"/>
+  <circle cx="136" cy="264" r="20" fill="#0f172a"/>
+  <circle cx="136" cy="232" r="6" fill="#0f172a"/>
+  <circle cx="136" cy="296" r="6" fill="#0f172a"/>
+  <circle cx="104" cy="264" r="6" fill="#0f172a"/>
+  <circle cx="168" cy="264" r="6" fill="#0f172a"/>
+  <!-- Film reel right -->
+  <circle cx="376" cy="264" r="52" fill="#3b82f6"/>
+  <circle cx="376" cy="264" r="20" fill="#0f172a"/>
+  <circle cx="376" cy="232" r="6" fill="#0f172a"/>
+  <circle cx="376" cy="296" r="6" fill="#0f172a"/>
+  <circle cx="344" cy="264" r="6" fill="#0f172a"/>
+  <circle cx="408" cy="264" r="6" fill="#0f172a"/>
+  <!-- Film strip top -->
+  <rect x="40" y="128" width="432" height="32" rx="16" fill="#3b82f6" opacity="0.6"/>
+  <rect x="40" y="138" width="32" height="10" rx="2" fill="#0f172a"/>
+  <rect x="84" y="138" width="32" height="10" rx="2" fill="#0f172a"/>
+  <rect x="128" y="138" width="32" height="10" rx="2" fill="#0f172a"/>
+  <rect x="172" y="138" width="32" height="10" rx="2" fill="#0f172a"/>
+  <rect x="216" y="138" width="32" height="10" rx="2" fill="#0f172a"/>
+  <rect x="260" y="138" width="32" height="10" rx="2" fill="#0f172a"/>
+  <rect x="304" y="138" width="32" height="10" rx="2" fill="#0f172a"/>
+  <rect x="348" y="138" width="32" height="10" rx="2" fill="#0f172a"/>
+  <rect x="392" y="138" width="32" height="10" rx="2" fill="#0f172a"/>
+  <rect x="436" y="138" width="32" height="10" rx="2" fill="#0f172a"/>
+  <!-- Film strip bottom -->
+  <rect x="40" y="368" width="432" height="32" rx="16" fill="#3b82f6" opacity="0.6"/>
+  <rect x="40" y="378" width="32" height="10" rx="2" fill="#0f172a"/>
+  <rect x="84" y="378" width="32" height="10" rx="2" fill="#0f172a"/>
+  <rect x="128" y="378" width="32" height="10" rx="2" fill="#0f172a"/>
+  <rect x="172" y="378" width="32" height="10" rx="2" fill="#0f172a"/>
+  <rect x="216" y="378" width="32" height="10" rx="2" fill="#0f172a"/>
+  <rect x="260" y="378" width="32" height="10" rx="2" fill="#0f172a"/>
+  <rect x="304" y="378" width="32" height="10" rx="2" fill="#0f172a"/>
+  <rect x="348" y="378" width="32" height="10" rx="2" fill="#0f172a"/>
+  <rect x="392" y="378" width="32" height="10" rx="2" fill="#0f172a"/>
+  <rect x="436" y="378" width="32" height="10" rx="2" fill="#0f172a"/>
+  <!-- Play triangle -->
+  <polygon points="232,224 232,312 304,268" fill="#ffffff"/>
+</svg>

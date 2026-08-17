@@ -1,0 +1,29 @@
+{
+  "id": "v2-08",
+  "seq": "08",
+  "title": "NextAuth.js Integration + Session Provider",
+  "status": "pending",
+  "phase": "phase-1",
+  "depends_on": ["v2-01"],
+  "suggested_agent": "CoderAgent",
+  "reference_files": [
+    "D:/dev/MovieSeriesTracker/src/app/[locale]/layout.tsx",
+    "D:/dev/MovieSeriesTracker/src/lib/auth/config.ts"
+  ],
+  "acceptance_criteria": [
+    "NextAuth.js v5 (Auth.js) configured with CredentialsProvider",
+    "Prisma adapter configured for session/account/verification storage",
+    "Session callback extends session with user.id and user.role",
+    "JWT callback includes user.id and user.role",
+    "src/app/api/auth/[...nextauth]/route.ts created",
+    "SessionProvider wrapped around app in layout.tsx",
+    "useSession hook available in client components",
+    "getServerSession available in server components"
+  ],
+  "deliverables": [
+    "src/lib/auth/config.ts (NextAuth config)",
+    "src/app/api/auth/[...nextauth]/route.ts",
+    "src/components/auth/SessionProvider.tsx",
+    "src/app/[locale]/layout.tsx (updated)"
+  ]
+}

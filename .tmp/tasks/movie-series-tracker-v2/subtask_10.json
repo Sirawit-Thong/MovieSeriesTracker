@@ -1,0 +1,39 @@
+{
+  "id": "v2-10",
+  "seq": "10",
+  "title": "Auth UI — Login, Register, Profile Pages",
+  "status": "pending",
+  "phase": "phase-4",
+  "depends_on": ["v2-09"],
+  "suggested_agent": "CoderAgent",
+  "reference_files": [
+    "D:/dev/MovieSeriesTracker/src/app/[locale]/layout.tsx",
+    "D:/dev/MovieSeriesTracker/src/components/layout/Header.tsx",
+    "D:/dev/MovieSeriesTracker/src/messages/en.json"
+  ],
+  "acceptance_criteria": [
+    "Login page: /en/login, /th/login — email + password form",
+    "Register page: /en/register, /th/register — name + email + password + confirm form",
+    "Profile page: /en/profile, /th/profile — view/edit profile",
+    "Password change section on profile page",
+    "Header updated: show user avatar/name when logged in, login/register when not",
+    "Logout button in header dropdown",
+    "Form validation with error messages",
+    "Loading states on forms",
+    "Redirect after login to previous page",
+    "All text uses i18n translation keys",
+    "Dark theme consistent with existing design"
+  ],
+  "deliverables": [
+    "src/app/[locale]/login/page.tsx",
+    "src/app/[locale]/register/page.tsx",
+    "src/app/[locale]/profile/page.tsx",
+    "src/components/auth/LoginForm.tsx",
+    "src/components/auth/RegisterForm.tsx",
+    "src/components/auth/ProfileForm.tsx",
+    "src/components/auth/UserMenu.tsx",
+    "src/components/layout/Header.tsx (updated)",
+    "src/messages/en.json (auth keys)",
+    "src/messages/th.json (auth keys)"
+  ]
+}

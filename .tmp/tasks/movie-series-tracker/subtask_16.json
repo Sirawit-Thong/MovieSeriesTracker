@@ -1,0 +1,35 @@
+{
+  "id": "movie-series-tracker-16",
+  "seq": "16",
+  "title": "Genre & Keyword Browsing Pages",
+  "status": "pending",
+  "depends_on": ["10", "11"],
+  "parallel": true,
+  "suggested_agent": "OpenFrontendSpecialist",
+  "context_files": [
+    "C:/Users/thong/.config/opencode/context/core/standards/code-quality.md",
+    "C:/Users/thong/.config/opencode/context/core/standards/typescript.md",
+    "C:/Users/thong/.config/opencode/context/core/essential-patterns.md"
+  ],
+  "reference_files": [
+    "D:/dev/MovieSeriesTracker/api/tmdb/14-genre/README.md",
+    "D:/dev/MovieSeriesTracker/api/tmdb/15-keyword/README.md"
+  ],
+  "acceptance_criteria": [
+    "Genre list page showing all genres as clickable cards/chips",
+    "Genre detail page showing movies and TV series for that genre",
+    "Movies/TV listed in genre page use MediaCard component",
+    "Keyword browsing page (if keywords exist in database)",
+    "Genre navigation accessible from main nav or home page",
+    "Genre count displayed on genre cards",
+    "Responsive grid for genre cards",
+    "All text uses i18n translation keys"
+  ],
+  "deliverables": [
+    "src/app/[locale]/genres/page.tsx",
+    "src/app/[locale]/genres/[id]/page.tsx",
+    "src/components/genre/GenreGrid.tsx",
+    "src/components/genre/GenreCard.tsx",
+    "src/lib/db/genre-queries.ts"
+  ]
+}

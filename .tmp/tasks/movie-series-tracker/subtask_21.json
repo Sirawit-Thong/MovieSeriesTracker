@@ -1,0 +1,31 @@
+{
+  "id": "movie-series-tracker-21",
+  "seq": "21",
+  "title": "Docker Compose - Local Development Environment",
+  "status": "completed",
+  "agent_id": "coder-agent",
+  "started_at": "2026-08-17T00:00:00Z",
+  "completed_at": "2026-08-17T00:00:00Z",
+  "completion_summary": "Created Dockerfile (3-stage: deps/builder/runner), docker-compose.yml (dev service with hot reload), .dockerignore, and added standalone output to next.config.mjs",
+  "depends_on": ["01"],
+  "parallel": true,
+  "suggested_agent": "CoderAgent",
+  "context_files": [
+    "C:/Users/thong/.config/opencode/context/core/standards/code-quality.md"
+  ],
+  "reference_files": [],
+  "acceptance_criteria": [
+    "Dockerfile for Next.js app (multi-stage build)",
+    "docker-compose.yml with app service",
+    "SQLite database volume mounted for persistence",
+    ".dockerignore excludes node_modules, .next, .env",
+    "docker compose up starts the app successfully",
+    "Development mode with hot reload supported",
+    "README instructions for Docker setup"
+  ],
+  "deliverables": [
+    "Dockerfile",
+    "docker-compose.yml",
+    ".dockerignore"
+  ]
+}

@@ -1,0 +1,60 @@
+# ============================================================
+# .dockerignore — Exclude files from Docker build context
+# ============================================================
+
+# Dependencies
+node_modules
+
+# Next.js build output
+.next
+
+# Task/temp files
+.tmp
+
+# Version control
+.git
+
+# Environment files (secrets should not be in the image)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Local SQLite dev database (not needed with PostgreSQL in Docker)
+prisma/dev.db
+prisma/dev.db-journal
+
+# Documentation (except README)
+*.md
+!README.md
+
+# IDE and editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test and build artifacts
+coverage
+build
+out
+
+# TypeScript build info
+*.tsbuildinfo
+next-env.d.ts
+
+# Docker files (avoid recursion)
+Dockerfile
+docker-compose.yml
+docker-compose*.yml
+.dockerignore
+
+# Misc
+npm-debug.log*
+.vercel

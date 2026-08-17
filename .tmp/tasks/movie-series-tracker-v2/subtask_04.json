@@ -1,0 +1,34 @@
+{
+  "id": "v2-04",
+  "seq": "04",
+  "title": "Extended TMDB Schema — Review, List, Certification, Config",
+  "status": "pending",
+  "phase": "phase-2",
+  "suggested_agent": "CoderAgent",
+  "reference_files": [
+    "D:/dev/MovieSeriesTracker/api/tmdb/16-review/README.md",
+    "D:/dev/MovieSeriesTracker/api/tmdb/17-list/README.md",
+    "D:/dev/MovieSeriesTracker/api/tmdb/04-certification/README.md",
+    "D:/dev/MovieSeriesTracker/api/tmdb/21-configuration/README.md",
+    "D:/dev/MovieSeriesTracker/api/tmdb/20-watch-providers/README.md",
+    "D:/dev/MovieSeriesTracker/prisma/schema.prisma"
+  ],
+  "acceptance_criteria": [
+    "Review model: id, tmdbId, author, authorDetails (username, name, avatarPath, rating), content, createdAt, updatedAt, url, iso6391, mediaType, mediaId, mediaTitle, mediaPosterPath, mediaReleaseDate, rating, language",
+    "TmdbList model: id, tmdbId, name, description, language, itemCount, createdBy (userId, username), public, sortBy, createdAt, updatedAt",
+    "TmdbListItem model: id, listId FK, mediaType, mediaId, title, originalTitle, overview, releaseDate, posterPath, mediaRating, popularity",
+    "Certification model: id, iso31661, certification, meaning, order (unique on iso31661+certification)",
+    "WatchProvider updated: add flatrate/rent/buy/free distinction with region support",
+    "WatchProviderRegion model: id, providerId FK, region (iso31661)",
+    "TmdbConfiguration model: id, imageUrl, logoPath, posterPath, backdropPath, profilePath, stillPath, changeKeys (JSON)",
+    "TmdbCountry model: iso31661, englishName, nativeName",
+    "TmdbLanguage model: iso6391, englishName, name",
+    "TmdbTimezone model: iso31661, zone (unique)",
+    "All junction tables with proper unique constraints",
+    "Indexes on foreign keys",
+    "prisma generate + db push succeed"
+  ],
+  "deliverables": [
+    "prisma/schema.prisma (extended with review, list, certification, config models)"
+  ]
+}

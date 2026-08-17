@@ -1,0 +1,32 @@
+{
+  "id": "v2-01",
+  "seq": "01",
+  "title": "Database Migration to PostgreSQL + Auth Schema",
+  "status": "pending",
+  "phase": "phase-1",
+  "suggested_agent": "CoderAgent",
+  "context_files": [],
+  "reference_files": [
+    "D:/dev/MovieSeriesTracker/prisma/schema.prisma",
+    "D:/dev/MovieSeriesTracker/prisma.config.ts"
+  ],
+  "acceptance_criteria": [
+    "Prisma schema updated to support PostgreSQL (provider change)",
+    "User model: id, email, emailVerified, name, passwordHash, image, role (USER/ADMIN), createdAt, updatedAt",
+    "Account model: id, userId, type, provider, providerAccountId, refresh_token, access_token, expires_at, token_type, scope, id_token, session_state",
+    "Session model: id, sessionToken, userId, expires",
+    "VerificationToken model: identifier, token, expires (composite unique)",
+    "NextAuth.js configuration with CredentialsProvider (email+password)",
+    "bcrypt password hashing",
+    "prisma.config.ts updated for PostgreSQL URL",
+    ".env.example updated with DATABASE_URL for PostgreSQL",
+    "prisma generate + migrate succeed"
+  ],
+  "deliverables": [
+    "prisma/schema.prisma (updated with auth models)",
+    "src/lib/auth/config.ts (NextAuth config)",
+    "src/lib/auth/password.ts (bcrypt helpers)",
+    "prisma/migrations/ (migration files)"
+  ],
+  "notes": "Use next-auth v5 (Auth.js) with Prisma adapter. Credentials provider for email+password."
+}

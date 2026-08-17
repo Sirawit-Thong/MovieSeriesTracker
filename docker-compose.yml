@@ -1,0 +1,52 @@
+# ============================================================
+# Docker Compose - Local Development Environment
+# ============================================================
+# Usage:
+#   docker compose up          — Start in dev mode with hot reload
+#   docker compose up -d       — Start in background
+#   docker compose down        — Stop and remove containers
+#   docker compose logs -f app — Follow app logs
+# ============================================================
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: movie_series_tracker
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: deps
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount source code for hot-reload during development
+      - .:/app
+      # Cache node_modules in a named volume (avoids host/container mismatch)
+      - node_modules:/app/node_modules
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/movie_series_tracker
+      - TMDB_API_KEY=${TMDB_API_KEY}
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["/bin/sh", "-c", "npx prisma generate && npx prisma db push && exec npm run dev"]
+
+volumes:
+  node_modules:
+  postgres_data:

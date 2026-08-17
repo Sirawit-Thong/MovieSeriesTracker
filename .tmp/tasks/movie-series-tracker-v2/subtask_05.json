@@ -1,0 +1,31 @@
+{
+  "id": "v2-05",
+  "seq": "05",
+  "title": "Extended Data Ingestion — Movie Sub-resources Sync",
+  "status": "pending",
+  "phase": "phase-3",
+  "depends_on": ["v2-02"],
+  "suggested_agent": "CoderAgent",
+  "reference_files": [
+    "D:/dev/MovieSeriesTracker/src/lib/ingestion/movie-sync.ts",
+    "D:/dev/MovieSeriesTracker/src/lib/tmdb/client.ts"
+  ],
+  "acceptance_criteria": [
+    "movie-sync.ts extended to fetch and store alternative titles",
+    "movie-sync.ts extended to fetch and store content ratings",
+    "movie-sync.ts extended to fetch and store images (with metadata)",
+    "movie-sync.ts extended to fetch and store translations",
+    "movie-sync.ts extended to fetch and store videos",
+    "movie-sync.ts extended to fetch and store release dates",
+    "movie-sync.ts extended to fetch and store external IDs",
+    "movie-sync.ts extended to fetch and store recommendations",
+    "movie-sync.ts extended to fetch and store similar movies",
+    "TmdbClient extended with new endpoint methods",
+    "All sub-resources stored in transactions",
+    "Error handling for missing sub-resources"
+  ],
+  "deliverables": [
+    "src/lib/ingestion/movie-sync.ts (extended)",
+    "src/lib/tmdb/client.ts (new methods)"
+  ]
+}

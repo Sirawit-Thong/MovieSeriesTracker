@@ -1,0 +1,32 @@
+{
+  "id": "movie-series-tracker-09",
+  "seq": "09",
+  "title": "Data Ingestion - Person Sync Service",
+  "status": "completed",
+  "agent_id": "coder-agent",
+  "started_at": "2026-01-28T00:00:00Z",
+  "completed_at": "2026-01-28T00:01:00Z",
+  "completion_summary": "Created person-sync.ts and credit-sync.ts with full TMDB field mapping, upsert logic, credit deduplication, and rate-limit compliance",
+  "depends_on": ["05", "06"],
+  "parallel": true,
+  "suggested_agent": "CoderAgent",
+  "context_files": [
+    "C:/Users/thong/.config/opencode/context/core/standards/code-quality.md",
+    "C:/Users/thong/.config/opencode/context/core/standards/typescript.md"
+  ],
+  "reference_files": [
+    "D:/dev/MovieSeriesTracker/api/tmdb/07-person/README.md"
+  ],
+  "acceptance_criteria": [
+    "Full sync fetches popular persons from TMDB",
+    "Person sync stores ALL fields: also_known_as, biography, birthday, deathday, gender, homepage, id, imdb_id, name, place_of_birth, popularity, profile_path",
+    "Cast and crew credits fetched and linked to existing movies/TV series",
+    "Upsert logic prevents duplicates",
+    "Rate limit compliant (40 req/10s)",
+    "Credit relationships created between Person and Movie/TvSeries entities"
+  ],
+  "deliverables": [
+    "src/lib/ingestion/person-sync.ts",
+    "src/lib/ingestion/credit-sync.ts"
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "id": "v2-06",
+  "seq": "06",
+  "title": "Extended Data Ingestion — TV/Person Sub-resources Sync",
+  "status": "pending",
+  "phase": "phase-3",
+  "depends_on": ["v2-03"],
+  "suggested_agent": "CoderAgent",
+  "reference_files": [
+    "D:/dev/MovieSeriesTracker/src/lib/ingestion/tv-sync.ts",
+    "D:/dev/MovieSeriesTracker/src/lib/ingestion/person-sync.ts",
+    "D:/dev/MovieSeriesTracker/src/lib/tmdb/client.ts"
+  ],
+  "acceptance_criteria": [
+    "tv-sync.ts extended to fetch and store translations, images, videos, external IDs, recommendations, similar, content ratings",
+    "tv-sync.ts extended to fetch and store episode groups with order",
+    "tv-sync.ts extended to fetch and store season/episode translations and images",
+    "person-sync.ts extended to fetch and store person images, external IDs",
+    "person-sync.ts extended to fetch and store person changes",
+    "TmdbClient extended with new TV/person endpoint methods",
+    "All sub-resources stored in transactions",
+    "Error handling for missing sub-resources"
+  ],
+  "deliverables": [
+    "src/lib/ingestion/tv-sync.ts (extended)",
+    "src/lib/ingestion/person-sync.ts (extended)",
+    "src/lib/tmdb/client.ts (new methods)"
+  ]
+}
