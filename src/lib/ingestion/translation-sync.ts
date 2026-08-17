@@ -7,7 +7,6 @@
 //   - The `data` JSON field contains localized title/name, overview, tagline/biography
 //   - Detail pages resolve display fields based on locale from this table
 
-import { PrismaClient } from '../../generated/prisma';
 import type { TmdbClient } from '../tmdb/client';
 import type { TmdbTranslationsResponse } from '../tmdb/types';
 
@@ -41,8 +40,7 @@ export async function storeTranslations(
   entityType: 'movie' | 'tv' | 'person',
   entityId: number,
   tmdbId: number,
-  client: TmdbClient,
-  tx?: PrismaClient
+  client: TmdbClient
 ): Promise<void> {
   try {
     // Fetch translations from TMDB
@@ -60,10 +58,10 @@ export async function storeTranslations(
     }
 
     // Upsert each translation
-    const db = tx || (await import('../db')).default;
+    const db = (await import('../db')).default;
     for (const tr of supportedTranslations) {
       const dataJson = JSON.stringify(tr.data);
-      const localeInfo = LOCALE_MAP[tr.iso_6391] || {
+      const localeInfo = LOCALE_MAP[tr.iso_639_1] || {
         iso6391: tr.iso_639_1,
         iso31661: tr.iso_3166_1,
       };

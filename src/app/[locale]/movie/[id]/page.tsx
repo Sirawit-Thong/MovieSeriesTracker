@@ -1,6 +1,6 @@
 import {notFound} from 'next/navigation';
 import type {Metadata} from 'next';
-import {setRequestLocale, getTranslations} from 'next-intl/server';
+import {setRequestLocale} from 'next-intl/server';
 import {prisma} from '@/lib/db';
 import MovieDetail from '@/components/movie/MovieDetail';
 import {getLocalizedField} from '@/lib/ingestion/translation-sync';
@@ -10,13 +10,13 @@ type MoviePageProps = {
 };
 
 /**
- * Fetch a movie by its database ID with all related data.
+ * Fetch a movie by its TMDB ID with all related data.
  * Includes direct relations and polymorphic sub-resources.
  * Returns null if no movie is found.
  */
-async function getMovieById(id: number) {
+async function getMovieById(id: number, locale: string) {
   const movie = await prisma.movie.findUnique({
-    where: {id},
+    where: {tmdbId: id},
     include: {
       genres: {include: {genre: true}},
       productionCompanies: {include: {company: true}},
@@ -40,24 +40,24 @@ async function getMovieById(id: number) {
 
   if (!movie) return null;
 
-  // Sub-resources: polymorphic tables
+  // Sub-resources: polymorphic tables (use movie.id = DB PK)
   const [images, videos, externalIds, translations, recommendations] =
     await Promise.all([
       prisma.mediaImage.findMany({
-        where: {entityType: 'movie', entityId: id},
+        where: {entityType: 'movie', entityId: movie.id},
         orderBy: {voteAverage: 'desc'},
       }),
       prisma.mediaVideo.findMany({
-        where: {entityType: 'movie', entityId: id},
+        where: {entityType: 'movie', entityId: movie.id},
       }),
       prisma.externalId.findFirst({
-        where: {entityType: 'movie', entityId: id},
+        where: {entityType: 'movie', entityId: movie.id},
       }),
       prisma.translation.findMany({
-        where: {entityType: 'movie', entityId: id},
+        where: {entityType: 'movie', entityId: movie.id},
       }),
       prisma.recommendation.findMany({
-        where: {sourceType: 'movie', sourceId: id},
+        where: {sourceType: 'movie', sourceId: movie.id},
         orderBy: {position: 'asc'},
       }),
     ]);
@@ -133,7 +133,7 @@ export async function generateMetadata({
   params,
 }: MoviePageProps): Promise<Metadata> {
   const {locale, id} = await params;
-  const movie = await getMovieById(Number(id));
+  const movie = await getMovieById(Number(id), locale);
 
   if (!movie) {
     return {title: 'Movie Not Found'};
@@ -159,7 +159,7 @@ export default async function MoviePage({params}: MoviePageProps) {
   const {locale, id} = await params;
   setRequestLocale(locale);
 
-  const movie = await getMovieById(Number(id));
+  const movie = await getMovieById(Number(id), locale);
 
   if (!movie) {
     notFound();

@@ -480,6 +480,304 @@ export async function syncPersonCredits(
 }
 
 // ============================================================
+// On-Demand Credit Sync: Ensure a person has credits in the DB
+// ============================================================
+
+/**
+ * Check if a person has any credits in the database.
+ * If not, fetch from TMDB and sync them.
+ * This is used by the person detail page to ensure credits are available.
+ */
+export async function ensurePersonCredits(
+  personId: number,
+  tmdbPersonId: number,
+): Promise<void> {
+  // Check if credits already exist
+  const castCount = await prisma.castCredit.count({
+    where: {personId},
+  });
+  const crewCount = await prisma.crewCredit.count({
+    where: {personId},
+  });
+  const combinedCount = await prisma.personCombinedCredit.count({
+    where: {personId},
+  });
+
+  // All credits already synced — nothing to do
+  if (castCount > 0 || crewCount > 0 || combinedCount > 0) {
+    return;
+  }
+
+  console.log(
+    `${LOG_PREFIX} No credits found for person ${tmdbPersonId}, syncing from TMDB...`,
+  );
+
+  const client = new TmdbClient();
+
+  // Fetch movie credits, TV credits, and combined credits in parallel
+  const [movieCredits, tvCredits, personDetails] = await Promise.all([
+    client.getPersonMovieCredits(tmdbPersonId),
+    client.getPersonTvCredits(tmdbPersonId),
+    client.getPersonDetails(tmdbPersonId, 'combined_credits'),
+  ]);
+
+  // Sync cast + crew credits (existing logic)
+  await syncPersonCreditsFromData(personId, movieCredits, tvCredits);
+
+  // Sync combined credits (for "Known For" section)
+  if (personDetails.combined_credits) {
+    await syncCombinedCredits(personId, personDetails.combined_credits);
+  }
+}
+
+/**
+ * Sync combined credits into the person_combined_credits table.
+ * These are used by the "Known For" section on the person detail page.
+ */
+async function syncCombinedCredits(
+  personId: number,
+  combinedCredits: {
+    cast: Array<{
+      id: number;
+      media_type: string;
+      character: string;
+      credit_id: string;
+      overview: string;
+      popularity: number;
+      poster_path: string | null;
+      release_date: string | null;
+      title: string | null;
+      vote_average: number;
+      vote_count: number;
+      name?: string;
+      first_air_date?: string;
+    }>;
+    crew: Array<{
+      id: number;
+      media_type: string;
+      department: string;
+      job: string;
+      credit_id: string;
+      overview: string;
+      popularity: number;
+      poster_path: string | null;
+      release_date: string | null;
+      title: string | null;
+      vote_average: number;
+      vote_count: number;
+      name?: string;
+      first_air_date?: string;
+    }>;
+  },
+): Promise<void> {
+  const data: Array<{
+    personId: number;
+    mediaType: string;
+    mediaId: number;
+    character: string | null;
+    department: string | null;
+    job: string | null;
+    creditId: string | null;
+    title: string | null;
+    overview: string | null;
+    popularity: number | null;
+    releaseDate: string | null;
+    voteAverage: number | null;
+    voteCount: number | null;
+    posterPath: string | null;
+  }> = [];
+
+  const seen = new Set<string>();
+
+  // Cast credits
+  for (const cast of combinedCredits.cast) {
+    const key = `${cast.media_type}-${cast.id}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+
+    data.push({
+      personId,
+      mediaType: cast.media_type,
+      mediaId: cast.id,
+      character: cast.character || null,
+      department: null,
+      job: null,
+      creditId: cast.credit_id || null,
+      title: cast.title || cast.name || null,
+      overview: cast.overview || null,
+      popularity: cast.popularity ?? null,
+      releaseDate: cast.release_date || cast.first_air_date || null,
+      voteAverage: cast.vote_average ?? null,
+      voteCount: cast.vote_count ?? null,
+      posterPath: cast.poster_path || null,
+    });
+  }
+
+  // Crew credits
+  for (const crew of combinedCredits.crew) {
+    const key = `${crew.media_type}-${crew.id}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+
+    data.push({
+      personId,
+      mediaType: crew.media_type,
+      mediaId: crew.id,
+      character: null,
+      department: crew.department || null,
+      job: crew.job || null,
+      creditId: crew.credit_id || null,
+      title: crew.title || crew.name || null,
+      overview: crew.overview || null,
+      popularity: crew.popularity ?? null,
+      releaseDate: crew.release_date || crew.first_air_date || null,
+      voteAverage: crew.vote_average ?? null,
+      voteCount: crew.vote_count ?? null,
+      posterPath: crew.poster_path || null,
+    });
+  }
+
+  if (data.length === 0) return;
+
+  await prisma.$transaction(async (tx) => {
+    await tx.personCombinedCredit.deleteMany({where: {personId}});
+    await tx.personCombinedCredit.createMany({data, skipDuplicates: true});
+  });
+
+  console.log(
+    `${LOG_PREFIX} Combined credits for person ${personId}: ${data.length} entries`,
+  );
+}
+
+/**
+ * Sync cast + crew credits from pre-fetched TMDB data.
+ * Used by ensurePersonCredits to avoid redundant API calls.
+ */
+async function syncPersonCreditsFromData(
+  personId: number,
+  movieCredits: {cast: Array<{id: number; credit_id: string; character: string; order: number}>;
+    crew: Array<{id: number; credit_id: string; department: string; job: string}>},
+  tvCredits: {cast: Array<{id: number; credit_id: string; character: string}>;
+    crew: Array<{id: number; credit_id: string; department: string; job: string}>},
+): Promise<void> {
+  const movieTmdbIds = new Set<number>();
+  const tvTmdbIds = new Set<number>();
+
+  for (const cast of movieCredits.cast) movieTmdbIds.add(cast.id);
+  for (const crew of movieCredits.crew) movieTmdbIds.add(crew.id);
+  for (const cast of tvCredits.cast) tvTmdbIds.add(cast.id);
+  for (const crew of tvCredits.crew) tvTmdbIds.add(crew.id);
+
+  const [existingMovies, existingTvSeries] = await Promise.all([
+    movieTmdbIds.size > 0
+      ? prisma.movie.findMany({
+          where: {tmdbId: {in: Array.from(movieTmdbIds)}},
+          select: {id: true, tmdbId: true},
+        })
+      : [],
+    tvTmdbIds.size > 0
+      ? prisma.tvSeries.findMany({
+          where: {tmdbId: {in: Array.from(tvTmdbIds)}},
+          select: {id: true, tmdbId: true},
+        })
+      : [],
+  ]);
+
+  const movieIdMap = new Map(existingMovies.map((m) => [m.tmdbId, m.id]));
+  const tvSeriesIdMap = new Map(existingTvSeries.map((s) => [s.tmdbId, s.id]));
+
+  const seenCastCreditIds = new Set<string>();
+  const seenCrewCreditIds = new Set<string>();
+
+  const castData: Array<{
+    personId: number;
+    movieId?: number;
+    tvSeriesId?: number;
+    character: string | null;
+    creditId: string | null;
+    order: number | null;
+  }> = [];
+
+  const crewData: Array<{
+    personId: number;
+    movieId?: number;
+    tvSeriesId?: number;
+    department: string | null;
+    job: string | null;
+    creditId: string | null;
+  }> = [];
+
+  for (const cast of movieCredits.cast) {
+    if (seenCastCreditIds.has(cast.credit_id)) continue;
+    seenCastCreditIds.add(cast.credit_id);
+    const movieId = movieIdMap.get(cast.id);
+    if (!movieId) continue;
+    castData.push({
+      personId,
+      movieId,
+      character: cast.character || null,
+      creditId: cast.credit_id || null,
+      order: cast.order ?? null,
+    });
+  }
+
+  for (const crew of movieCredits.crew) {
+    if (seenCrewCreditIds.has(crew.credit_id)) continue;
+    seenCrewCreditIds.add(crew.credit_id);
+    const movieId = movieIdMap.get(crew.id);
+    if (!movieId) continue;
+    crewData.push({
+      personId,
+      movieId,
+      department: crew.department || null,
+      job: crew.job || null,
+      creditId: crew.credit_id || null,
+    });
+  }
+
+  for (const cast of tvCredits.cast) {
+    if (seenCastCreditIds.has(cast.credit_id)) continue;
+    seenCastCreditIds.add(cast.credit_id);
+    const tvSeriesId = tvSeriesIdMap.get(cast.id);
+    if (!tvSeriesId) continue;
+    castData.push({
+      personId,
+      tvSeriesId,
+      character: cast.character || null,
+      creditId: cast.credit_id || null,
+      order: null,
+    });
+  }
+
+  for (const crew of tvCredits.crew) {
+    if (seenCrewCreditIds.has(crew.credit_id)) continue;
+    seenCrewCreditIds.add(crew.credit_id);
+    const tvSeriesId = tvSeriesIdMap.get(crew.id);
+    if (!tvSeriesId) continue;
+    crewData.push({
+      personId,
+      tvSeriesId,
+      department: crew.department || null,
+      job: crew.job || null,
+      creditId: crew.credit_id || null,
+    });
+  }
+
+  await prisma.$transaction(async (tx) => {
+    await Promise.all([
+      tx.castCredit.deleteMany({where: {personId}}),
+      tx.crewCredit.deleteMany({where: {personId}}),
+    ]);
+    if (castData.length > 0) await tx.castCredit.createMany({data: castData});
+    if (crewData.length > 0) await tx.crewCredit.createMany({data: crewData});
+  });
+
+  console.log(
+    `${LOG_PREFIX} Credits synced for person ${personId}: ${castData.length} cast, ${crewData.length} crew`,
+  );
+}
+
+// ============================================================
 // Bulk Credit Sync: Credits for all persons in the database
 // ============================================================
 

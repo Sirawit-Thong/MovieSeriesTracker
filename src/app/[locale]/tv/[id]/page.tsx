@@ -10,13 +10,13 @@ type TvPageProps = {
 };
 
 /**
- * Fetch a TV series by its database ID with all related data.
+ * Fetch a TV series by its TMDB ID with all related data.
  * Includes direct relations and polymorphic sub-resources.
  * Returns null if no series is found.
  */
 async function getTvSeriesById(id: number, locale: string) {
   const series = await prisma.tvSeries.findUnique({
-    where: {id},
+    where: {tmdbId: id},
     include: {
       genres: {include: {genre: true}},
       networks: {include: {network: true}},
@@ -50,24 +50,24 @@ async function getTvSeriesById(id: number, locale: string) {
 
   if (!series) return null;
 
-  // Sub-resources: polymorphic tables
+  // Sub-resources: polymorphic tables (use series.id = DB PK)
   const [images, videos, externalIds, translations, recommendations] =
     await Promise.all([
       prisma.mediaImage.findMany({
-        where: {entityType: 'tv', entityId: id},
+        where: {entityType: 'tv', entityId: series.id},
         orderBy: {voteAverage: 'desc'},
       }),
       prisma.mediaVideo.findMany({
-        where: {entityType: 'tv', entityId: id},
+        where: {entityType: 'tv', entityId: series.id},
       }),
       prisma.externalId.findFirst({
-        where: {entityType: 'tv', entityId: id},
+        where: {entityType: 'tv', entityId: series.id},
       }),
       prisma.translation.findMany({
-        where: {entityType: 'tv', entityId: id},
+        where: {entityType: 'tv', entityId: series.id},
       }),
       prisma.recommendation.findMany({
-        where: {sourceType: 'tv', sourceId: id},
+        where: {sourceType: 'tv', sourceId: series.id},
         orderBy: {position: 'asc'},
       }),
     ]);
