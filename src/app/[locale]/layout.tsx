@@ -26,9 +26,19 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const {locale} = await props.params;
 
+  const titles: Record<string, string> = {
+    en: 'Movie Series Tracker',
+    th: 'ติดตามภาพยนตร์และซีรีส์',
+  };
+
+  const descriptions: Record<string, string> = {
+    en: 'Track your favorite movies and TV series. Rate, annotate, and organize your watchlist.',
+    th: 'ติดตามภาพยนตร์และซีรีส์ที่คุณชื่นชอบ ให้คะแนน จดบันทึก และจัดระเบียบรายการที่ต้องการดู',
+  };
+
   return {
-    title: 'Movie Series Tracker',
-    description: 'Track your favorite movies and TV series',
+    title: titles[locale] || titles.en,
+    description: descriptions[locale] || descriptions.en,
     manifest: '/manifest.json',
     appleWebApp: {
       capable: true,
@@ -41,6 +51,17 @@ export async function generateMetadata(
     icons: {
       icon: '/icons/icon-192x192.svg',
       apple: '/icons/icon-512x512.svg',
+    },
+    openGraph: {
+      title: titles[locale] || titles.en,
+      description: descriptions[locale] || descriptions.en,
+      type: 'website',
+      locale: locale === 'th' ? 'th_TH' : 'en_US',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: titles[locale] || titles.en,
+      description: descriptions[locale] || descriptions.en,
     },
   };
 }

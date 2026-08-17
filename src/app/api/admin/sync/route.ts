@@ -3,6 +3,9 @@
 
 import {NextResponse} from 'next/server';
 import {auth} from '@/lib/auth/config';
+import {createLogger} from '@/lib/logger';
+
+const log = createLogger('admin:sync');
 
 function isAdmin(role: unknown): boolean {
   return role === 'ADMIN';
@@ -23,7 +26,7 @@ export async function POST() {
       queuedAt: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('[admin:sync]', error);
+    log.error('Sync failed', error);
     return NextResponse.json(
       {error: 'Internal server error'},
       {status: 500},

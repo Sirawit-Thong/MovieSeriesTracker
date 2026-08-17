@@ -20,7 +20,8 @@ build/
 # debug
 npm-debug.log*
 
-# local env files
+# env files
+.env
 .env*.local
 
 # vercel
@@ -31,5 +32,8 @@ npm-debug.log*
 next-env.d.ts
 
 # prisma
-prisma/dev.db
-prisma/dev.db-journal
+*.db
+*.db-journal
+
+# opencode
+.tmp/

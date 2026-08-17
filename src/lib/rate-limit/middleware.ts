@@ -1,9 +1,5 @@
-import createMiddleware from 'next-intl/middleware';
-import {routing} from './src/i18n/routing';
 import {NextResponse} from 'next/server';
 import type {NextRequest} from 'next/server';
-
-const intlMiddleware = createMiddleware(routing);
 
 const rateLimitMap = new Map<string, {count: number; resetAt: number}>();
 
@@ -23,10 +19,12 @@ function getRateLimitConfig(pathname: string) {
   return DEFAULT_RATE_LIMIT;
 }
 
-function applyRateLimit(request: NextRequest): NextResponse | null {
+export function middleware(request: NextRequest) {
   const {pathname} = request.nextUrl;
 
-  if (!pathname.startsWith('/api/')) return null;
+  if (!pathname.startsWith('/api/')) {
+    return NextResponse.next();
+  }
 
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 'anonymous';
   const key = `${ip}:${pathname}`;
@@ -37,7 +35,7 @@ function applyRateLimit(request: NextRequest): NextResponse | null {
 
   if (!entry || now > entry.resetAt) {
     rateLimitMap.set(key, {count: 1, resetAt: now + config.windowMs});
-    return null;
+    return NextResponse.next();
   }
 
   if (entry.count >= config.max) {
@@ -56,19 +54,15 @@ function applyRateLimit(request: NextRequest): NextResponse | null {
   }
 
   entry.count++;
-  return null;
-}
 
-export function middleware(request: NextRequest) {
-  const rateLimitResponse = applyRateLimit(request);
-  if (rateLimitResponse) return rateLimitResponse;
+  const response = NextResponse.next();
+  response.headers.set('X-RateLimit-Limit', String(config.max));
+  response.headers.set('X-RateLimit-Remaining', String(config.max - entry.count));
+  response.headers.set('X-RateLimit-Reset', String(Math.ceil(entry.resetAt / 1000)));
 
-  return intlMiddleware(request);
+  return response;
 }
 
 export const config = {
-  matcher: [
-    '/((?!api|_next|_vercel|.*\\..*).*)',
-    '/api/:path*',
-  ],
+  matcher: ['/api/:path*'],
 };

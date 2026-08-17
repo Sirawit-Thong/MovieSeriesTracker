@@ -5,6 +5,9 @@
 import {NextResponse} from 'next/server';
 import {auth} from '@/lib/auth/config';
 import prisma from '@/lib/db';
+import {createLogger} from '@/lib/logger';
+
+const log = createLogger('admin:users');
 
 function isAdmin(role: unknown): boolean {
   return role === 'ADMIN';
@@ -50,7 +53,7 @@ export async function GET(request: Request) {
       totalPages: Math.ceil(total / PAGE_SIZE),
     });
   } catch (error) {
-    console.error('[admin:users:get]', error);
+    log.error('Failed to fetch users', error);
     return NextResponse.json(
       {error: 'Internal server error'},
       {status: 500},
@@ -114,7 +117,7 @@ export async function PUT(request: Request) {
 
     return NextResponse.json(updatedUser);
   } catch (error) {
-    console.error('[admin:users:put]', error);
+    log.error('Failed to update user', error);
     return NextResponse.json(
       {error: 'Internal server error'},
       {status: 500},

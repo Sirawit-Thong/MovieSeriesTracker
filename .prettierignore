@@ -1,0 +1,7 @@
+node_modules
+.next
+generated
+public
+*.db
+*.db-journal
+package-lock.json

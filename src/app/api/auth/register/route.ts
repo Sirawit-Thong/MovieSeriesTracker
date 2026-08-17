@@ -2,6 +2,9 @@ import {NextResponse} from 'next/server';
 import prisma from '@/lib/db';
 import {hashPassword} from '@/lib/auth/password';
 import {registerSchema} from '@/lib/validations/auth';
+import {createLogger} from '@/lib/logger';
+
+const log = createLogger('register');
 
 export async function POST(request: Request) {
   try {
@@ -47,7 +50,7 @@ export async function POST(request: Request) {
       {status: 201},
     );
   } catch (error) {
-    console.error('[register]', error);
+    log.error('Registration failed', error);
     return NextResponse.json(
       {error: 'Internal server error'},
       {status: 500},
