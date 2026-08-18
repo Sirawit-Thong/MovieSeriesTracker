@@ -1,5 +1,6 @@
 import {notFound} from 'next/navigation';
 import type {Metadata} from 'next';
+import {cache} from 'react';
 import {setRequestLocale} from 'next-intl/server';
 import {prisma} from '@/lib/db';
 import MovieDetail from '@/components/movie/MovieDetail';
@@ -16,7 +17,7 @@ type MoviePageProps = {
  * Includes direct relations and polymorphic sub-resources.
  * Returns null if no movie is found.
  */
-async function getMovieById(id: number, locale: string) {
+const getMovieById = cache(async function getMovieById(id: number, locale: string) {
   const movie = await prisma.movie.findUnique({
     where: {tmdbId: id},
     include: {
@@ -46,26 +47,19 @@ async function getMovieById(id: number, locale: string) {
   const hasCredits = movie.castCredits.length > 0 || movie.crewCredits.length > 0;
   if (!hasCredits) {
     await ensureMediaCredits('movie', movie.id, id);
-    // Re-fetch movie with credits
-    const refreshed = await prisma.movie.findUnique({
-      where: {tmdbId: id},
-      include: {
-        genres: {include: {genre: true}},
-        productionCompanies: {include: {company: true}},
-        productionCountries: {include: {country: true}},
-        spokenLanguages: {include: {language: true}},
-        collection: true,
-        castCredits: {include: {person: true}, orderBy: {order: 'asc'}},
-        crewCredits: {include: {person: true}},
-        watchProviders: {include: {provider: true}},
-        releaseDates: true,
-        contentRatings: true,
-        altTitles: true,
-      },
-    });
-    if (refreshed) {
-      Object.assign(movie, refreshed);
-    }
+    const [castCredits, crewCredits] = await Promise.all([
+      prisma.castCredit.findMany({
+        where: {movieId: movie.id},
+        include: {person: true},
+        orderBy: {order: 'asc'},
+      }),
+      prisma.crewCredit.findMany({
+        where: {movieId: movie.id},
+        include: {person: true},
+      }),
+    ]);
+    movie.castCredits = castCredits;
+    movie.crewCredits = crewCredits;
   }
 
   // Sub-resources: polymorphic tables (use movie.id = DB PK)
@@ -164,7 +158,7 @@ async function getMovieById(id: number, locale: string) {
       tagline: getLocalizedField(translations, locale, 'tagline', movie.tagline),
     },
   };
-}
+});
 
 export async function generateMetadata({
   params,

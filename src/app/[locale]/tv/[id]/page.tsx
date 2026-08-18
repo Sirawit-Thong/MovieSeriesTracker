@@ -1,5 +1,6 @@
 import {notFound} from 'next/navigation';
 import type {Metadata} from 'next';
+import {cache} from 'react';
 import {setRequestLocale} from 'next-intl/server';
 import {prisma} from '@/lib/db';
 import TvDetail from '@/components/tv/TvDetail';
@@ -16,7 +17,7 @@ type TvPageProps = {
  * Includes direct relations and polymorphic sub-resources.
  * Returns null if no series is found.
  */
-async function getTvSeriesById(id: number, locale: string) {
+const getTvSeriesById = cache(async function getTvSeriesById(id: number, locale: string) {
   const series = await prisma.tvSeries.findUnique({
     where: {tmdbId: id},
     include: {
@@ -56,29 +57,19 @@ async function getTvSeriesById(id: number, locale: string) {
   const hasCredits = series.castCredits.length > 0 || series.crewCredits.length > 0;
   if (!hasCredits) {
     await ensureMediaCredits('tv', series.id, id);
-    // Re-fetch series with credits
-    const refreshed = await prisma.tvSeries.findUnique({
-      where: {tmdbId: id},
-      include: {
-        genres: {include: {genre: true}},
-        networks: {include: {network: true}},
-        productionCompanies: {include: {company: true}},
-        productionCountries: {include: {country: true}},
-        spokenLanguages: {include: {language: true}},
-        createdBy: true,
-        seasons: {include: {episodes: {orderBy: {episodeNumber: 'asc'}}}, orderBy: {seasonNumber: 'asc'}},
-        nextEpisodeToAir: true,
-        lastEpisodeToAir: true,
-        castCredits: {include: {person: true}, orderBy: {order: 'asc'}},
-        crewCredits: {include: {person: true}},
-        watchProviders: {include: {provider: true}},
-        contentRatings: true,
-        altTitles: true,
-      },
-    });
-    if (refreshed) {
-      Object.assign(series, refreshed);
-    }
+    const [castCredits, crewCredits] = await Promise.all([
+      prisma.castCredit.findMany({
+        where: {tvSeriesId: series.id},
+        include: {person: true},
+        orderBy: {order: 'asc'},
+      }),
+      prisma.crewCredit.findMany({
+        where: {tvSeriesId: series.id},
+        include: {person: true},
+      }),
+    ]);
+    series.castCredits = castCredits;
+    series.crewCredits = crewCredits;
   }
 
   // Sub-resources: polymorphic tables (use series.id = DB PK)
@@ -177,7 +168,7 @@ async function getTvSeriesById(id: number, locale: string) {
       tagline: getLocalizedField(translations, locale, 'tagline', series.tagline),
     },
   };
-}
+});
 
 export async function generateMetadata({
   params,
