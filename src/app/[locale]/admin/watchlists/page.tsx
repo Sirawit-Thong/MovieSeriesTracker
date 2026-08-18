@@ -3,6 +3,10 @@
 import {useEffect, useState, useCallback} from 'react';
 import {Link} from '@/i18n/navigation';
 import {useTranslations} from 'next-intl';
+import AdminPagination from '@/components/admin/AdminPagination';
+import AdminSpinner from '@/components/admin/AdminSpinner';
+import AdminEmptyState from '@/components/admin/AdminEmptyState';
+import ConfirmButton from '@/components/admin/ConfirmButton';
 
 type Watchlist = {
   id: string;
@@ -29,6 +33,7 @@ export default function AdminWatchlistsPage() {
   const [data, setData] = useState<WatchlistsResponse | null>(null);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchWatchlists = useCallback(async (p: number) => {
     setLoading(true);
@@ -36,11 +41,16 @@ export default function AdminWatchlistsPage() {
       const res = await fetch(`/api/admin/watchlists?page=${p}`);
       if (res.ok) {
         setData(await res.json());
+        setError(null);
+      } else {
+        setError(t('loadError'));
       }
+    } catch {
+      setError(t('loadError'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchWatchlists(page);
@@ -78,6 +88,12 @@ export default function AdminWatchlistsPage() {
         </p>
       </div>
 
+      {error && (
+        <div className="mb-4 px-4 py-3 text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg">
+          {error}
+        </div>
+      )}
+
       {/* Watchlists Table */}
       <div className="bg-surface border border-border rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
@@ -99,37 +115,16 @@ export default function AdminWatchlistsPage() {
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
                   {t('watchlistsPage.created')}
                 </th>
+                <th className="text-right px-6 py-3 text-foreground/50 font-medium">
+                  {t('actions')}
+                </th>
               </tr>
             </thead>
             <tbody>
               {loading && !data && (
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="px-6 py-8 text-center text-foreground/40"
-                  >
-                    <div className="flex items-center justify-center gap-2">
-                      <svg
-                        className="animate-spin h-5 w-5 text-primary"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                        />
-                      </svg>
-                      {t('loadingWatchlists')}
-                    </div>
+                  <td colSpan={6}>
+                    <AdminSpinner label={t('loadingWatchlists')} />
                   </td>
                 </tr>
               )}
@@ -164,15 +159,34 @@ export default function AdminWatchlistsPage() {
                       day: 'numeric',
                     })}
                   </td>
+                  <td className="px-6 py-3">
+                    <div className="flex items-center justify-end">
+                      <ConfirmButton
+                        onConfirm={async () => {
+                          try {
+                            const res = await fetch(`/api/admin/watchlists?id=${watchlist.id}`, {method: 'DELETE'});
+                            if (res.ok) {
+                              await fetchWatchlists(page);
+                              if (data && page > data.totalPages) setPage(data.totalPages);
+                            } else {
+                              setError(t('watchlistsPage.deleteError'));
+                            }
+                          } catch {
+                            setError(t('watchlistsPage.deleteError'));
+                          }
+                        }}
+                        confirmLabel={t('watchlistsPage.confirmDelete')}
+                      >
+                        {t('watchlistsPage.delete')}
+                      </ConfirmButton>
+                    </div>
+                  </td>
                 </tr>
               ))}
               {data && data.watchlists.length === 0 && (
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="px-6 py-8 text-center text-foreground/40"
-                  >
-                    {t('watchlistsPage.noWatchlists')}
+                  <td colSpan={6}>
+                    <AdminEmptyState message={t('watchlistsPage.noWatchlists')} />
                   </td>
                 </tr>
               )}
@@ -181,32 +195,13 @@ export default function AdminWatchlistsPage() {
         </div>
 
         {/* Pagination */}
-        {data && data.totalPages > 1 && (
-          <div className="flex items-center justify-between px-6 py-4 border-t border-border">
-            <p className="text-sm text-foreground/50">
-              {t('pagination', {page: data.page, totalPages: data.totalPages, count: data.total})}
-            </p>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page <= 1}
-                className="px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground/70 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                {t('previous')}
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  setPage((p) => Math.min(data.totalPages, p + 1))
-                }
-                disabled={page >= data.totalPages}
-                className="px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground/70 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                {t('next')}
-              </button>
-            </div>
-          </div>
+        {data && (
+          <AdminPagination
+            page={data.page}
+            totalPages={data.totalPages}
+            total={data.total}
+            onPageChange={setPage}
+          />
         )}
       </div>
     </div>
