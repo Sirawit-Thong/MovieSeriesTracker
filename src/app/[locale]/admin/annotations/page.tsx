@@ -2,14 +2,18 @@
 
 import {useEffect, useState, useCallback} from 'react';
 import {Link} from '@/i18n/navigation';
-import {useTranslations} from 'next-intl';
+import {useLocale, useTranslations} from 'next-intl';
+import AdminPagination from '@/components/admin/AdminPagination';
+import AdminSpinner from '@/components/admin/AdminSpinner';
+import AdminEmptyState from '@/components/admin/AdminEmptyState';
+import {formatDate} from '@/lib/format-date';
 
 type Annotation = {
   id: string;
   entityType: string;
-  entityId: string;
-  status: string;
-  rating: number | null;
+  entityId: number;
+  watchStatus: string | null;
+  personalRating: number | null;
   notes: string | null;
   createdAt: string;
   user: {
@@ -26,23 +30,24 @@ type AnnotationsResponse = {
   totalPages: number;
 };
 
-const STATUS_OPTIONS = [
+const STATUS_OPTIONS: {value: string; labelKey: string}[] = [
   {value: '', labelKey: 'allStatuses'},
-  {value: 'WATCHED', label: 'Watched'},
-  {value: 'WATCHING', label: 'Watching'},
-  {value: 'WANT_TO_WATCH', label: 'Want to Watch'},
-  {value: 'DROPPED', label: 'Dropped'},
+  {value: 'WATCHED', labelKey: 'watched'},
+  {value: 'WATCHING', labelKey: 'watching'},
+  {value: 'WANT_TO_WATCH', labelKey: 'wantToWatch'},
+  {value: 'DROPPED', labelKey: 'dropped'},
 ];
 
-const ENTITY_TYPE_OPTIONS = [
+const ENTITY_TYPE_OPTIONS: {value: string; labelKey: string}[] = [
   {value: '', labelKey: 'allTypes'},
-  {value: 'MOVIE', label: 'Movie'},
-  {value: 'TV', label: 'TV'},
-  {value: 'PERSON', label: 'Person'},
+  {value: 'MOVIE', labelKey: 'movie'},
+  {value: 'TV', labelKey: 'tv'},
+  {value: 'PERSON', labelKey: 'person'},
 ];
 
 export default function AdminAnnotationsPage() {
   const t = useTranslations('Admin');
+  const locale = useLocale();
   const [data, setData] = useState<AnnotationsResponse | null>(null);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -120,7 +125,7 @@ export default function AdminAnnotationsPage() {
         >
           {STATUS_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
-              {opt.labelKey ? t(`annotationsPage.${opt.labelKey}`) : opt.label}
+              {t(`annotationsPage.${opt.labelKey}`)}
             </option>
           ))}
         </select>
@@ -131,7 +136,7 @@ export default function AdminAnnotationsPage() {
         >
           {ENTITY_TYPE_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
-              {opt.labelKey ? t(`annotationsPage.${opt.labelKey}`) : opt.label}
+              {t(`annotationsPage.${opt.labelKey}`)}
             </option>
           ))}
         </select>
@@ -169,32 +174,8 @@ export default function AdminAnnotationsPage() {
             <tbody>
               {loading && !data && (
                 <tr>
-                  <td
-                    colSpan={7}
-                    className="px-6 py-8 text-center text-foreground/40"
-                  >
-                    <div className="flex items-center justify-center gap-2">
-                      <svg
-                        className="animate-spin h-5 w-5 text-primary"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                        />
-                      </svg>
-                      {t('loadingAnnotations')}
-                    </div>
+                  <td colSpan={7}>
+                    <AdminSpinner label={t('loadingAnnotations')} />
                   </td>
                 </tr>
               )}
@@ -218,49 +199,56 @@ export default function AdminAnnotationsPage() {
                       {annotation.entityType}
                     </span>
                   </td>
-                  <td className="px-6 py-3 text-foreground/70 font-mono text-xs">
-                    {annotation.entityId}
+                  <td className="px-6 py-3">
+                    {annotation.entityType === 'MOVIE' && (
+                      <Link href={`/movie/${annotation.entityId}`} className="text-primary hover:underline font-mono text-xs">
+                        {annotation.entityId}
+                      </Link>
+                    )}
+                    {annotation.entityType === 'TV' && (
+                      <Link href={`/tv/${annotation.entityId}`} className="text-primary hover:underline font-mono text-xs">
+                        {annotation.entityId}
+                      </Link>
+                    )}
+                    {annotation.entityType === 'PERSON' && (
+                      <Link href={`/person/${annotation.entityId}`} className="text-primary hover:underline font-mono text-xs">
+                        {annotation.entityId}
+                      </Link>
+                    )}
+                    {!['MOVIE', 'TV', 'PERSON'].includes(annotation.entityType) && (
+                      <span className="font-mono text-xs text-foreground/70">{annotation.entityId}</span>
+                    )}
                   </td>
                   <td className="px-6 py-3">
                     <span
                       className={`inline-block px-2.5 py-0.5 text-xs font-medium rounded-full ${
-                        annotation.status === 'WATCHED'
+                        annotation.watchStatus === 'WATCHED'
                           ? 'bg-green-500/15 text-green-400'
-                          : annotation.status === 'WATCHING'
+                          : annotation.watchStatus === 'WATCHING'
                             ? 'bg-blue-500/15 text-blue-400'
-                            : annotation.status === 'WANT_TO_WATCH'
+                            : annotation.watchStatus === 'WANT_TO_WATCH'
                               ? 'bg-yellow-500/15 text-yellow-400'
                               : 'bg-red-500/15 text-red-400'
                       }`}
                     >
-                      {annotation.status}
+                      {annotation.watchStatus}
                     </span>
                   </td>
                   <td className="px-6 py-3 text-foreground/70">
-                    {annotation.rating ?? '—'}
+                    {annotation.personalRating ?? '—'}
                   </td>
                   <td className="px-6 py-3 text-foreground/60 max-w-[200px] truncate">
                     {annotation.notes ?? '—'}
                   </td>
                   <td className="px-6 py-3 text-foreground/60">
-                    {new Date(annotation.createdAt).toLocaleDateString(
-                      'en-US',
-                      {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                      },
-                    )}
+                    {formatDate(annotation.createdAt, locale)}
                   </td>
                 </tr>
               ))}
               {data && data.annotations.length === 0 && (
                 <tr>
-                  <td
-                    colSpan={7}
-                    className="px-6 py-8 text-center text-foreground/40"
-                  >
-                    {t('annotationsPage.noAnnotations')}
+                  <td colSpan={7}>
+                    <AdminEmptyState message={t('annotationsPage.noAnnotations')} />
                   </td>
                 </tr>
               )}
@@ -269,32 +257,13 @@ export default function AdminAnnotationsPage() {
         </div>
 
         {/* Pagination */}
-        {data && data.totalPages > 1 && (
-          <div className="flex items-center justify-between px-6 py-4 border-t border-border">
-            <p className="text-sm text-foreground/50">
-              {t('pagination', {page: data.page, totalPages: data.totalPages, count: data.total})}
-            </p>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page <= 1}
-                className="px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground/70 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                {t('previous')}
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  setPage((p) => Math.min(data.totalPages, p + 1))
-                }
-                disabled={page >= data.totalPages}
-                className="px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground/70 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                {t('next')}
-              </button>
-            </div>
-          </div>
+        {data && (
+          <AdminPagination
+            page={data.page}
+            totalPages={data.totalPages}
+            total={data.total}
+            onPageChange={setPage}
+          />
         )}
       </div>
     </div>
