@@ -2,6 +2,7 @@
 // POST /api/sync — Re-fetch a single entity from TMDB with ALL sub-resources.
 
 import {NextResponse} from 'next/server';
+import {requireAdmin} from '@/lib/admin';
 import {fetchAndUpsertMovie} from '@/lib/ingestion/movie-sync';
 import {fetchAndUpsertTvSeries} from '@/lib/ingestion/tv-sync';
 import {fetchAndUpsertPerson} from '@/lib/ingestion/person-sync';
@@ -10,6 +11,9 @@ import {TmdbClient} from '@/lib/tmdb/client';
 
 export async function POST(request: Request) {
   try {
+    const auth = await requireAdmin();
+    if (auth.response) return auth.response;
+
     const body = await request.json();
     const {type, tmdbId} = body as {type?: string; tmdbId?: number};
 
