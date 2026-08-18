@@ -22,10 +22,11 @@ export async function GET(request: Request) {
   const countryRaw = searchParams.getAll('country');
   const countryCodes = countryRaw.length > 0 ? countryRaw : null;
   const limit = Math.min(Math.max(Number(searchParams.get('limit')) || 100, 1), 500);
+  const hasInMemoryFilter = Boolean(search) || countryCodes !== null;
 
   // Fetch annotations
   const annotations = await prisma.userAnnotation.findMany({
-    take: limit,
+    ...(!hasInMemoryFilter ? {take: limit} : {}),
     where: {
       userId: session.user.id,
       ...(entityType ? {entityType} : {}),
@@ -40,7 +41,7 @@ export async function GET(request: Request) {
 
   // Fetch watchlist items (treated as WANT_TO_WATCH if not already annotated)
   const watchlistItems = await prisma.watchlistItem.findMany({
-    take: limit,
+    ...(!hasInMemoryFilter ? {take: limit} : {}),
     where: {
       watchlist: {userId: session.user.id},
       ...(entityType ? {entityType: entityType === 'MOVIE' ? 'MOVIE' : 'TV'} : {}),
@@ -237,7 +238,7 @@ export async function GET(request: Request) {
   // Filter by search term
   if (search) {
     const q = search.toLowerCase();
-    filtered = allResults.filter((a) => {
+    filtered = filtered.filter((a) => {
       if (a.entityType === 'MOVIE' && a.movie) {
         return a.movie.title.toLowerCase().includes(q);
       }
