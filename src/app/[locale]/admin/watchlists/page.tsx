@@ -3,37 +3,35 @@
 import {useEffect, useState, useCallback} from 'react';
 import {Link} from '@/i18n/navigation';
 
-type User = {
+type Watchlist = {
   id: string;
-  name: string | null;
-  email: string;
-  role: string;
+  name: string;
+  description: string | null;
+  itemCount: number;
   createdAt: string;
+  user: {
+    name: string | null;
+    email: string;
+  };
 };
 
-type UsersResponse = {
-  users: User[];
+type WatchlistsResponse = {
+  watchlists: Watchlist[];
   total: number;
   page: number;
   pageSize: number;
   totalPages: number;
 };
 
-export default function AdminUsersPage() {
-  const [data, setData] = useState<UsersResponse | null>(null);
+export default function AdminWatchlistsPage() {
+  const [data, setData] = useState<WatchlistsResponse | null>(null);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [updatingId, setUpdatingId] = useState<string | null>(null);
-  const [search, setSearch] = useState('');
-  const [role, setRole] = useState('');
 
-  const fetchUsers = useCallback(async (p: number, searchQuery: string, roleFilter: string) => {
+  const fetchWatchlists = useCallback(async (p: number) => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({page: String(p)});
-      if (searchQuery) params.set('search', searchQuery);
-      if (roleFilter) params.set('role', roleFilter);
-      const res = await fetch(`/api/admin/users?${params.toString()}`);
+      const res = await fetch(`/api/admin/watchlists?page=${p}`);
       if (res.ok) {
         setData(await res.json());
       }
@@ -43,37 +41,8 @@ export default function AdminUsersPage() {
   }, []);
 
   useEffect(() => {
-    fetchUsers(page, search, role);
-  }, [page, fetchUsers, search, role]);
-
-  function handleSearch(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setPage(1);
-    fetchUsers(1, search, role);
-  }
-
-  function handleRoleFilter(e: React.ChangeEvent<HTMLSelectElement>) {
-    const value = e.target.value;
-    setRole(value);
-    setPage(1);
-  }
-
-  async function handleRoleChange(userId: string, newRole: string) {
-    setUpdatingId(userId);
-    try {
-      const res = await fetch('/api/admin/users', {
-        method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({userId, role: newRole}),
-      });
-
-      if (res.ok) {
-        await fetchUsers(page, search, role);
-      }
-    } finally {
-      setUpdatingId(null);
-    }
-  }
+    fetchWatchlists(page);
+  }, [page, fetchWatchlists]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
@@ -98,58 +67,35 @@ export default function AdminUsersPage() {
               />
             </svg>
           </Link>
-          <h1 className="text-3xl font-bold text-white">User Management</h1>
+          <h1 className="text-3xl font-bold text-white">
+            Watchlist Management
+          </h1>
         </div>
         <p className="mt-1 text-foreground/60">
-          View and manage user accounts and roles.
+          Browse and manage user watchlists across the platform.
         </p>
       </div>
 
-      {/* Search & Role Filter */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
-        <form onSubmit={handleSearch} className="flex-1 flex gap-2">
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name or email..."
-            className="flex-1 px-4 py-2 text-sm rounded-lg bg-background border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:border-primary/50 transition-colors"
-          />
-          <button
-            type="submit"
-            className="px-4 py-2 text-sm font-medium rounded-lg bg-primary text-white hover:bg-primary/80 transition-colors"
-          >
-            Search
-          </button>
-        </form>
-        <select
-          value={role}
-          onChange={handleRoleFilter}
-          className="px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground focus:outline-none focus:border-primary/50 transition-colors"
-        >
-          <option value="">All Roles</option>
-          <option value="USER">USER</option>
-          <option value="ADMIN">ADMIN</option>
-        </select>
-      </div>
-
-      {/* Users Table */}
+      {/* Watchlists Table */}
       <div className="bg-surface border border-border rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border">
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
+                  User
+                </th>
+                <th className="text-left px-6 py-3 text-foreground/50 font-medium">
                   Name
                 </th>
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Email
+                  Description
                 </th>
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Role
+                  Items
                 </th>
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Joined
+                  Created
                 </th>
               </tr>
             </thead>
@@ -157,7 +103,7 @@ export default function AdminUsersPage() {
               {loading && !data && (
                 <tr>
                   <td
-                    colSpan={4}
+                    colSpan={5}
                     className="px-6 py-8 text-center text-foreground/40"
                   >
                     <div className="flex items-center justify-center gap-2">
@@ -180,41 +126,37 @@ export default function AdminUsersPage() {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                         />
                       </svg>
-                      Loading users...
+                      Loading watchlists...
                     </div>
                   </td>
                 </tr>
               )}
-              {data?.users.map((user) => (
+              {data?.watchlists.map((watchlist) => (
                 <tr
-                  key={user.id}
+                  key={watchlist.id}
                   className="border-b border-border last:border-0"
                 >
-                  <td className="px-6 py-3 text-foreground">
-                    {user.name ?? '—'}
+                  <td className="px-6 py-3">
+                    <div>
+                      <div className="text-foreground">
+                        {watchlist.user.name ?? '—'}
+                      </div>
+                      <div className="text-xs text-foreground/50">
+                        {watchlist.user.email}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-3 text-foreground font-medium">
+                    {watchlist.name}
+                  </td>
+                  <td className="px-6 py-3 text-foreground/60 max-w-xs truncate">
+                    {watchlist.description ?? '—'}
                   </td>
                   <td className="px-6 py-3 text-foreground/70">
-                    {user.email}
-                  </td>
-                  <td className="px-6 py-3">
-                    <select
-                      value={user.role}
-                      onChange={(e) =>
-                        handleRoleChange(user.id, e.target.value)
-                      }
-                      disabled={updatingId === user.id}
-                      className={`px-2.5 py-1 text-xs font-medium rounded-lg bg-background border border-border text-foreground focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-50 ${
-                        user.role === 'ADMIN'
-                          ? 'text-primary'
-                          : 'text-foreground/60'
-                      }`}
-                    >
-                      <option value="USER">USER</option>
-                      <option value="ADMIN">ADMIN</option>
-                    </select>
+                    {watchlist.itemCount}
                   </td>
                   <td className="px-6 py-3 text-foreground/60">
-                    {new Date(user.createdAt).toLocaleDateString('en-US', {
+                    {new Date(watchlist.createdAt).toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'short',
                       day: 'numeric',
@@ -222,13 +164,13 @@ export default function AdminUsersPage() {
                   </td>
                 </tr>
               ))}
-              {data && data.users.length === 0 && (
+              {data && data.watchlists.length === 0 && (
                 <tr>
                   <td
-                    colSpan={4}
+                    colSpan={5}
                     className="px-6 py-8 text-center text-foreground/40"
                   >
-                    No users found.
+                    No watchlists found.
                   </td>
                 </tr>
               )}
@@ -240,7 +182,7 @@ export default function AdminUsersPage() {
         {data && data.totalPages > 1 && (
           <div className="flex items-center justify-between px-6 py-4 border-t border-border">
             <p className="text-sm text-foreground/50">
-              Page {data.page} of {data.totalPages} ({data.total} users)
+              Page {data.page} of {data.totalPages} ({data.total} watchlists)
             </p>
             <div className="flex gap-2">
               <button

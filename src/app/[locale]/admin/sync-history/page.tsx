@@ -3,37 +3,56 @@
 import {useEffect, useState, useCallback} from 'react';
 import {Link} from '@/i18n/navigation';
 
-type User = {
+type SyncLog = {
   id: string;
-  name: string | null;
-  email: string;
-  role: string;
-  createdAt: string;
+  entityType: string;
+  status: string;
+  processedCount: number;
+  errorCount: number;
+  durationMs: number | null;
+  startedAt: string;
+  endedAt: string | null;
 };
 
-type UsersResponse = {
-  users: User[];
+type SyncLogsResponse = {
+  logs: SyncLog[];
   total: number;
   page: number;
   pageSize: number;
   totalPages: number;
 };
 
-export default function AdminUsersPage() {
-  const [data, setData] = useState<UsersResponse | null>(null);
+function StatusBadge({status}: {status: string}) {
+  const styles: Record<string, string> = {
+    running: 'bg-yellow-500/15 text-yellow-400',
+    completed: 'bg-green-500/15 text-green-400',
+    failed: 'bg-red-500/15 text-red-400',
+  };
+
+  return (
+    <span
+      className={`inline-block px-2.5 py-0.5 text-xs font-medium rounded-full ${styles[status] ?? 'bg-foreground/10 text-foreground/60'}`}
+    >
+      {status}
+    </span>
+  );
+}
+
+function formatDuration(ms: number | null): string {
+  if (ms === null) return '—';
+  if (ms < 1000) return `${ms}ms`;
+  return `${(ms / 1000).toFixed(1)}s`;
+}
+
+export default function AdminSyncHistoryPage() {
+  const [data, setData] = useState<SyncLogsResponse | null>(null);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [updatingId, setUpdatingId] = useState<string | null>(null);
-  const [search, setSearch] = useState('');
-  const [role, setRole] = useState('');
 
-  const fetchUsers = useCallback(async (p: number, searchQuery: string, roleFilter: string) => {
+  const fetchLogs = useCallback(async (p: number) => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({page: String(p)});
-      if (searchQuery) params.set('search', searchQuery);
-      if (roleFilter) params.set('role', roleFilter);
-      const res = await fetch(`/api/admin/users?${params.toString()}`);
+      const res = await fetch(`/api/admin/sync-logs?page=${p}`);
       if (res.ok) {
         setData(await res.json());
       }
@@ -43,37 +62,8 @@ export default function AdminUsersPage() {
   }, []);
 
   useEffect(() => {
-    fetchUsers(page, search, role);
-  }, [page, fetchUsers, search, role]);
-
-  function handleSearch(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setPage(1);
-    fetchUsers(1, search, role);
-  }
-
-  function handleRoleFilter(e: React.ChangeEvent<HTMLSelectElement>) {
-    const value = e.target.value;
-    setRole(value);
-    setPage(1);
-  }
-
-  async function handleRoleChange(userId: string, newRole: string) {
-    setUpdatingId(userId);
-    try {
-      const res = await fetch('/api/admin/users', {
-        method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({userId, role: newRole}),
-      });
-
-      if (res.ok) {
-        await fetchUsers(page, search, role);
-      }
-    } finally {
-      setUpdatingId(null);
-    }
-  }
+    fetchLogs(page);
+  }, [page, fetchLogs]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
@@ -98,58 +88,39 @@ export default function AdminUsersPage() {
               />
             </svg>
           </Link>
-          <h1 className="text-3xl font-bold text-white">User Management</h1>
+          <h1 className="text-3xl font-bold text-white">Sync History</h1>
         </div>
         <p className="mt-1 text-foreground/60">
-          View and manage user accounts and roles.
+          Track data synchronization jobs, their status, and performance.
         </p>
       </div>
 
-      {/* Search & Role Filter */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
-        <form onSubmit={handleSearch} className="flex-1 flex gap-2">
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name or email..."
-            className="flex-1 px-4 py-2 text-sm rounded-lg bg-background border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:border-primary/50 transition-colors"
-          />
-          <button
-            type="submit"
-            className="px-4 py-2 text-sm font-medium rounded-lg bg-primary text-white hover:bg-primary/80 transition-colors"
-          >
-            Search
-          </button>
-        </form>
-        <select
-          value={role}
-          onChange={handleRoleFilter}
-          className="px-3 py-2 text-sm rounded-lg bg-background border border-border text-foreground focus:outline-none focus:border-primary/50 transition-colors"
-        >
-          <option value="">All Roles</option>
-          <option value="USER">USER</option>
-          <option value="ADMIN">ADMIN</option>
-        </select>
-      </div>
-
-      {/* Users Table */}
+      {/* Sync Logs Table */}
       <div className="bg-surface border border-border rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border">
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Name
+                  Entity
                 </th>
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Email
+                  Status
                 </th>
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Role
+                  Processed
                 </th>
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Joined
+                  Errors
+                </th>
+                <th className="text-left px-6 py-3 text-foreground/50 font-medium">
+                  Duration
+                </th>
+                <th className="text-left px-6 py-3 text-foreground/50 font-medium">
+                  Started
+                </th>
+                <th className="text-left px-6 py-3 text-foreground/50 font-medium">
+                  Ended
                 </th>
               </tr>
             </thead>
@@ -157,7 +128,7 @@ export default function AdminUsersPage() {
               {loading && !data && (
                 <tr>
                   <td
-                    colSpan={4}
+                    colSpan={7}
                     className="px-6 py-8 text-center text-foreground/40"
                   >
                     <div className="flex items-center justify-center gap-2">
@@ -180,55 +151,66 @@ export default function AdminUsersPage() {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                         />
                       </svg>
-                      Loading users...
+                      Loading sync logs...
                     </div>
                   </td>
                 </tr>
               )}
-              {data?.users.map((user) => (
+              {data?.logs.map((log) => (
                 <tr
-                  key={user.id}
+                  key={log.id}
                   className="border-b border-border last:border-0"
                 >
-                  <td className="px-6 py-3 text-foreground">
-                    {user.name ?? '—'}
-                  </td>
-                  <td className="px-6 py-3 text-foreground/70">
-                    {user.email}
+                  <td className="px-6 py-3">
+                    <span className="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-foreground/10 text-foreground/60">
+                      {log.entityType}
+                    </span>
                   </td>
                   <td className="px-6 py-3">
-                    <select
-                      value={user.role}
-                      onChange={(e) =>
-                        handleRoleChange(user.id, e.target.value)
-                      }
-                      disabled={updatingId === user.id}
-                      className={`px-2.5 py-1 text-xs font-medium rounded-lg bg-background border border-border text-foreground focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-50 ${
-                        user.role === 'ADMIN'
-                          ? 'text-primary'
-                          : 'text-foreground/60'
-                      }`}
-                    >
-                      <option value="USER">USER</option>
-                      <option value="ADMIN">ADMIN</option>
-                    </select>
+                    <StatusBadge status={log.status} />
+                  </td>
+                  <td className="px-6 py-3 text-foreground/70">
+                    {log.processedCount.toLocaleString()}
+                  </td>
+                  <td className="px-6 py-3">
+                    {log.errorCount > 0 ? (
+                      <span className="text-red-400 font-medium">
+                        {log.errorCount.toLocaleString()}
+                      </span>
+                    ) : (
+                      <span className="text-foreground/40">0</span>
+                    )}
                   </td>
                   <td className="px-6 py-3 text-foreground/60">
-                    {new Date(user.createdAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
+                    {formatDuration(log.durationMs)}
+                  </td>
+                  <td className="px-6 py-3 text-foreground/60">
+                    {new Date(log.startedAt).toLocaleString('en-US', {
                       month: 'short',
                       day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
                     })}
+                  </td>
+                  <td className="px-6 py-3 text-foreground/60">
+                    {log.endedAt
+                      ? new Date(log.endedAt).toLocaleString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })
+                      : '—'}
                   </td>
                 </tr>
               ))}
-              {data && data.users.length === 0 && (
+              {data && data.logs.length === 0 && (
                 <tr>
                   <td
-                    colSpan={4}
+                    colSpan={7}
                     className="px-6 py-8 text-center text-foreground/40"
                   >
-                    No users found.
+                    No sync logs found.
                   </td>
                 </tr>
               )}
@@ -240,7 +222,7 @@ export default function AdminUsersPage() {
         {data && data.totalPages > 1 && (
           <div className="flex items-center justify-between px-6 py-4 border-t border-border">
             <p className="text-sm text-foreground/50">
-              Page {data.page} of {data.totalPages} ({data.total} users)
+              Page {data.page} of {data.totalPages} ({data.total} logs)
             </p>
             <div className="flex gap-2">
               <button

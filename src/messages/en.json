@@ -177,7 +177,15 @@
     "episodeCount": "Episodes watched",
     "lastUpdated": "Updated {date}",
     "seasons": "{count} seasons",
-    "noEpisodes": "No episodes yet"
+    "noEpisodes": "No episodes yet",
+    "movie": "Movie",
+    "tv": "TV",
+    "removeConfirm": "Remove this from your library?",
+    "noNotes": "No notes",
+    "gridView": "Grid",
+    "listView": "List",
+    "yourRating": "Your rating",
+    "remove": "Remove"
   },
   "Watchlist": {
     "title": "My Watchlists",

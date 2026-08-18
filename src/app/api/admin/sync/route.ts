@@ -3,6 +3,7 @@
 
 import {NextResponse} from 'next/server';
 import {requireAdmin} from '@/lib/admin';
+import prisma from '@/lib/db';
 import {syncMovies} from '@/lib/ingestion/movie-sync';
 import {syncTvSeries} from '@/lib/ingestion/tv-sync';
 import {syncPersons} from '@/lib/ingestion/person-sync';
@@ -23,45 +24,93 @@ export async function POST(request: Request) {
     const entity = (body.entity as string) ?? 'all';
     const limit = (body.limit as number) ?? 0;
 
-    const results: Record<string, unknown> = {};
-
-    if (entity === 'all' || entity === 'movies') {
-      const movieResult = await syncMovies({limit, fullSync: true});
-      results.movies = {
-        success: movieResult.success,
-        processed: movieResult.moviesProcessed ?? 0,
-        errors: movieResult.errors.length,
-        duration: movieResult.duration,
-      };
-    }
-
-    if (entity === 'all' || entity === 'tv') {
-      const client = new TmdbClient({language: 'en-US'});
-      const tvResult = await syncTvSeries(client, {limit, fullSync: true});
-      results.tv = {
-        success: tvResult.success,
-        processed: tvResult.moviesProcessed ?? 0,
-        errors: tvResult.errors.length,
-        duration: tvResult.duration,
-      };
-    }
-
-    if (entity === 'all' || entity === 'persons') {
-      const personResult = await syncPersons({limit, fullSync: true});
-      results.persons = {
-        success: personResult.success,
-        processed: personResult.moviesProcessed ?? 0,
-        errors: personResult.errors.length,
-        duration: personResult.duration,
-      };
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: 'Sync completed',
-      completedAt: new Date().toISOString(),
-      results,
+    const syncLog = await prisma.syncLog.create({
+      data: {entity, status: 'running'},
     });
+
+    const results: Record<string, unknown> = {};
+    let totalProcessed = 0;
+    let totalErrors = 0;
+    const startTime = Date.now();
+
+    try {
+      if (entity === 'all' || entity === 'movies') {
+        const movieResult = await syncMovies({limit, fullSync: true});
+        results.movies = {
+          success: movieResult.success,
+          processed: movieResult.moviesProcessed ?? 0,
+          errors: movieResult.errors.length,
+          duration: movieResult.duration,
+        };
+        totalProcessed += movieResult.moviesProcessed ?? 0;
+        totalErrors += movieResult.errors.length;
+      }
+
+      if (entity === 'all' || entity === 'tv') {
+        const client = new TmdbClient({language: 'en-US'});
+        const tvResult = await syncTvSeries(client, {limit, fullSync: true});
+        results.tv = {
+          success: tvResult.success,
+          processed: tvResult.moviesProcessed ?? 0,
+          errors: tvResult.errors.length,
+          duration: tvResult.duration,
+        };
+        totalProcessed += tvResult.moviesProcessed ?? 0;
+        totalErrors += tvResult.errors.length;
+      }
+
+      if (entity === 'all' || entity === 'persons') {
+        const personResult = await syncPersons({limit, fullSync: true});
+        results.persons = {
+          success: personResult.success,
+          processed: personResult.moviesProcessed ?? 0,
+          errors: personResult.errors.length,
+          duration: personResult.duration,
+        };
+        totalProcessed += personResult.moviesProcessed ?? 0;
+        totalErrors += personResult.errors.length;
+      }
+
+      const totalDuration = Date.now() - startTime;
+
+      await prisma.syncLog.update({
+        where: {id: syncLog.id},
+        data: {
+          status: 'completed',
+          processed: totalProcessed,
+          errors: totalErrors,
+          duration: totalDuration,
+          details: JSON.stringify(results),
+          endedAt: new Date(),
+        },
+      });
+
+      return NextResponse.json({
+        success: true,
+        message: 'Sync completed',
+        completedAt: new Date().toISOString(),
+        results,
+      });
+    } catch (syncError) {
+      const totalDuration = Date.now() - startTime;
+
+      await prisma.syncLog.update({
+        where: {id: syncLog.id},
+        data: {
+          status: 'failed',
+          processed: totalProcessed,
+          errors: totalErrors + 1,
+          duration: totalDuration,
+          details: JSON.stringify({
+            ...results,
+            error: syncError instanceof Error ? syncError.message : 'Unknown error',
+          }),
+          endedAt: new Date(),
+        },
+      });
+
+      throw syncError;
+    }
   } catch (error) {
     console.error('Sync failed', error);
     return NextResponse.json(

@@ -177,7 +177,15 @@
     "episodeCount": "จำนวนตอนที่ดู",
     "lastUpdated": "แก้ไข {date}",
     "seasons": "{count} ซีซัน",
-    "noEpisodes": "ยังไม่มีข้อมูลตอน"
+    "noEpisodes": "ยังไม่มีข้อมูลตอน",
+    "movie": "ภาพยนตร์",
+    "tv": "ซีรีส์",
+    "removeConfirm": "ลบรายการนี้ออกจากคลัง?",
+    "noNotes": "ไม่มีหมายเหตุ",
+    "gridView": "ตาราง",
+    "listView": "รายการ",
+    "yourRating": "คะแนนของคุณ",
+    "remove": "ลบ"
   },
   "Watchlist": {
     "title": "Watchlists ของฉัน",

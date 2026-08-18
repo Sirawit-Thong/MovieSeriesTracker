@@ -47,19 +47,6 @@ type LibraryItem = {
   } | null;
 };
 
-type TmdbSearchResult = {
-  id: number;
-  media_type: 'movie' | 'tv';
-  title?: string;
-  name?: string;
-  poster_path: string | null;
-  backdrop_path: string | null;
-  vote_average: number | null;
-  release_date?: string;
-  first_air_date?: string;
-  overview?: string;
-};
-
 type TmdbSearchResponse = {
   movies: Array<{id: number; tmdbId: number; title: string; posterPath: string | null; voteAverage: number | null; releaseDate: string | null; source: string}>;
   tvSeries: Array<{id: number; tmdbId: number; name: string; posterPath: string | null; voteAverage: number | null; firstAirDate: string | null; source: string}>;
@@ -92,6 +79,7 @@ export default function LibraryContent({locale}: {locale: string}) {
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
   const [localSearch, setLocalSearch] = useState('');
   const [sortBy, setSortBy] = useState<'updatedAt' | 'rating' | 'title'>('updatedAt');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   // TMDB search state
   const [tmdbQuery, setTmdbQuery] = useState('');
@@ -167,7 +155,6 @@ export default function LibraryContent({locale}: {locale: string}) {
         body: JSON.stringify({entityType, tmdbId, watchStatus: 'WANT_TO_WATCH'}),
       });
       if (res.ok) {
-        // Navigate to the detail page
         router.push(`/${entityType === 'movie' ? 'movie' : 'tv'}/tmdb/${tmdbId}`);
       }
     } catch {
@@ -182,13 +169,11 @@ export default function LibraryContent({locale}: {locale: string}) {
     const item = items.find((i) => i.id === annotationId);
     if (!item) return;
 
-    // If marking as WATCHED, set currentEpisode = totalEpisodes
     const patch: Record<string, unknown> = {watchStatus: newStatus};
     if (newStatus === 'WATCHED' && item.tvSeries?.numberOfEpisodes) {
       patch.currentEpisode = item.tvSeries.numberOfEpisodes;
       patch.totalEpisodes = item.tvSeries.numberOfEpisodes;
     }
-    // If changing from WATCHED to something else, reset currentEpisode to 0
     if (item.watchStatus === 'WATCHED' && newStatus !== 'WATCHED') {
       patch.currentEpisode = 0;
     }
@@ -201,9 +186,7 @@ export default function LibraryContent({locale}: {locale: string}) {
       });
       if (res.ok) {
         setItems((prev) =>
-          prev.map((i) =>
-            i.id === annotationId ? {...i, ...patch} : i
-          )
+          prev.map((i) => i.id === annotationId ? {...i, ...patch} : i)
         );
       }
     } catch {
@@ -215,17 +198,12 @@ export default function LibraryContent({locale}: {locale: string}) {
   const updateEpisode = useCallback(async (annotationId: number, currentEpisode: number, totalEpisodes: number | null) => {
     const patch: Record<string, unknown> = {currentEpisode, totalEpisodes};
 
-    // If currentEpisode >= totalEpisodes, auto-set to WATCHED
     if (totalEpisodes && currentEpisode >= totalEpisodes) {
       patch.watchStatus = 'WATCHED';
       patch.currentEpisode = totalEpisodes;
-    }
-    // If currentEpisode < totalEpisodes, auto-set to WATCHING
-    else if (totalEpisodes && currentEpisode > 0 && currentEpisode < totalEpisodes) {
+    } else if (totalEpisodes && currentEpisode > 0 && currentEpisode < totalEpisodes) {
       patch.watchStatus = 'WATCHING';
-    }
-    // If currentEpisode is 0, set to WANT_TO_WATCH
-    else if (currentEpisode === 0) {
+    } else if (currentEpisode === 0) {
       patch.watchStatus = 'WANT_TO_WATCH';
     }
 
@@ -237,15 +215,47 @@ export default function LibraryContent({locale}: {locale: string}) {
       });
       if (res.ok) {
         setItems((prev) =>
-          prev.map((i) =>
-            i.id === annotationId ? {...i, ...patch} : i
-          )
+          prev.map((i) => i.id === annotationId ? {...i, ...patch} : i)
         );
       }
     } catch {
       // ignore
     }
   }, []);
+
+  // Inline rating update (1-5 stars)
+  const updateRating = useCallback(async (annotationId: number, rating: number) => {
+    try {
+      const res = await fetch(`/api/annotations/${annotationId}`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({personalRating: rating}),
+      });
+      if (res.ok) {
+        setItems((prev) =>
+          prev.map((i) => i.id === annotationId ? {...i, personalRating: rating} : i)
+        );
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  // Remove annotation from library
+  const removeAnnotation = useCallback(async (annotationId: number) => {
+    if (!window.confirm(t('removeConfirm'))) return;
+
+    try {
+      const res = await fetch(`/api/annotations/${annotationId}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        setItems((prev) => prev.filter((i) => i.id !== annotationId));
+      }
+    } catch {
+      // ignore
+    }
+  }, [t]);
 
   if (!session?.user) {
     return (
@@ -339,7 +349,6 @@ export default function LibraryContent({locale}: {locale: string}) {
               <div className="bg-surface border border-border rounded-xl p-4">
                 <p className="text-xs text-foreground/50 mb-3">TMDB Search Results — click to add to library</p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                  {/* Movies */}
                   {tmdbResults!.movies.map((movie) => (
                     <button
                       key={`movie-${movie.tmdbId}`}
@@ -350,16 +359,12 @@ export default function LibraryContent({locale}: {locale: string}) {
                     >
                       <div className="relative aspect-[2/3] w-full overflow-hidden">
                         {movie.posterPath ? (
-                          <img
-                            src={`${TMDB_IMG}/w300${movie.posterPath}`}
-                            alt={movie.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                          />
+                          <img src={`${TMDB_IMG}/w300${movie.posterPath}`} alt={movie.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
                         ) : (
                           <div className="w-full h-full bg-muted flex items-center justify-center text-sm text-foreground/40">No Image</div>
                         )}
                         <div className="absolute top-2 left-2 bg-blue-500/80 backdrop-blur-sm text-[10px] font-bold uppercase tracking-wider text-white px-2 py-0.5 rounded">
-                          Movie
+                          {t('movie')}
                         </div>
                         {savingTmdbId === movie.tmdbId && (
                           <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
@@ -376,19 +381,11 @@ export default function LibraryContent({locale}: {locale: string}) {
                         )}
                       </div>
                       <div className="p-2">
-                        <p className="text-xs font-medium text-foreground line-clamp-2 group-hover:text-blue-400 transition-colors">
-                          {movie.title}
-                        </p>
-                        {movie.releaseDate && (
-                          <p className="text-[10px] text-foreground/40 mt-0.5">
-                            {new Date(movie.releaseDate).getFullYear()}
-                          </p>
-                        )}
+                        <p className="text-xs font-medium text-foreground line-clamp-2 group-hover:text-blue-400 transition-colors">{movie.title}</p>
+                        {movie.releaseDate && <p className="text-[10px] text-foreground/40 mt-0.5">{new Date(movie.releaseDate).getFullYear()}</p>}
                       </div>
                     </button>
                   ))}
-
-                  {/* TV Series */}
                   {tmdbResults!.tvSeries.map((series) => (
                     <button
                       key={`tv-${series.tmdbId}`}
@@ -399,16 +396,12 @@ export default function LibraryContent({locale}: {locale: string}) {
                     >
                       <div className="relative aspect-[2/3] w-full overflow-hidden">
                         {series.posterPath ? (
-                          <img
-                            src={`${TMDB_IMG}/w300${series.posterPath}`}
-                            alt={series.name}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                          />
+                          <img src={`${TMDB_IMG}/w300${series.posterPath}`} alt={series.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
                         ) : (
                           <div className="w-full h-full bg-muted flex items-center justify-center text-sm text-foreground/40">No Image</div>
                         )}
                         <div className="absolute top-2 left-2 bg-purple-500/80 backdrop-blur-sm text-[10px] font-bold uppercase tracking-wider text-white px-2 py-0.5 rounded">
-                          TV
+                          {t('tv')}
                         </div>
                         {savingTmdbId === series.tmdbId && (
                           <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
@@ -425,14 +418,8 @@ export default function LibraryContent({locale}: {locale: string}) {
                         )}
                       </div>
                       <div className="p-2">
-                        <p className="text-xs font-medium text-foreground line-clamp-2 group-hover:text-purple-400 transition-colors">
-                          {series.name}
-                        </p>
-                        {series.firstAirDate && (
-                          <p className="text-[10px] text-foreground/40 mt-0.5">
-                            {new Date(series.firstAirDate).getFullYear()}
-                          </p>
-                        )}
+                        <p className="text-xs font-medium text-foreground line-clamp-2 group-hover:text-purple-400 transition-colors">{series.name}</p>
+                        {series.firstAirDate && <p className="text-[10px] text-foreground/40 mt-0.5">{new Date(series.firstAirDate).getFullYear()}</p>}
                       </div>
                     </button>
                   ))}
@@ -452,17 +439,14 @@ export default function LibraryContent({locale}: {locale: string}) {
 
       {/* Library Filters */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
-        {/* Local search */}
         <input
           type="text"
           placeholder={t('searchPlaceholder')}
           value={localSearch}
           onChange={(e) => setLocalSearch(e.target.value)}
-          className="flex-1 px-4 py-2.5 rounded-lg border border-border bg-surface text-foreground text-sm
-            focus:outline-none focus:ring-2 focus:ring-primary/50"
+          className="flex-1 px-4 py-2.5 rounded-lg border border-border bg-surface text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
         />
 
-        {/* Type filter */}
         <div className="flex gap-1 bg-surface border border-border rounded-lg p-1">
           {(['ALL', 'MOVIE', 'TV'] as const).map((type) => (
             <button
@@ -470,9 +454,7 @@ export default function LibraryContent({locale}: {locale: string}) {
               type="button"
               onClick={() => setFilterType(type)}
               className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                filterType === type
-                  ? 'bg-primary text-white'
-                  : 'text-foreground/60 hover:text-white'
+                filterType === type ? 'bg-primary text-white' : 'text-foreground/60 hover:text-white'
               }`}
             >
               {type === 'ALL' ? t('all') : type === 'MOVIE' ? t('movies') : t('tvSeries')}
@@ -480,12 +462,10 @@ export default function LibraryContent({locale}: {locale: string}) {
           ))}
         </div>
 
-        {/* Status filter */}
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="px-3 py-2 rounded-lg border border-border bg-surface text-foreground text-sm
-            focus:outline-none focus:ring-2 focus:ring-primary/50"
+          className="px-3 py-2 rounded-lg border border-border bg-surface text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
         >
           <option value="ALL">{t('all')}</option>
           <option value="WATCHED">{t('watched')}</option>
@@ -494,20 +474,40 @@ export default function LibraryContent({locale}: {locale: string}) {
           <option value="DROPPED">{t('dropped')}</option>
         </select>
 
-        {/* Sort */}
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-          className="px-3 py-2 rounded-lg border border-border bg-surface text-foreground text-sm
-            focus:outline-none focus:ring-2 focus:ring-primary/50"
+          className="px-3 py-2 rounded-lg border border-border bg-surface text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
         >
           <option value="updatedAt">{t('sortUpdated')}</option>
           <option value="rating">{t('sortRating')}</option>
           <option value="title">{t('sortTitle')}</option>
         </select>
+
+        {/* View toggle */}
+        <div className="flex gap-1 bg-surface border border-border rounded-lg p-1">
+          <button
+            type="button"
+            onClick={() => setViewMode('grid')}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+              viewMode === 'grid' ? 'bg-primary text-white' : 'text-foreground/60 hover:text-white'
+            }`}
+          >
+            {t('gridView')}
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode('list')}
+            className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+              viewMode === 'list' ? 'bg-primary text-white' : 'text-foreground/60 hover:text-white'
+            }`}
+          >
+            {t('listView')}
+          </button>
+        </div>
       </div>
 
-      {/* Library Grid */}
+      {/* Library Content */}
       {isLoading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {Array.from({length: 10}).map((_, i) => (
@@ -523,7 +523,8 @@ export default function LibraryContent({locale}: {locale: string}) {
           <p className="text-xl text-foreground/70 mb-2">{t('empty')}</p>
           <p className="text-sm text-foreground/40">{t('emptyDescription')}</p>
         </div>
-      ) : (
+      ) : viewMode === 'grid' ? (
+        /* ── GRID VIEW ── */
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {items.map((item) => {
             const poster = getPoster(item);
@@ -532,42 +533,55 @@ export default function LibraryContent({locale}: {locale: string}) {
             const year = getYear(item);
             const totalEps = item.tvSeries?.numberOfEpisodes;
             const seasons = item.tvSeries?.numberOfSeasons;
+            const overview = item.entityType === 'MOVIE' ? item.movie?.overview : item.tvSeries?.overview;
             const updatedDate = item.updatedAt
-              ? new Date(item.updatedAt).toLocaleDateString(
-                  locale === 'th' ? 'th-TH' : 'en-US',
-                  {year: 'numeric', month: 'short', day: 'numeric'}
-                )
+              ? new Date(item.updatedAt).toLocaleDateString(locale === 'th' ? 'th-TH' : 'en-US', {year: 'numeric', month: 'short', day: 'numeric'})
               : null;
 
             return (
               <div key={item.id} className="group flex flex-col">
                 {/* Poster + badges */}
-                <Link href={link} className="block">
+                <Link href={link} className="block relative">
                   <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-surface mb-2">
                     {poster ? (
-                      <img
-                        src={poster}
-                        alt={title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                      />
+                      <img src={poster} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-foreground/30 text-sm">
-                        No Image
-                      </div>
+                      <div className="w-full h-full flex items-center justify-center text-foreground/30 text-sm">No Image</div>
                     )}
+
+                    {/* Type badge — top left */}
+                    <div className={`absolute top-2 left-2 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm text-white ${
+                      item.entityType === 'MOVIE' ? 'bg-blue-500/80' : 'bg-purple-500/80'
+                    }`}>
+                      {item.entityType === 'MOVIE' ? t('movie') : t('tv')}
+                    </div>
 
                     {/* Status badge */}
                     {item.watchStatus && (
-                      <div className={`absolute top-2 left-2 px-2 py-0.5 rounded text-xs font-medium ${STATUS_COLORS[item.watchStatus] ?? ''}`}>
+                      <div className={`absolute top-2 right-2 px-2 py-0.5 rounded text-[10px] font-medium ${STATUS_COLORS[item.watchStatus] ?? ''}`}>
                         {tAnnotation(STATUS_LABELS[item.watchStatus] ?? item.watchStatus)}
                       </div>
                     )}
 
-                    {/* Rating badge */}
-                    {item.personalRating && (
-                      <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/70 text-yellow-400 text-xs font-bold">
-                        ★ {item.personalRating}
+                    {/* Year badge — bottom left */}
+                    {year && year > 0 && (
+                      <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/70 backdrop-blur-sm text-[10px] font-semibold text-white">
+                        {year}
                       </div>
+                    )}
+
+                    {/* Delete button — top right, visible on hover */}
+                    {item.id > 0 && (
+                      <button
+                        type="button"
+                        onClick={(e) => { e.preventDefault(); removeAnnotation(item.id); }}
+                        className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full bg-black/60 text-white/60 hover:text-red-400 hover:bg-black/80 opacity-0 group-hover:opacity-100 transition-all z-10"
+                        title={t('remove')}
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
                     )}
 
                     {/* Episode progress bar for TV */}
@@ -584,45 +598,58 @@ export default function LibraryContent({locale}: {locale: string}) {
                   </div>
                 </Link>
 
-                {/* Title + Year */}
+                {/* Title */}
                 <Link href={link}>
-                  <h3 className="text-sm font-medium text-white group-hover:text-primary transition-colors line-clamp-1">
-                    {title}
-                  </h3>
+                  <h3 className="text-sm font-medium text-white group-hover:text-primary transition-colors line-clamp-1">{title}</h3>
                 </Link>
 
-                {/* Meta info: year, seasons, episodes */}
+                {/* Notes preview */}
+                {item.notes && (
+                  <p className="text-[10px] text-foreground/40 mt-0.5 line-clamp-1 italic">"{item.notes}"</p>
+                )}
+
+                {/* Meta: seasons + episodes */}
                 <p className="text-xs text-foreground/40 mt-0.5">
-                  {year && <span>{year}</span>}
                   {item.entityType === 'TV' && seasons && seasons > 0 && (
-                    <span> · {t('seasons', {count: seasons})}</span>
+                    <span>{t('seasons', {count: seasons})}</span>
                   )}
                   {item.entityType === 'TV' && totalEps && totalEps > 0 && (
-                    <span> · {t('episodes', {count: totalEps})}</span>
+                    <span>{seasons && seasons > 0 ? ' · ' : ''}{t('episodes', {count: totalEps})}</span>
                   )}
                   {item.entityType === 'TV' && item.currentEpisode != null && item.totalEpisodes != null && item.totalEpisodes > 0 && (
                     <span className="block text-primary/80">{t('episodeOf', {current: item.currentEpisode, total: item.totalEpisodes})}</span>
                   )}
                 </p>
 
-                {/* Last updated */}
-                {updatedDate && (
-                  <p className="text-[10px] text-foreground/30 mt-0.5">
-                    {t('lastUpdated', {date: updatedDate})}
-                  </p>
+                {/* Quick rating (1-5 stars) */}
+                {item.id > 0 && (
+                  <div className="flex gap-0.5 mt-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => updateRating(item.id, star)}
+                        className="cursor-pointer transition-colors"
+                        title={`${t('yourRating')}: ${star}`}
+                      >
+                        <svg
+                          className={`w-3.5 h-3.5 ${(item.personalRating ?? 0) >= star ? 'text-yellow-400 fill-yellow-400' : 'text-foreground/20 fill-current'}`}
+                          viewBox="0 0 20 20"
+                        >
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                      </button>
+                    ))}
+                  </div>
                 )}
 
-                {/* Inline controls — only for annotated items (positive ID) */}
+                {/* Inline controls — only for annotated items */}
                 {item.id > 0 && (
                   <div className="mt-1.5 space-y-1.5">
                     <select
                       value={item.watchStatus ?? ''}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        if (val) updateStatus(item.id, val);
-                      }}
-                      className="w-full px-2 py-1 rounded border border-border bg-surface text-foreground text-[11px]
-                        focus:outline-none focus:ring-1 focus:ring-primary/50 cursor-pointer appearance-none"
+                      onChange={(e) => { const val = e.target.value; if (val) updateStatus(item.id, val); }}
+                      className="w-full px-2 py-1 rounded border border-border bg-surface text-foreground text-[11px] focus:outline-none focus:ring-1 focus:ring-primary/50 cursor-pointer appearance-none"
                     >
                       <option value="WATCHING">{tAnnotation('watching')}</option>
                       <option value="WATCHED">{tAnnotation('watched')}</option>
@@ -630,26 +657,152 @@ export default function LibraryContent({locale}: {locale: string}) {
                       <option value="DROPPED">{tAnnotation('dropped')}</option>
                     </select>
 
-                    {/* Episode dropdown for TV — when totalEpisodes is known */}
-                    {item.entityType === 'TV' && totalEps && totalEps > 0 && item.id > 0 && (
+                    {item.entityType === 'TV' && totalEps && totalEps > 0 && (
                       <select
                         value={item.currentEpisode ?? 0}
-                        onChange={(e) => {
-                          const ep = Number(e.target.value);
-                          updateEpisode(item.id, ep, totalEps);
-                        }}
-                        className="w-full px-2 py-1 rounded border border-border bg-surface text-foreground text-[11px]
-                          focus:outline-none focus:ring-1 focus:ring-primary/50 cursor-pointer appearance-none"
+                        onChange={(e) => { const ep = Number(e.target.value); updateEpisode(item.id, ep, totalEps); }}
+                        className="w-full px-2 py-1 rounded border border-border bg-surface text-foreground text-[11px] focus:outline-none focus:ring-1 focus:ring-primary/50 cursor-pointer appearance-none"
                       >
                         {Array.from({length: totalEps + 1}, (_, i) => i).map((ep) => (
-                          <option key={ep} value={ep}>
-                            {ep === 0 ? t('noEpisodes') : `EP ${ep} / ${totalEps}`}
-                          </option>
+                          <option key={ep} value={ep}>{ep === 0 ? t('noEpisodes') : `EP ${ep} / ${totalEps}`}</option>
                         ))}
                       </select>
                     )}
                   </div>
                 )}
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        /* ── LIST VIEW ── */
+        <div className="space-y-3">
+          {items.map((item) => {
+            const poster = getPoster(item);
+            const title = getTitle(item);
+            const link = getLink(item);
+            const year = getYear(item);
+            const totalEps = item.tvSeries?.numberOfEpisodes;
+            const seasons = item.tvSeries?.numberOfSeasons;
+            const overview = item.entityType === 'MOVIE' ? item.movie?.overview : item.tvSeries?.overview;
+            const rating = item.entityType === 'MOVIE' ? item.movie?.voteAverage : item.tvSeries?.voteAverage;
+            const updatedDate = item.updatedAt
+              ? new Date(item.updatedAt).toLocaleDateString(locale === 'th' ? 'th-TH' : 'en-US', {year: 'numeric', month: 'short', day: 'numeric'})
+              : null;
+
+            return (
+              <div key={item.id} className="group flex gap-4 p-3 rounded-lg bg-surface border border-border hover:border-primary/30 transition-colors">
+                {/* Poster */}
+                <Link href={link} className="flex-shrink-0">
+                  <div className="relative w-[80px] aspect-[2/3] rounded-lg overflow-hidden bg-background">
+                    {poster ? (
+                      <img src={poster} alt={title} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-foreground/30 text-xs">No Image</div>
+                    )}
+                    <div className={`absolute top-1 left-1 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider text-white ${
+                      item.entityType === 'MOVIE' ? 'bg-blue-500/80' : 'bg-purple-500/80'
+                    }`}>
+                      {item.entityType === 'MOVIE' ? t('movie') : t('tv')}
+                    </div>
+                  </div>
+                </Link>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <Link href={link}>
+                        <h3 className="text-sm font-medium text-white group-hover:text-primary transition-colors line-clamp-1">{title}</h3>
+                      </Link>
+                      <p className="text-xs text-foreground/40 mt-0.5">
+                        {year && <span>{year}</span>}
+                        {item.entityType === 'TV' && seasons && seasons > 0 && <span> · {t('seasons', {count: seasons})}</span>}
+                        {item.entityType === 'TV' && totalEps && totalEps > 0 && <span> · {t('episodes', {count: totalEps})}</span>}
+                        {rating != null && rating > 0 && <span> · ★ {rating.toFixed(1)}</span>}
+                      </p>
+                    </div>
+                    {/* Delete button */}
+                    {item.id > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => removeAnnotation(item.id)}
+                        className="flex-shrink-0 w-6 h-6 flex items-center justify-center rounded text-foreground/30 hover:text-red-400 transition-colors"
+                        title={t('remove')}
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Notes preview */}
+                  {item.notes && (
+                    <p className="text-[11px] text-foreground/40 mt-1 line-clamp-1 italic">"{item.notes}"</p>
+                  )}
+
+                  {/* Overview preview */}
+                  {overview && (
+                    <p className="text-[11px] text-foreground/30 mt-1 line-clamp-2">{overview}</p>
+                  )}
+
+                  {/* Controls row */}
+                  <div className="flex flex-wrap items-center gap-2 mt-2">
+                    {/* Status */}
+                    {item.id > 0 && (
+                      <select
+                        value={item.watchStatus ?? ''}
+                        onChange={(e) => { const val = e.target.value; if (val) updateStatus(item.id, val); }}
+                        className="px-2 py-1 rounded border border-border bg-background text-foreground text-[11px] focus:outline-none focus:ring-1 focus:ring-primary/50 cursor-pointer appearance-none"
+                      >
+                        <option value="WATCHING">{tAnnotation('watching')}</option>
+                        <option value="WATCHED">{tAnnotation('watched')}</option>
+                        <option value="WANT_TO_WATCH">{tAnnotation('wantToWatch')}</option>
+                        <option value="DROPPED">{tAnnotation('dropped')}</option>
+                      </select>
+                    )}
+
+                    {/* Episode dropdown */}
+                    {item.entityType === 'TV' && totalEps && totalEps > 0 && item.id > 0 && (
+                      <select
+                        value={item.currentEpisode ?? 0}
+                        onChange={(e) => { const ep = Number(e.target.value); updateEpisode(item.id, ep, totalEps); }}
+                        className="px-2 py-1 rounded border border-border bg-background text-foreground text-[11px] focus:outline-none focus:ring-1 focus:ring-primary/50 cursor-pointer appearance-none"
+                      >
+                        {Array.from({length: totalEps + 1}, (_, i) => i).map((ep) => (
+                          <option key={ep} value={ep}>{ep === 0 ? t('noEpisodes') : `EP ${ep} / ${totalEps}`}</option>
+                        ))}
+                      </select>
+                    )}
+
+                    {/* Rating stars */}
+                    {item.id > 0 && (
+                      <div className="flex gap-0.5">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            type="button"
+                            onClick={() => updateRating(item.id, star)}
+                            className="cursor-pointer transition-colors"
+                          >
+                            <svg
+                              className={`w-3.5 h-3.5 ${(item.personalRating ?? 0) >= star ? 'text-yellow-400 fill-yellow-400' : 'text-foreground/20 fill-current'}`}
+                              viewBox="0 0 20 20"
+                            >
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Last updated */}
+                    {updatedDate && (
+                      <span className="text-[10px] text-foreground/30 ml-auto">{t('lastUpdated', {date: updatedDate})}</span>
+                    )}
+                  </div>
+                </div>
               </div>
             );
           })}

@@ -1,9 +1,10 @@
 // Single Annotation API Route
-// GET    /api/annotations/[id]  — get annotation by ID
-// PUT    /api/annotations/[id]  — update annotation by ID
-// DELETE /api/annotations/[id]  — delete annotation by ID
+// GET    /api/annotations/[id]  — get annotation by ID (owner only)
+// PUT    /api/annotations/[id]  — update annotation by ID (owner only)
+// DELETE /api/annotations/[id]  — delete annotation by ID (owner only)
 
 import {NextResponse} from 'next/server';
+import {auth} from '@/lib/auth/config';
 import {prisma} from '@/lib/db';
 import {deleteAnnotation} from '@/lib/db/user-queries';
 import type {WatchStatus} from '../../../../../generated/prisma/client';
@@ -22,6 +23,11 @@ export async function GET(
   _request: Request,
   {params}: {params: Promise<{id: string}>}
 ) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({error: 'Unauthorized'}, {status: 401});
+  }
+
   const {id: idStr} = await params;
   const id = Number(idStr);
 
@@ -41,6 +47,13 @@ export async function GET(
     );
   }
 
+  if (annotation.userId !== session.user.id) {
+    return NextResponse.json(
+      {error: 'Forbidden'},
+      {status: 403}
+    );
+  }
+
   return NextResponse.json(annotation);
 }
 
@@ -50,6 +63,11 @@ export async function PUT(
   request: Request,
   {params}: {params: Promise<{id: string}>}
 ) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({error: 'Unauthorized'}, {status: 401});
+  }
+
   const {id: idStr} = await params;
   const id = Number(idStr);
 
@@ -60,12 +78,19 @@ export async function PUT(
     );
   }
 
-  // Ensure the annotation exists
+  // Ensure the annotation exists and belongs to the current user
   const existing = await prisma.userAnnotation.findUnique({where: {id}});
   if (!existing) {
     return NextResponse.json(
       {error: 'Annotation not found'},
       {status: 404}
+    );
+  }
+
+  if (existing.userId !== session.user.id) {
+    return NextResponse.json(
+      {error: 'Forbidden'},
+      {status: 403}
     );
   }
 
@@ -190,6 +215,11 @@ export async function DELETE(
   _request: Request,
   {params}: {params: Promise<{id: string}>}
 ) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({error: 'Unauthorized'}, {status: 401});
+  }
+
   const {id: idStr} = await params;
   const id = Number(idStr);
 
@@ -197,6 +227,22 @@ export async function DELETE(
     return NextResponse.json(
       {error: 'Invalid annotation ID'},
       {status: 400}
+    );
+  }
+
+  // Ensure the annotation exists and belongs to the current user
+  const existing = await prisma.userAnnotation.findUnique({where: {id}});
+  if (!existing) {
+    return NextResponse.json(
+      {error: 'Annotation not found'},
+      {status: 404}
+    );
+  }
+
+  if (existing.userId !== session.user.id) {
+    return NextResponse.json(
+      {error: 'Forbidden'},
+      {status: 403}
     );
   }
 

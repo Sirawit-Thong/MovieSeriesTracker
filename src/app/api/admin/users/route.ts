@@ -20,10 +20,24 @@ export async function GET(request: Request) {
 
     const {searchParams} = new URL(request.url);
     const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10));
+    const search = searchParams.get('search');
+    const role = searchParams.get('role');
     const skip = (page - 1) * PAGE_SIZE;
+
+    const where: Record<string, unknown> = {};
+    if (search) {
+      where.OR = [
+        {name: {contains: search, mode: 'insensitive'}},
+        {email: {contains: search, mode: 'insensitive'}},
+      ];
+    }
+    if (role && ['USER', 'ADMIN'].includes(role)) {
+      where.role = role;
+    }
 
     const [users, total] = await Promise.all([
       prisma.user.findMany({
+        where,
         select: {
           id: true,
           name: true,
@@ -35,7 +49,7 @@ export async function GET(request: Request) {
         skip,
         take: PAGE_SIZE,
       }),
-      prisma.user.count(),
+      prisma.user.count({where}),
     ]);
 
     return NextResponse.json({

@@ -327,6 +327,11 @@ export type TrendingItem = Prisma.TrendingItemModel
  */
 export type TvSeriesWatchProvider = Prisma.TvSeriesWatchProviderModel
 /**
+ * Model SyncLog
+ * 
+ */
+export type SyncLog = Prisma.SyncLogModel
+/**
  * Model User
  * 
  */

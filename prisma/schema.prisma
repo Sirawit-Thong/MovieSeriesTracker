@@ -1025,6 +1025,21 @@ model TvSeriesWatchProvider {
   @@map("tv_series_watch_providers")
 }
 
+model SyncLog {
+  id        Int      @id @default(autoincrement())
+  entity    String   // "all", "movies", "tv", "persons"
+  status    String   // "running", "completed", "failed"
+  processed Int      @default(0)
+  errors    Int      @default(0)
+  duration  Int?     // milliseconds
+  details   String?  @db.Text // JSON string with per-entity results
+  startedAt DateTime @default(now()) @map("started_at")
+  endedAt   DateTime? @map("ended_at")
+
+  @@index([startedAt])
+  @@map("sync_logs")
+}
+
 // ============================================================
 // Authentication & Authorization
 // ============================================================

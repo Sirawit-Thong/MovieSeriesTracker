@@ -108,6 +108,7 @@ export const ModelName = {
   TmdbList: 'TmdbList',
   TrendingItem: 'TrendingItem',
   TvSeriesWatchProvider: 'TvSeriesWatchProvider',
+  SyncLog: 'SyncLog',
   User: 'User',
   Account: 'Account',
   Session: 'Session',
@@ -873,6 +874,21 @@ export const TvSeriesWatchProviderScalarFieldEnum = {
 } as const
 
 export type TvSeriesWatchProviderScalarFieldEnum = (typeof TvSeriesWatchProviderScalarFieldEnum)[keyof typeof TvSeriesWatchProviderScalarFieldEnum]
+
+
+export const SyncLogScalarFieldEnum = {
+  id: 'id',
+  entity: 'entity',
+  status: 'status',
+  processed: 'processed',
+  errors: 'errors',
+  duration: 'duration',
+  details: 'details',
+  startedAt: 'startedAt',
+  endedAt: 'endedAt'
+} as const
+
+export type SyncLogScalarFieldEnum = (typeof SyncLogScalarFieldEnum)[keyof typeof SyncLogScalarFieldEnum]
 
 
 export const UserScalarFieldEnum = {
