@@ -171,7 +171,13 @@
     "changeStatus": "Change Status",
     "removeFromLibrary": "Remove from Library",
     "confirmRemove": "Remove this from your library?",
-    "saved": "Saved to library"
+    "saved": "Saved to library",
+    "episodes": "{count} episodes",
+    "episodeOf": "EP {current}/{total}",
+    "episodeCount": "Episodes watched",
+    "lastUpdated": "Updated {date}",
+    "seasons": "{count} seasons",
+    "noEpisodes": "No episodes yet"
   },
   "Watchlist": {
     "title": "My Watchlists",

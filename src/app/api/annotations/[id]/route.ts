@@ -76,7 +76,7 @@ export async function PUT(
     return NextResponse.json({error: 'Invalid JSON body'}, {status: 400});
   }
 
-  const {watchStatus, personalRating, notes, watchDate, entityType, entityId} = body;
+  const {watchStatus, personalRating, notes, watchDate, entityType, entityId, currentEpisode, totalEpisodes} = body;
 
   // Build update data with validation
   const updateData: Record<string, unknown> = {};
@@ -144,6 +144,26 @@ export async function PUT(
     } else {
       updateData.watchDate = null;
     }
+  }
+
+  if (currentEpisode !== undefined) {
+    if (currentEpisode !== null && (typeof currentEpisode !== 'number' || !Number.isInteger(currentEpisode) || currentEpisode < 0)) {
+      return NextResponse.json(
+        {error: 'currentEpisode must be a non-negative integer or null'},
+        {status: 400}
+      );
+    }
+    updateData.currentEpisode = currentEpisode;
+  }
+
+  if (totalEpisodes !== undefined) {
+    if (totalEpisodes !== null && (typeof totalEpisodes !== 'number' || !Number.isInteger(totalEpisodes) || totalEpisodes < 0)) {
+      return NextResponse.json(
+        {error: 'totalEpisodes must be a non-negative integer or null'},
+        {status: 400}
+      );
+    }
+    updateData.totalEpisodes = totalEpisodes;
   }
 
   try {

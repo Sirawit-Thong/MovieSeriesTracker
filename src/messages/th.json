@@ -171,7 +171,13 @@
     "changeStatus": "เปลี่ยนสถานะ",
     "removeFromLibrary": "ลบจากคลัง",
     "confirmRemove": "ลบรายการนี้ออกจากคลังของคุณ?",
-    "saved": "บันทึกลงคลังแล้ว"
+    "saved": "บันทึกลงคลังแล้ว",
+    "episodes": "{count} ตอน",
+    "episodeOf": "ดู {current}/{total} ตอน",
+    "episodeCount": "จำนวนตอนที่ดู",
+    "lastUpdated": "แก้ไข {date}",
+    "seasons": "{count} ซีซัน",
+    "noEpisodes": "ยังไม่มีข้อมูลตอน"
   },
   "Watchlist": {
     "title": "Watchlists ของฉัน",

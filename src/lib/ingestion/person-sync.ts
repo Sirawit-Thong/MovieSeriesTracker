@@ -261,7 +261,7 @@ export async function syncPersons(
   console.log(`${LOG_PREFIX} Collected ${total} unique person IDs`);
 
   if (total === 0) {
-    return { success: true, errors: [], duration: Date.now() - startTime };
+    return { success: true, errors: [], duration: Date.now() - startTime, moviesProcessed: 0 };
   }
 
   // ---- Phase 2: Fetch details + upsert in batches ----
@@ -289,7 +289,7 @@ export async function syncPersons(
     `${LOG_PREFIX} Sync complete: ${processed}/${total} persons in ${duration}ms (${errors.length} errors)`,
   );
 
-  return { success, errors, duration };
+  return { success, errors, duration, moviesProcessed: processed };
 }
 
 // ============================================================

@@ -2,23 +2,16 @@
 // POST /api/admin/sync — Trigger TMDB data sync (admin only)
 
 import {NextResponse} from 'next/server';
-import {auth} from '@/lib/auth/config';
+import {requireAdmin} from '@/lib/admin';
 import {syncMovies} from '@/lib/ingestion/movie-sync';
 import {syncTvSeries} from '@/lib/ingestion/tv-sync';
 import {syncPersons} from '@/lib/ingestion/person-sync';
 import {TmdbClient} from '@/lib/tmdb/client';
 
-function isAdmin(role: unknown): boolean {
-  return role === 'ADMIN';
-}
-
 export async function POST(request: Request) {
   try {
-    const session = await auth();
-
-    if (!session?.user || !isAdmin((session.user as Record<string, unknown>).role)) {
-      return NextResponse.json({error: 'Forbidden'}, {status: 403});
-    }
+    const auth = await requireAdmin();
+    if (auth.response) return auth.response;
 
     let body: Record<string, unknown> = {};
     try {

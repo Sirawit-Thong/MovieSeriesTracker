@@ -3,15 +3,11 @@
 // PUT  /api/admin/users       — Update a user's role (admin only)
 
 import {NextResponse} from 'next/server';
-import {auth} from '@/lib/auth/config';
+import {requireAdmin} from '@/lib/admin';
 import prisma from '@/lib/db';
 import {createLogger} from '@/lib/logger';
 
 const log = createLogger('admin:users');
-
-function isAdmin(role: unknown): boolean {
-  return role === 'ADMIN';
-}
 
 const PAGE_SIZE = 20;
 
@@ -19,11 +15,8 @@ const PAGE_SIZE = 20;
 
 export async function GET(request: Request) {
   try {
-    const session = await auth();
-
-    if (!session?.user || !isAdmin((session.user as Record<string, unknown>).role)) {
-      return NextResponse.json({error: 'Forbidden'}, {status: 403});
-    }
+    const auth = await requireAdmin();
+    if (auth.response) return auth.response;
 
     const {searchParams} = new URL(request.url);
     const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10));
@@ -65,11 +58,9 @@ export async function GET(request: Request) {
 
 export async function PUT(request: Request) {
   try {
-    const session = await auth();
-
-    if (!session?.user || !isAdmin((session.user as Record<string, unknown>).role)) {
-      return NextResponse.json({error: 'Forbidden'}, {status: 403});
-    }
+    const authResult = await requireAdmin();
+    if (authResult.response) return authResult.response;
+    const sessionUser = authResult.user;
 
     let body: Record<string, unknown>;
     try {
@@ -96,7 +87,7 @@ export async function PUT(request: Request) {
     }
 
     // Prevent self-demotion
-    if (userId === session.user.id) {
+    if (userId === sessionUser.id) {
       return NextResponse.json(
         {error: 'Cannot change your own role'},
         {status: 400},

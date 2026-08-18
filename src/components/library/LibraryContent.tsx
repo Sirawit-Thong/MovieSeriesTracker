@@ -177,6 +177,76 @@ export default function LibraryContent({locale}: {locale: string}) {
     }
   }, [router]);
 
+  // Inline status update — auto-syncs episode count
+  const updateStatus = useCallback(async (annotationId: number, newStatus: string) => {
+    const item = items.find((i) => i.id === annotationId);
+    if (!item) return;
+
+    // If marking as WATCHED, set currentEpisode = totalEpisodes
+    const patch: Record<string, unknown> = {watchStatus: newStatus};
+    if (newStatus === 'WATCHED' && item.tvSeries?.numberOfEpisodes) {
+      patch.currentEpisode = item.tvSeries.numberOfEpisodes;
+      patch.totalEpisodes = item.tvSeries.numberOfEpisodes;
+    }
+    // If changing from WATCHED to something else, reset currentEpisode to 0
+    if (item.watchStatus === 'WATCHED' && newStatus !== 'WATCHED') {
+      patch.currentEpisode = 0;
+    }
+
+    try {
+      const res = await fetch(`/api/annotations/${annotationId}`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(patch),
+      });
+      if (res.ok) {
+        setItems((prev) =>
+          prev.map((i) =>
+            i.id === annotationId ? {...i, ...patch} : i
+          )
+        );
+      }
+    } catch {
+      // ignore
+    }
+  }, [items]);
+
+  // Inline episode update — auto-syncs watch status
+  const updateEpisode = useCallback(async (annotationId: number, currentEpisode: number, totalEpisodes: number | null) => {
+    const patch: Record<string, unknown> = {currentEpisode, totalEpisodes};
+
+    // If currentEpisode >= totalEpisodes, auto-set to WATCHED
+    if (totalEpisodes && currentEpisode >= totalEpisodes) {
+      patch.watchStatus = 'WATCHED';
+      patch.currentEpisode = totalEpisodes;
+    }
+    // If currentEpisode < totalEpisodes, auto-set to WATCHING
+    else if (totalEpisodes && currentEpisode > 0 && currentEpisode < totalEpisodes) {
+      patch.watchStatus = 'WATCHING';
+    }
+    // If currentEpisode is 0, set to WANT_TO_WATCH
+    else if (currentEpisode === 0) {
+      patch.watchStatus = 'WANT_TO_WATCH';
+    }
+
+    try {
+      const res = await fetch(`/api/annotations/${annotationId}`, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(patch),
+      });
+      if (res.ok) {
+        setItems((prev) =>
+          prev.map((i) =>
+            i.id === annotationId ? {...i, ...patch} : i
+          )
+        );
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
   if (!session?.user) {
     return (
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
@@ -460,62 +530,127 @@ export default function LibraryContent({locale}: {locale: string}) {
             const title = getTitle(item);
             const link = getLink(item);
             const year = getYear(item);
+            const totalEps = item.tvSeries?.numberOfEpisodes;
+            const seasons = item.tvSeries?.numberOfSeasons;
+            const updatedDate = item.updatedAt
+              ? new Date(item.updatedAt).toLocaleDateString(
+                  locale === 'th' ? 'th-TH' : 'en-US',
+                  {year: 'numeric', month: 'short', day: 'numeric'}
+                )
+              : null;
 
             return (
-              <Link key={item.id} href={link} className="group">
-                <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-surface mb-2">
-                  {poster ? (
-                    <img
-                      src={poster}
-                      alt={title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-foreground/30 text-sm">
-                      No Image
-                    </div>
-                  )}
-
-                  {/* Status badge */}
-                  {item.watchStatus && (
-                    <div className={`absolute top-2 left-2 px-2 py-0.5 rounded text-xs font-medium ${STATUS_COLORS[item.watchStatus] ?? ''}`}>
-                      {tAnnotation(STATUS_LABELS[item.watchStatus] ?? item.watchStatus)}
-                    </div>
-                  )}
-
-                  {/* Rating badge */}
-                  {item.personalRating && (
-                    <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/70 text-yellow-400 text-xs font-bold">
-                      ★ {item.personalRating}
-                    </div>
-                  )}
-
-                  {/* Episode progress for TV */}
-                  {item.entityType === 'TV' && item.currentEpisode != null && item.totalEpisodes != null && item.totalEpisodes > 0 && (
-                    <div className="absolute bottom-0 left-0 right-0 bg-black/70 px-2 py-1">
-                      <div className="w-full bg-white/20 rounded-full h-1.5">
-                        <div
-                          className="bg-primary h-1.5 rounded-full"
-                          style={{width: `${Math.min(100, (item.currentEpisode / item.totalEpisodes) * 100)}%`}}
-                        />
+              <div key={item.id} className="group flex flex-col">
+                {/* Poster + badges */}
+                <Link href={link} className="block">
+                  <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-surface mb-2">
+                    {poster ? (
+                      <img
+                        src={poster}
+                        alt={title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-foreground/30 text-sm">
+                        No Image
                       </div>
-                      <p className="text-[10px] text-white/70 mt-0.5 text-center">
-                        {item.currentEpisode}/{item.totalEpisodes}
-                      </p>
-                    </div>
-                  )}
-                </div>
+                    )}
 
-                <h3 className="text-sm font-medium text-white group-hover:text-primary transition-colors line-clamp-1">
-                  {title}
-                </h3>
-                <p className="text-xs text-foreground/40">
+                    {/* Status badge */}
+                    {item.watchStatus && (
+                      <div className={`absolute top-2 left-2 px-2 py-0.5 rounded text-xs font-medium ${STATUS_COLORS[item.watchStatus] ?? ''}`}>
+                        {tAnnotation(STATUS_LABELS[item.watchStatus] ?? item.watchStatus)}
+                      </div>
+                    )}
+
+                    {/* Rating badge */}
+                    {item.personalRating && (
+                      <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/70 text-yellow-400 text-xs font-bold">
+                        ★ {item.personalRating}
+                      </div>
+                    )}
+
+                    {/* Episode progress bar for TV */}
+                    {item.entityType === 'TV' && item.currentEpisode != null && item.totalEpisodes != null && item.totalEpisodes > 0 && (
+                      <div className="absolute bottom-0 left-0 right-0 bg-black/70 px-2 py-1">
+                        <div className="w-full bg-white/20 rounded-full h-1.5">
+                          <div
+                            className="bg-primary h-1.5 rounded-full"
+                            style={{width: `${Math.min(100, (item.currentEpisode / item.totalEpisodes) * 100)}%`}}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </Link>
+
+                {/* Title + Year */}
+                <Link href={link}>
+                  <h3 className="text-sm font-medium text-white group-hover:text-primary transition-colors line-clamp-1">
+                    {title}
+                  </h3>
+                </Link>
+
+                {/* Meta info: year, seasons, episodes */}
+                <p className="text-xs text-foreground/40 mt-0.5">
                   {year && <span>{year}</span>}
-                  {item.entityType === 'TV' && item.tvSeries?.numberOfSeasons && (
-                    <span> · {item.tvSeries.numberOfSeasons} seasons</span>
+                  {item.entityType === 'TV' && seasons && seasons > 0 && (
+                    <span> · {t('seasons', {count: seasons})}</span>
+                  )}
+                  {item.entityType === 'TV' && totalEps && totalEps > 0 && (
+                    <span> · {t('episodes', {count: totalEps})}</span>
+                  )}
+                  {item.entityType === 'TV' && item.currentEpisode != null && item.totalEpisodes != null && item.totalEpisodes > 0 && (
+                    <span className="block text-primary/80">{t('episodeOf', {current: item.currentEpisode, total: item.totalEpisodes})}</span>
                   )}
                 </p>
-              </Link>
+
+                {/* Last updated */}
+                {updatedDate && (
+                  <p className="text-[10px] text-foreground/30 mt-0.5">
+                    {t('lastUpdated', {date: updatedDate})}
+                  </p>
+                )}
+
+                {/* Inline controls — only for annotated items (positive ID) */}
+                {item.id > 0 && (
+                  <div className="mt-1.5 space-y-1.5">
+                    <select
+                      value={item.watchStatus ?? ''}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val) updateStatus(item.id, val);
+                      }}
+                      className="w-full px-2 py-1 rounded border border-border bg-surface text-foreground text-[11px]
+                        focus:outline-none focus:ring-1 focus:ring-primary/50 cursor-pointer appearance-none"
+                    >
+                      <option value="WATCHING">{tAnnotation('watching')}</option>
+                      <option value="WATCHED">{tAnnotation('watched')}</option>
+                      <option value="WANT_TO_WATCH">{tAnnotation('wantToWatch')}</option>
+                      <option value="DROPPED">{tAnnotation('dropped')}</option>
+                    </select>
+
+                    {/* Episode dropdown for TV — when totalEpisodes is known */}
+                    {item.entityType === 'TV' && totalEps && totalEps > 0 && item.id > 0 && (
+                      <select
+                        value={item.currentEpisode ?? 0}
+                        onChange={(e) => {
+                          const ep = Number(e.target.value);
+                          updateEpisode(item.id, ep, totalEps);
+                        }}
+                        className="w-full px-2 py-1 rounded border border-border bg-surface text-foreground text-[11px]
+                          focus:outline-none focus:ring-1 focus:ring-primary/50 cursor-pointer appearance-none"
+                      >
+                        {Array.from({length: totalEps + 1}, (_, i) => i).map((ep) => (
+                          <option key={ep} value={ep}>
+                            {ep === 0 ? t('noEpisodes') : `EP ${ep} / ${totalEps}`}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
+                )}
+              </div>
             );
           })}
         </div>

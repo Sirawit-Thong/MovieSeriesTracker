@@ -690,7 +690,7 @@ export async function syncMovies(
     `${LOG_PREFIX} Sync complete: ${movieIds.length} movies in ${duration}ms (${errors.length} errors)`,
   );
 
-  return { success, errors, duration };
+  return { success, errors, duration, moviesProcessed: movieIds.length };
 }
 
 // ============================================================

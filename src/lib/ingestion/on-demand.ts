@@ -8,7 +8,7 @@
 //   2b. If found but stale → return stale + trigger background re-fetch
 //   3. If not found → fetch from TMDB, upsert, return
 
-import { prisma } from '../db';
+import prisma from '../db';
 import { fetchAndUpsertMovie } from './movie-sync';
 import { fetchAndUpsertTvSeries } from './tv-sync';
 import { fetchAndUpsertPerson } from './person-sync';
@@ -116,13 +116,13 @@ export async function fetchOnMiss(
     };
   }
 
-  // Step 2b: Found but stale — serve stale + background re-fetch
+  // Step 2b: Found but stale — serve stale data + background re-fetch
   if (record && isStale(record.lastFetchedAt)) {
     triggerBackgroundRefetch(entity, tmdbId);
     return {
       dbId: record.id,
       tmdbId,
-      fresh: true, // Still "fresh" for the user — data exists
+      fresh: false,
       revalidating: true,
     };
   }

@@ -107,16 +107,13 @@ export default function AdminUsersPage() {
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
                   Joined
                 </th>
-                <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Actions
-                </th>
               </tr>
             </thead>
             <tbody>
               {loading && !data && (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={4}
                     className="px-6 py-8 text-center text-foreground/40"
                   >
                     Loading...
@@ -158,22 +155,12 @@ export default function AdminUsersPage() {
                       day: 'numeric',
                     })}
                   </td>
-                  <td className="px-6 py-3">
-                    <button
-                      type="button"
-                      disabled
-                      className="px-2.5 py-1 text-xs font-medium rounded-lg bg-background border border-border text-foreground/40 cursor-not-allowed"
-                      title="Ban (coming soon)"
-                    >
-                      Ban
-                    </button>
-                  </td>
                 </tr>
               ))}
               {data && data.users.length === 0 && (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={4}
                     className="px-6 py-8 text-center text-foreground/40"
                   >
                     No users found.
