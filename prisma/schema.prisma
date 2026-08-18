@@ -799,7 +799,7 @@ model Translation {
   iso31661    String  @map("iso_3166_1")
   name        String
   englishName String? @map("english_name")
-  data        String?
+  data        String? @db.Text
 
   @@unique([entityType, entityId, iso6391, iso31661])
   @@index([entityType, entityId])
@@ -993,6 +993,7 @@ model TmdbList {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([accountId])
   @@map("tmdb_lists")
 }
 
@@ -1105,6 +1106,7 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@index([userId])
   @@map("accounts")
 }
 
@@ -1116,6 +1118,7 @@ model Session {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
   @@map("sessions")
 }
 
