@@ -6,7 +6,7 @@ import {requireAdmin} from '@/lib/admin';
 import {fetchAndUpsertMovie} from '@/lib/ingestion/movie-sync';
 import {fetchAndUpsertTvSeries} from '@/lib/ingestion/tv-sync';
 import {fetchAndUpsertPerson} from '@/lib/ingestion/person-sync';
-import {syncPersonCredits} from '@/lib/ingestion/credit-sync';
+import {syncPersonCredits, syncCombinedCredits} from '@/lib/ingestion/credit-sync';
 import {acquireSyncLock, finishSyncLog} from '@/lib/ingestion/sync-lock';
 import {TmdbClient} from '@/lib/tmdb/client';
 
@@ -59,10 +59,17 @@ export async function POST(request: Request) {
       } else if (type === 'person') {
         // fetchAndUpsertPerson syncs: details, external IDs, images, translations
         dbId = await fetchAndUpsertPerson(tmdbId);
-        // syncPersonCredits fully re-fetches: movie cast/crew, TV cast/crew, combined credits
+        // syncPersonCredits fully re-fetches: movie cast/crew, TV cast/crew
+        // syncCombinedCredits fetches combined credits (used by Filmography component)
         if (dbId) {
           const client = new TmdbClient({language: 'en-US'});
-          await syncPersonCredits(tmdbId, client);
+          const [personDetails] = await Promise.all([
+            client.getPersonDetails(tmdbId, 'combined_credits'),
+            syncPersonCredits(tmdbId, client),
+          ]);
+          if (personDetails.combined_credits) {
+            await syncCombinedCredits(dbId, personDetails.combined_credits);
+          }
         }
       }
     } catch (error) {

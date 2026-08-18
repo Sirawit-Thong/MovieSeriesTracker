@@ -29,6 +29,7 @@ const getPersonById = cache(async function getPersonById(id: number, locale: str
       birthday: true,
       placeOfBirth: true,
       lastFetchedAt: true,
+      _count: {select: {combinedCredits: true}},
     },
   });
 
@@ -45,15 +46,17 @@ const getPersonById = cache(async function getPersonById(id: number, locale: str
     !person.lastFetchedAt ||
     Date.now() - person.lastFetchedAt.getTime() > CREDITS_STALE_MS;
 
+  const hasCombinedCredits = person._count.combinedCredits > 0;
+
   if (isStub) {
     console.log(`[person-page] Upgrading stub person ${id} to full record`);
     await fetchAndUpsertPerson(person.tmdbId);
   }
 
-  // Re-sync credits from TMDB only when the person is a stub (partial credits
-  // from media-credit-sync) or the last full sync is older than 7 days.
-  // Pass user locale to TMDB so titles come back in the correct language.
-  if (isStub || creditsStale) {
+  // Re-sync credits from TMDB when: person is a stub, credits are stale,
+  // or combinedCredits are missing (e.g. after fetchAndUpsertPerson set lastFetchedAt
+  // but credits were never synced). Pass user locale so titles come back in the correct language.
+  if (isStub || creditsStale || !hasCombinedCredits) {
     const tmdbLanguage = locale === 'th' ? 'th-TH' : 'en-US';
     const client = new TmdbClient({language: tmdbLanguage});
     const [personDetails2] = await Promise.all([
