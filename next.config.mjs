@@ -7,19 +7,6 @@ const withPwa = withPWA({
   skipWaiting: true,
   disable: process.env.NODE_ENV === 'development',
   runtimeCaching: [
-    // API responses — NetworkFirst (try network, fall back to cache)
-    {
-      urlPattern: /^\/api\/.*/i,
-      handler: 'NetworkFirst',
-      options: {
-        cacheName: 'api-cache',
-        networkTimeoutSeconds: 10,
-        expiration: {
-          maxEntries: 50,
-          maxAgeSeconds: 24 * 60 * 60, // 1 day
-        },
-      },
-    },
     // TMDB external API — NetworkFirst
     {
       urlPattern: /^https:\/\/api\.themoviedb\.org\/.*/i,
