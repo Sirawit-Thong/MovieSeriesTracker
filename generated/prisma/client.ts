@@ -332,6 +332,11 @@ export type TvSeriesWatchProvider = Prisma.TvSeriesWatchProviderModel
  */
 export type SyncLog = Prisma.SyncLogModel
 /**
+ * Model LoginLog
+ * 
+ */
+export type LoginLog = Prisma.LoginLogModel
+/**
  * Model User
  * 
  */

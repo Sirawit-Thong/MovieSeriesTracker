@@ -8,7 +8,9 @@ export async function GET(request: Request) {
     if (auth.response) return auth.response;
 
     const {searchParams} = new URL(request.url);
-    const type = searchParams.get('type') ?? 'movies';
+    const rawType = searchParams.get('type') ?? 'movies';
+    const typeMap: Record<string, string> = {movie: 'movies', tv: 'tv', person: 'persons'};
+    const type = typeMap[rawType] ?? rawType;
     const search = searchParams.get('q');
     const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10));
     const pageSize = 20;

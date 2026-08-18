@@ -288,6 +288,7 @@ export type UserAnnotationWhereInput = {
   watchDate?: Prisma.DateTimeNullableFilter<"UserAnnotation"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"UserAnnotation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"UserAnnotation"> | Date | string
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type UserAnnotationOrderByWithRelationInput = {
@@ -303,6 +304,7 @@ export type UserAnnotationOrderByWithRelationInput = {
   watchDate?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  user?: Prisma.UserOrderByWithRelationInput
 }
 
 export type UserAnnotationWhereUniqueInput = Prisma.AtLeast<{
@@ -322,6 +324,7 @@ export type UserAnnotationWhereUniqueInput = Prisma.AtLeast<{
   watchDate?: Prisma.DateTimeNullableFilter<"UserAnnotation"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"UserAnnotation"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"UserAnnotation"> | Date | string
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id" | "userId_entityType_entityId">
 
 export type UserAnnotationOrderByWithAggregationInput = {
@@ -363,7 +366,6 @@ export type UserAnnotationScalarWhereWithAggregatesInput = {
 }
 
 export type UserAnnotationCreateInput = {
-  userId: string
   entityType: string
   entityId: number
   watchStatus?: $Enums.WatchStatus | null
@@ -374,6 +376,7 @@ export type UserAnnotationCreateInput = {
   watchDate?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutUserAnnotationsInput
 }
 
 export type UserAnnotationUncheckedCreateInput = {
@@ -392,7 +395,6 @@ export type UserAnnotationUncheckedCreateInput = {
 }
 
 export type UserAnnotationUpdateInput = {
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
   entityType?: Prisma.StringFieldUpdateOperationsInput | string
   entityId?: Prisma.IntFieldUpdateOperationsInput | number
   watchStatus?: Prisma.NullableEnumWatchStatusFieldUpdateOperationsInput | $Enums.WatchStatus | null
@@ -403,6 +405,7 @@ export type UserAnnotationUpdateInput = {
   watchDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutUserAnnotationsNestedInput
 }
 
 export type UserAnnotationUncheckedUpdateInput = {
@@ -436,7 +439,6 @@ export type UserAnnotationCreateManyInput = {
 }
 
 export type UserAnnotationUpdateManyMutationInput = {
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
   entityType?: Prisma.StringFieldUpdateOperationsInput | string
   entityId?: Prisma.IntFieldUpdateOperationsInput | number
   watchStatus?: Prisma.NullableEnumWatchStatusFieldUpdateOperationsInput | $Enums.WatchStatus | null
@@ -531,8 +533,186 @@ export type UserAnnotationSumOrderByAggregateInput = {
   totalEpisodes?: Prisma.SortOrder
 }
 
+export type UserAnnotationListRelationFilter = {
+  every?: Prisma.UserAnnotationWhereInput
+  some?: Prisma.UserAnnotationWhereInput
+  none?: Prisma.UserAnnotationWhereInput
+}
+
+export type UserAnnotationOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
 export type NullableEnumWatchStatusFieldUpdateOperationsInput = {
   set?: $Enums.WatchStatus | null
+}
+
+export type UserAnnotationCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.UserAnnotationCreateWithoutUserInput, Prisma.UserAnnotationUncheckedCreateWithoutUserInput> | Prisma.UserAnnotationCreateWithoutUserInput[] | Prisma.UserAnnotationUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.UserAnnotationCreateOrConnectWithoutUserInput | Prisma.UserAnnotationCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.UserAnnotationCreateManyUserInputEnvelope
+  connect?: Prisma.UserAnnotationWhereUniqueInput | Prisma.UserAnnotationWhereUniqueInput[]
+}
+
+export type UserAnnotationUncheckedCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.UserAnnotationCreateWithoutUserInput, Prisma.UserAnnotationUncheckedCreateWithoutUserInput> | Prisma.UserAnnotationCreateWithoutUserInput[] | Prisma.UserAnnotationUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.UserAnnotationCreateOrConnectWithoutUserInput | Prisma.UserAnnotationCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.UserAnnotationCreateManyUserInputEnvelope
+  connect?: Prisma.UserAnnotationWhereUniqueInput | Prisma.UserAnnotationWhereUniqueInput[]
+}
+
+export type UserAnnotationUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAnnotationCreateWithoutUserInput, Prisma.UserAnnotationUncheckedCreateWithoutUserInput> | Prisma.UserAnnotationCreateWithoutUserInput[] | Prisma.UserAnnotationUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.UserAnnotationCreateOrConnectWithoutUserInput | Prisma.UserAnnotationCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.UserAnnotationUpsertWithWhereUniqueWithoutUserInput | Prisma.UserAnnotationUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.UserAnnotationCreateManyUserInputEnvelope
+  set?: Prisma.UserAnnotationWhereUniqueInput | Prisma.UserAnnotationWhereUniqueInput[]
+  disconnect?: Prisma.UserAnnotationWhereUniqueInput | Prisma.UserAnnotationWhereUniqueInput[]
+  delete?: Prisma.UserAnnotationWhereUniqueInput | Prisma.UserAnnotationWhereUniqueInput[]
+  connect?: Prisma.UserAnnotationWhereUniqueInput | Prisma.UserAnnotationWhereUniqueInput[]
+  update?: Prisma.UserAnnotationUpdateWithWhereUniqueWithoutUserInput | Prisma.UserAnnotationUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.UserAnnotationUpdateManyWithWhereWithoutUserInput | Prisma.UserAnnotationUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.UserAnnotationScalarWhereInput | Prisma.UserAnnotationScalarWhereInput[]
+}
+
+export type UserAnnotationUncheckedUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.UserAnnotationCreateWithoutUserInput, Prisma.UserAnnotationUncheckedCreateWithoutUserInput> | Prisma.UserAnnotationCreateWithoutUserInput[] | Prisma.UserAnnotationUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.UserAnnotationCreateOrConnectWithoutUserInput | Prisma.UserAnnotationCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.UserAnnotationUpsertWithWhereUniqueWithoutUserInput | Prisma.UserAnnotationUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.UserAnnotationCreateManyUserInputEnvelope
+  set?: Prisma.UserAnnotationWhereUniqueInput | Prisma.UserAnnotationWhereUniqueInput[]
+  disconnect?: Prisma.UserAnnotationWhereUniqueInput | Prisma.UserAnnotationWhereUniqueInput[]
+  delete?: Prisma.UserAnnotationWhereUniqueInput | Prisma.UserAnnotationWhereUniqueInput[]
+  connect?: Prisma.UserAnnotationWhereUniqueInput | Prisma.UserAnnotationWhereUniqueInput[]
+  update?: Prisma.UserAnnotationUpdateWithWhereUniqueWithoutUserInput | Prisma.UserAnnotationUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.UserAnnotationUpdateManyWithWhereWithoutUserInput | Prisma.UserAnnotationUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.UserAnnotationScalarWhereInput | Prisma.UserAnnotationScalarWhereInput[]
+}
+
+export type UserAnnotationCreateWithoutUserInput = {
+  entityType: string
+  entityId: number
+  watchStatus?: $Enums.WatchStatus | null
+  personalRating?: number | null
+  currentEpisode?: number | null
+  totalEpisodes?: number | null
+  notes?: string | null
+  watchDate?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type UserAnnotationUncheckedCreateWithoutUserInput = {
+  id?: number
+  entityType: string
+  entityId: number
+  watchStatus?: $Enums.WatchStatus | null
+  personalRating?: number | null
+  currentEpisode?: number | null
+  totalEpisodes?: number | null
+  notes?: string | null
+  watchDate?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type UserAnnotationCreateOrConnectWithoutUserInput = {
+  where: Prisma.UserAnnotationWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserAnnotationCreateWithoutUserInput, Prisma.UserAnnotationUncheckedCreateWithoutUserInput>
+}
+
+export type UserAnnotationCreateManyUserInputEnvelope = {
+  data: Prisma.UserAnnotationCreateManyUserInput | Prisma.UserAnnotationCreateManyUserInput[]
+  skipDuplicates?: boolean
+}
+
+export type UserAnnotationUpsertWithWhereUniqueWithoutUserInput = {
+  where: Prisma.UserAnnotationWhereUniqueInput
+  update: Prisma.XOR<Prisma.UserAnnotationUpdateWithoutUserInput, Prisma.UserAnnotationUncheckedUpdateWithoutUserInput>
+  create: Prisma.XOR<Prisma.UserAnnotationCreateWithoutUserInput, Prisma.UserAnnotationUncheckedCreateWithoutUserInput>
+}
+
+export type UserAnnotationUpdateWithWhereUniqueWithoutUserInput = {
+  where: Prisma.UserAnnotationWhereUniqueInput
+  data: Prisma.XOR<Prisma.UserAnnotationUpdateWithoutUserInput, Prisma.UserAnnotationUncheckedUpdateWithoutUserInput>
+}
+
+export type UserAnnotationUpdateManyWithWhereWithoutUserInput = {
+  where: Prisma.UserAnnotationScalarWhereInput
+  data: Prisma.XOR<Prisma.UserAnnotationUpdateManyMutationInput, Prisma.UserAnnotationUncheckedUpdateManyWithoutUserInput>
+}
+
+export type UserAnnotationScalarWhereInput = {
+  AND?: Prisma.UserAnnotationScalarWhereInput | Prisma.UserAnnotationScalarWhereInput[]
+  OR?: Prisma.UserAnnotationScalarWhereInput[]
+  NOT?: Prisma.UserAnnotationScalarWhereInput | Prisma.UserAnnotationScalarWhereInput[]
+  id?: Prisma.IntFilter<"UserAnnotation"> | number
+  userId?: Prisma.StringFilter<"UserAnnotation"> | string
+  entityType?: Prisma.StringFilter<"UserAnnotation"> | string
+  entityId?: Prisma.IntFilter<"UserAnnotation"> | number
+  watchStatus?: Prisma.EnumWatchStatusNullableFilter<"UserAnnotation"> | $Enums.WatchStatus | null
+  personalRating?: Prisma.IntNullableFilter<"UserAnnotation"> | number | null
+  currentEpisode?: Prisma.IntNullableFilter<"UserAnnotation"> | number | null
+  totalEpisodes?: Prisma.IntNullableFilter<"UserAnnotation"> | number | null
+  notes?: Prisma.StringNullableFilter<"UserAnnotation"> | string | null
+  watchDate?: Prisma.DateTimeNullableFilter<"UserAnnotation"> | Date | string | null
+  createdAt?: Prisma.DateTimeFilter<"UserAnnotation"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"UserAnnotation"> | Date | string
+}
+
+export type UserAnnotationCreateManyUserInput = {
+  id?: number
+  entityType: string
+  entityId: number
+  watchStatus?: $Enums.WatchStatus | null
+  personalRating?: number | null
+  currentEpisode?: number | null
+  totalEpisodes?: number | null
+  notes?: string | null
+  watchDate?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type UserAnnotationUpdateWithoutUserInput = {
+  entityType?: Prisma.StringFieldUpdateOperationsInput | string
+  entityId?: Prisma.IntFieldUpdateOperationsInput | number
+  watchStatus?: Prisma.NullableEnumWatchStatusFieldUpdateOperationsInput | $Enums.WatchStatus | null
+  personalRating?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentEpisode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  totalEpisodes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  watchDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type UserAnnotationUncheckedUpdateWithoutUserInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  entityType?: Prisma.StringFieldUpdateOperationsInput | string
+  entityId?: Prisma.IntFieldUpdateOperationsInput | number
+  watchStatus?: Prisma.NullableEnumWatchStatusFieldUpdateOperationsInput | $Enums.WatchStatus | null
+  personalRating?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentEpisode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  totalEpisodes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  watchDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type UserAnnotationUncheckedUpdateManyWithoutUserInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  entityType?: Prisma.StringFieldUpdateOperationsInput | string
+  entityId?: Prisma.IntFieldUpdateOperationsInput | number
+  watchStatus?: Prisma.NullableEnumWatchStatusFieldUpdateOperationsInput | $Enums.WatchStatus | null
+  personalRating?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentEpisode?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  totalEpisodes?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  watchDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -550,6 +730,7 @@ export type UserAnnotationSelect<ExtArgs extends runtime.Types.Extensions.Intern
   watchDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userAnnotation"]>
 
 export type UserAnnotationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -565,6 +746,7 @@ export type UserAnnotationSelectCreateManyAndReturn<ExtArgs extends runtime.Type
   watchDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userAnnotation"]>
 
 export type UserAnnotationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -580,6 +762,7 @@ export type UserAnnotationSelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   watchDate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userAnnotation"]>
 
 export type UserAnnotationSelectScalar = {
@@ -598,10 +781,21 @@ export type UserAnnotationSelectScalar = {
 }
 
 export type UserAnnotationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "entityType" | "entityId" | "watchStatus" | "personalRating" | "currentEpisode" | "totalEpisodes" | "notes" | "watchDate" | "createdAt" | "updatedAt", ExtArgs["result"]["userAnnotation"]>
+export type UserAnnotationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
+export type UserAnnotationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
+export type UserAnnotationIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
 
 export type $UserAnnotationPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "UserAnnotation"
-  objects: {}
+  objects: {
+    user: Prisma.$UserPayload<ExtArgs>
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     userId: string
@@ -1009,6 +1203,7 @@ readonly fields: UserAnnotationFieldRefs;
  */
 export interface Prisma__UserAnnotationClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1067,6 +1262,10 @@ export type UserAnnotationFindUniqueArgs<ExtArgs extends runtime.Types.Extension
    */
   omit?: Prisma.UserAnnotationOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserAnnotationInclude<ExtArgs> | null
+  /**
    * Filter, which UserAnnotation to fetch.
    */
   where: Prisma.UserAnnotationWhereUniqueInput
@@ -1085,6 +1284,10 @@ export type UserAnnotationFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Ex
    */
   omit?: Prisma.UserAnnotationOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserAnnotationInclude<ExtArgs> | null
+  /**
    * Filter, which UserAnnotation to fetch.
    */
   where: Prisma.UserAnnotationWhereUniqueInput
@@ -1102,6 +1305,10 @@ export type UserAnnotationFindFirstArgs<ExtArgs extends runtime.Types.Extensions
    * Omit specific fields from the UserAnnotation
    */
   omit?: Prisma.UserAnnotationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserAnnotationInclude<ExtArgs> | null
   /**
    * Filter, which UserAnnotation to fetch.
    */
@@ -1151,6 +1358,10 @@ export type UserAnnotationFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Ext
    */
   omit?: Prisma.UserAnnotationOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserAnnotationInclude<ExtArgs> | null
+  /**
    * Filter, which UserAnnotation to fetch.
    */
   where?: Prisma.UserAnnotationWhereInput
@@ -1198,6 +1409,10 @@ export type UserAnnotationFindManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Omit specific fields from the UserAnnotation
    */
   omit?: Prisma.UserAnnotationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserAnnotationInclude<ExtArgs> | null
   /**
    * Filter, which UserAnnotations to fetch.
    */
@@ -1247,6 +1462,10 @@ export type UserAnnotationCreateArgs<ExtArgs extends runtime.Types.Extensions.In
    */
   omit?: Prisma.UserAnnotationOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserAnnotationInclude<ExtArgs> | null
+  /**
    * The data needed to create a UserAnnotation.
    */
   data: Prisma.XOR<Prisma.UserAnnotationCreateInput, Prisma.UserAnnotationUncheckedCreateInput>
@@ -1280,6 +1499,10 @@ export type UserAnnotationCreateManyAndReturnArgs<ExtArgs extends runtime.Types.
    */
   data: Prisma.UserAnnotationCreateManyInput | Prisma.UserAnnotationCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserAnnotationIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1294,6 +1517,10 @@ export type UserAnnotationUpdateArgs<ExtArgs extends runtime.Types.Extensions.In
    * Omit specific fields from the UserAnnotation
    */
   omit?: Prisma.UserAnnotationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserAnnotationInclude<ExtArgs> | null
   /**
    * The data needed to update a UserAnnotation.
    */
@@ -1346,6 +1573,10 @@ export type UserAnnotationUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.
    * Limit how many UserAnnotations to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserAnnotationIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1360,6 +1591,10 @@ export type UserAnnotationUpsertArgs<ExtArgs extends runtime.Types.Extensions.In
    * Omit specific fields from the UserAnnotation
    */
   omit?: Prisma.UserAnnotationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserAnnotationInclude<ExtArgs> | null
   /**
    * The filter to search for the UserAnnotation to update in case it exists.
    */
@@ -1386,6 +1621,10 @@ export type UserAnnotationDeleteArgs<ExtArgs extends runtime.Types.Extensions.In
    * Omit specific fields from the UserAnnotation
    */
   omit?: Prisma.UserAnnotationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserAnnotationInclude<ExtArgs> | null
   /**
    * Filter which UserAnnotation to delete.
    */
@@ -1418,4 +1657,8 @@ export type UserAnnotationDefaultArgs<ExtArgs extends runtime.Types.Extensions.I
    * Omit specific fields from the UserAnnotation
    */
   omit?: Prisma.UserAnnotationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserAnnotationInclude<ExtArgs> | null
 }

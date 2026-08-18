@@ -455,6 +455,7 @@ export const ModelName = {
   TrendingItem: 'TrendingItem',
   TvSeriesWatchProvider: 'TvSeriesWatchProvider',
   SyncLog: 'SyncLog',
+  LoginLog: 'LoginLog',
   User: 'User',
   Account: 'Account',
   Session: 'Session',
@@ -474,7 +475,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "genre" | "keyword" | "watchProvider" | "collection" | "productionCompany" | "productionCountry" | "spokenLanguage" | "configuration" | "country" | "language" | "timezone" | "certification" | "movie" | "movieGenre" | "movieKeyword" | "movieWatchProvider" | "movieProductionCompany" | "movieProductionCountry" | "movieSpokenLanguage" | "collectionMovie" | "movieReleaseDate" | "movieContentRating" | "movieAlternativeTitle" | "tvCreatedBy" | "tvNetwork" | "tvSeries" | "tvSeason" | "tvEpisode" | "tvSeriesGenre" | "tvSeriesNetwork" | "tvSeriesProductionCompany" | "tvSeriesProductionCountry" | "tvSeriesSpokenLanguage" | "tvContentRating" | "tvAlternativeTitle" | "episodeGroup" | "episodeGroupEpisode" | "person" | "castCredit" | "crewCredit" | "personCombinedCredit" | "externalId" | "mediaImage" | "mediaVideo" | "translation" | "recommendation" | "review" | "userAnnotation" | "watchlist" | "watchlistItem" | "tmdbAccount" | "tmdbFavorite" | "tmdbRating" | "tmdbWatchlist" | "tmdbList" | "trendingItem" | "tvSeriesWatchProvider" | "syncLog" | "user" | "account" | "session" | "verificationToken"
+    modelProps: "genre" | "keyword" | "watchProvider" | "collection" | "productionCompany" | "productionCountry" | "spokenLanguage" | "configuration" | "country" | "language" | "timezone" | "certification" | "movie" | "movieGenre" | "movieKeyword" | "movieWatchProvider" | "movieProductionCompany" | "movieProductionCountry" | "movieSpokenLanguage" | "collectionMovie" | "movieReleaseDate" | "movieContentRating" | "movieAlternativeTitle" | "tvCreatedBy" | "tvNetwork" | "tvSeries" | "tvSeason" | "tvEpisode" | "tvSeriesGenre" | "tvSeriesNetwork" | "tvSeriesProductionCompany" | "tvSeriesProductionCountry" | "tvSeriesSpokenLanguage" | "tvContentRating" | "tvAlternativeTitle" | "episodeGroup" | "episodeGroupEpisode" | "person" | "castCredit" | "crewCredit" | "personCombinedCredit" | "externalId" | "mediaImage" | "mediaVideo" | "translation" | "recommendation" | "review" | "userAnnotation" | "watchlist" | "watchlistItem" | "tmdbAccount" | "tmdbFavorite" | "tmdbRating" | "tmdbWatchlist" | "tmdbList" | "trendingItem" | "tvSeriesWatchProvider" | "syncLog" | "loginLog" | "user" | "account" | "session" | "verificationToken"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -4770,6 +4771,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    LoginLog: {
+      payload: Prisma.$LoginLogPayload<ExtArgs>
+      fields: Prisma.LoginLogFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.LoginLogFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LoginLogPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.LoginLogFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LoginLogPayload>
+        }
+        findFirst: {
+          args: Prisma.LoginLogFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LoginLogPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.LoginLogFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LoginLogPayload>
+        }
+        findMany: {
+          args: Prisma.LoginLogFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LoginLogPayload>[]
+        }
+        create: {
+          args: Prisma.LoginLogCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LoginLogPayload>
+        }
+        createMany: {
+          args: Prisma.LoginLogCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.LoginLogCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LoginLogPayload>[]
+        }
+        delete: {
+          args: Prisma.LoginLogDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LoginLogPayload>
+        }
+        update: {
+          args: Prisma.LoginLogUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LoginLogPayload>
+        }
+        deleteMany: {
+          args: Prisma.LoginLogDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.LoginLogUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.LoginLogUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LoginLogPayload>[]
+        }
+        upsert: {
+          args: Prisma.LoginLogUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$LoginLogPayload>
+        }
+        aggregate: {
+          args: Prisma.LoginLogAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateLoginLog>
+        }
+        groupBy: {
+          args: Prisma.LoginLogGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LoginLogGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.LoginLogCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.LoginLogCountAggregateOutputType> | number
+        }
+      }
+    }
     User: {
       payload: Prisma.$UserPayload<ExtArgs>
       fields: Prisma.UserFieldRefs
@@ -5865,6 +5940,22 @@ export const SyncLogScalarFieldEnum = {
 export type SyncLogScalarFieldEnum = (typeof SyncLogScalarFieldEnum)[keyof typeof SyncLogScalarFieldEnum]
 
 
+export const LoginLogScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  email: 'email',
+  name: 'name',
+  method: 'method',
+  ip: 'ip',
+  userAgent: 'userAgent',
+  success: 'success',
+  reason: 'reason',
+  createdAt: 'createdAt'
+} as const
+
+export type LoginLogScalarFieldEnum = (typeof LoginLogScalarFieldEnum)[keyof typeof LoginLogScalarFieldEnum]
+
+
 export const UserScalarFieldEnum = {
   id: 'id',
   email: 'email',
@@ -6233,6 +6324,7 @@ export type GlobalOmitConfig = {
   trendingItem?: Prisma.TrendingItemOmit
   tvSeriesWatchProvider?: Prisma.TvSeriesWatchProviderOmit
   syncLog?: Prisma.SyncLogOmit
+  loginLog?: Prisma.LoginLogOmit
   user?: Prisma.UserOmit
   account?: Prisma.AccountOmit
   session?: Prisma.SessionOmit

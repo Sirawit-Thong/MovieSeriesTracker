@@ -369,6 +369,23 @@
     "loadingWatchlists": "Loading watchlists...",
     "loadingAnnotations": "Loading annotations...",
     "loadingSyncLogs": "Loading sync logs...",
-    "loadingMedia": "Loading media..."
+    "loadingMedia": "Loading media...",
+    "loginHistoryPage": {
+      "title": "Login History",
+      "subtitle": "View login attempts and authentication logs for all users.",
+      "user": "User",
+      "method": "Method",
+      "ipAddress": "IP Address",
+      "reason": "Reason",
+      "time": "Time",
+      "credentials": "Email/Password",
+      "google": "Google",
+      "success": "Success",
+      "failed": "Failed",
+      "allStatuses": "All Statuses",
+      "allMethods": "All Methods",
+      "loadingLogs": "Loading login logs...",
+      "noLogs": "No login logs found."
+    }
   }
 }

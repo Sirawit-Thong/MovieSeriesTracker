@@ -23,7 +23,7 @@ providers.push(
       email: {label: 'Email', type: 'email'},
       password: {label: 'Password', type: 'password'},
     },
-    async authorize(credentials) {
+    async authorize(credentials, request) {
       if (!credentials?.email || !credentials?.password) {
         return null;
       }
@@ -33,6 +33,15 @@ providers.push(
       });
 
       if (!user || !user.passwordHash) {
+        await recordLogin({
+          userId: user?.id ?? null,
+          email: (credentials.email as string) ?? '',
+          name: user?.name ?? null,
+          method: 'credentials',
+          request,
+          success: false,
+          reason: !user ? 'User not found' : 'No password set',
+        });
         return null;
       }
 
@@ -42,8 +51,26 @@ providers.push(
       );
 
       if (!isValid) {
+        await recordLogin({
+          userId: user.id,
+          email: user.email,
+          name: user.name,
+          method: 'credentials',
+          request,
+          success: false,
+          reason: 'Invalid password',
+        });
         return null;
       }
+
+      await recordLogin({
+        userId: user.id,
+        email: user.email,
+        name: user.name,
+        method: 'credentials',
+        request,
+        success: true,
+      });
 
       return {
         id: user.id,
@@ -56,6 +83,38 @@ providers.push(
   })
 );
 
+async function recordLogin(opts: {
+  userId: string | null;
+  email: string;
+  name: string | null;
+  method: string;
+  request?: Request;
+  success: boolean;
+  reason?: string;
+}) {
+  try {
+    const ip = opts.request?.headers?.get('x-forwarded-for')?.split(',')[0]?.trim()
+      ?? opts.request?.headers?.get('x-real-ip')
+      ?? null;
+    const userAgent = opts.request?.headers?.get('user-agent') ?? null;
+
+    await prisma.loginLog.create({
+      data: {
+        userId: opts.userId || null,
+        email: opts.email,
+        name: opts.name,
+        method: opts.method,
+        ip,
+        userAgent,
+        success: opts.success,
+        reason: opts.reason ?? null,
+      },
+    });
+  } catch (error) {
+    console.error('[auth:login-log]', error);
+  }
+}
+
 export const {handlers, auth, signIn, signOut} = NextAuth({
   adapter: PrismaAdapter(prisma),
   session: {strategy: 'jwt'},
@@ -64,10 +123,30 @@ export const {handlers, auth, signIn, signOut} = NextAuth({
   },
   providers,
   callbacks: {
-    async jwt({token, user}) {
+    async jwt({token, user, account}) {
       if (user) {
         token.id = user.id;
         token.role = (user as Record<string, unknown>).role ?? 'USER';
+        if (account?.provider !== 'credentials') {
+          const u = user as {id: string; email?: string | null; name?: string | null};
+          await recordLogin({
+            userId: u.id,
+            email: u.email ?? '',
+            name: u.name ?? null,
+            method: account?.provider ?? 'oauth',
+            request: undefined,
+            success: true,
+          });
+        }
+      } else if (token?.id) {
+        const dbUser = await prisma.user.findUnique({
+          where: {id: token.id as string},
+          select: {role: true, banned: true},
+        });
+        if (dbUser) {
+          token.role = dbUser.role;
+          (token as Record<string, unknown>).banned = dbUser.banned;
+        }
       }
       return token;
     },
@@ -78,6 +157,7 @@ export const {handlers, auth, signIn, signOut} = NextAuth({
       if (token?.role) {
         (session.user as unknown as Record<string, unknown>).role = token.role as string;
       }
+      (session.user as unknown as Record<string, unknown>).banned = (token as Record<string, unknown>).banned ?? false;
       return session;
     },
   },

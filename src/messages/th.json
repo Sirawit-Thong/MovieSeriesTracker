@@ -369,6 +369,23 @@
     "loadingWatchlists": "กำลังโหลด Watchlist...",
     "loadingAnnotations": "กำลังโหลดความคิดเห็น...",
     "loadingSyncLogs": "กำลังโหลดประวัติการซิงค์...",
-    "loadingMedia": "กำลังโหลดสื่อ..."
+    "loadingMedia": "กำลังโหลดสื่อ...",
+    "loginHistoryPage": {
+      "title": "ประวัติการเข้าสู่ระบบ",
+      "subtitle": "ดูประวัติการเข้าสู่ระบบและการยืนยันตัวตนของผู้ใช้ทุกคน",
+      "user": "ผู้ใช้",
+      "method": "วิธี",
+      "ipAddress": "IP Address",
+      "reason": "เหตุผล",
+      "time": "เวลา",
+      "credentials": "อีเมล/รหัสผ่าน",
+      "google": "Google",
+      "success": "สำเร็จ",
+      "failed": "ล้มเหลว",
+      "allStatuses": "ทุกสถานะ",
+      "allMethods": "ทุกวิธี",
+      "loadingLogs": "กำลังโหลดประวัติการเข้าสู่ระบบ...",
+      "noLogs": "ไม่พบประวัติการเข้าสู่ระบบ"
+    }
   }
 }

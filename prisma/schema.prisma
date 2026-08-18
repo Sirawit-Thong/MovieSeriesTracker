@@ -873,6 +873,8 @@ model UserAnnotation {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([userId, entityType, entityId])
   @@index([userId])
   @@index([userId, entityType])
@@ -888,6 +890,7 @@ model Watchlist {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  user  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   items WatchlistItem[]
 
   @@index([userId])
@@ -1040,6 +1043,26 @@ model SyncLog {
   @@map("sync_logs")
 }
 
+model LoginLog {
+  id        String   @id @default(cuid())
+  userId    String?  @map("user_id")
+  email     String
+  name      String?
+  method    String   // "credentials", "google", "oauth"
+  ip        String?  @db.VarChar(45)
+  userAgent String?  @db.Text @map("user_agent")
+  success   Boolean  @default(true)
+  reason    String?  @db.Text // failure reason
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([email])
+  @@map("login_logs")
+}
+
 // ============================================================
 // Authentication & Authorization
 // ============================================================
@@ -1058,6 +1081,9 @@ model User {
 
   accounts Account[]
   sessions Session[]
+  loginLogs LoginLog[]
+  watchlists Watchlist[]
+  userAnnotations UserAnnotation[]
 
   @@map("users")
 }

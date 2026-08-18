@@ -109,6 +109,7 @@ export const ModelName = {
   TrendingItem: 'TrendingItem',
   TvSeriesWatchProvider: 'TvSeriesWatchProvider',
   SyncLog: 'SyncLog',
+  LoginLog: 'LoginLog',
   User: 'User',
   Account: 'Account',
   Session: 'Session',
@@ -889,6 +890,22 @@ export const SyncLogScalarFieldEnum = {
 } as const
 
 export type SyncLogScalarFieldEnum = (typeof SyncLogScalarFieldEnum)[keyof typeof SyncLogScalarFieldEnum]
+
+
+export const LoginLogScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  email: 'email',
+  name: 'name',
+  method: 'method',
+  ip: 'ip',
+  userAgent: 'userAgent',
+  success: 'success',
+  reason: 'reason',
+  createdAt: 'createdAt'
+} as const
+
+export type LoginLogScalarFieldEnum = (typeof LoginLogScalarFieldEnum)[keyof typeof LoginLogScalarFieldEnum]
 
 
 export const UserScalarFieldEnum = {

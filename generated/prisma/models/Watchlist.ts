@@ -224,6 +224,7 @@ export type WatchlistWhereInput = {
   userId?: Prisma.StringFilter<"Watchlist"> | string
   createdAt?: Prisma.DateTimeFilter<"Watchlist"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Watchlist"> | Date | string
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   items?: Prisma.WatchlistItemListRelationFilter
 }
 
@@ -234,6 +235,7 @@ export type WatchlistOrderByWithRelationInput = {
   userId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  user?: Prisma.UserOrderByWithRelationInput
   items?: Prisma.WatchlistItemOrderByRelationAggregateInput
 }
 
@@ -247,6 +249,7 @@ export type WatchlistWhereUniqueInput = Prisma.AtLeast<{
   userId?: Prisma.StringFilter<"Watchlist"> | string
   createdAt?: Prisma.DateTimeFilter<"Watchlist"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Watchlist"> | Date | string
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   items?: Prisma.WatchlistItemListRelationFilter
 }, "id">
 
@@ -279,9 +282,9 @@ export type WatchlistScalarWhereWithAggregatesInput = {
 export type WatchlistCreateInput = {
   name: string
   description?: string | null
-  userId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutWatchlistsInput
   items?: Prisma.WatchlistItemCreateNestedManyWithoutWatchlistInput
 }
 
@@ -298,9 +301,9 @@ export type WatchlistUncheckedCreateInput = {
 export type WatchlistUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutWatchlistsNestedInput
   items?: Prisma.WatchlistItemUpdateManyWithoutWatchlistNestedInput
 }
 
@@ -326,7 +329,6 @@ export type WatchlistCreateManyInput = {
 export type WatchlistUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -380,6 +382,16 @@ export type WatchlistScalarRelationFilter = {
   isNot?: Prisma.WatchlistWhereInput
 }
 
+export type WatchlistListRelationFilter = {
+  every?: Prisma.WatchlistWhereInput
+  some?: Prisma.WatchlistWhereInput
+  none?: Prisma.WatchlistWhereInput
+}
+
+export type WatchlistOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
+}
+
 export type WatchlistCreateNestedOneWithoutItemsInput = {
   create?: Prisma.XOR<Prisma.WatchlistCreateWithoutItemsInput, Prisma.WatchlistUncheckedCreateWithoutItemsInput>
   connectOrCreate?: Prisma.WatchlistCreateOrConnectWithoutItemsInput
@@ -394,12 +406,54 @@ export type WatchlistUpdateOneRequiredWithoutItemsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.WatchlistUpdateToOneWithWhereWithoutItemsInput, Prisma.WatchlistUpdateWithoutItemsInput>, Prisma.WatchlistUncheckedUpdateWithoutItemsInput>
 }
 
+export type WatchlistCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.WatchlistCreateWithoutUserInput, Prisma.WatchlistUncheckedCreateWithoutUserInput> | Prisma.WatchlistCreateWithoutUserInput[] | Prisma.WatchlistUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.WatchlistCreateOrConnectWithoutUserInput | Prisma.WatchlistCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.WatchlistCreateManyUserInputEnvelope
+  connect?: Prisma.WatchlistWhereUniqueInput | Prisma.WatchlistWhereUniqueInput[]
+}
+
+export type WatchlistUncheckedCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.WatchlistCreateWithoutUserInput, Prisma.WatchlistUncheckedCreateWithoutUserInput> | Prisma.WatchlistCreateWithoutUserInput[] | Prisma.WatchlistUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.WatchlistCreateOrConnectWithoutUserInput | Prisma.WatchlistCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.WatchlistCreateManyUserInputEnvelope
+  connect?: Prisma.WatchlistWhereUniqueInput | Prisma.WatchlistWhereUniqueInput[]
+}
+
+export type WatchlistUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.WatchlistCreateWithoutUserInput, Prisma.WatchlistUncheckedCreateWithoutUserInput> | Prisma.WatchlistCreateWithoutUserInput[] | Prisma.WatchlistUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.WatchlistCreateOrConnectWithoutUserInput | Prisma.WatchlistCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.WatchlistUpsertWithWhereUniqueWithoutUserInput | Prisma.WatchlistUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.WatchlistCreateManyUserInputEnvelope
+  set?: Prisma.WatchlistWhereUniqueInput | Prisma.WatchlistWhereUniqueInput[]
+  disconnect?: Prisma.WatchlistWhereUniqueInput | Prisma.WatchlistWhereUniqueInput[]
+  delete?: Prisma.WatchlistWhereUniqueInput | Prisma.WatchlistWhereUniqueInput[]
+  connect?: Prisma.WatchlistWhereUniqueInput | Prisma.WatchlistWhereUniqueInput[]
+  update?: Prisma.WatchlistUpdateWithWhereUniqueWithoutUserInput | Prisma.WatchlistUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.WatchlistUpdateManyWithWhereWithoutUserInput | Prisma.WatchlistUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.WatchlistScalarWhereInput | Prisma.WatchlistScalarWhereInput[]
+}
+
+export type WatchlistUncheckedUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.WatchlistCreateWithoutUserInput, Prisma.WatchlistUncheckedCreateWithoutUserInput> | Prisma.WatchlistCreateWithoutUserInput[] | Prisma.WatchlistUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.WatchlistCreateOrConnectWithoutUserInput | Prisma.WatchlistCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.WatchlistUpsertWithWhereUniqueWithoutUserInput | Prisma.WatchlistUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.WatchlistCreateManyUserInputEnvelope
+  set?: Prisma.WatchlistWhereUniqueInput | Prisma.WatchlistWhereUniqueInput[]
+  disconnect?: Prisma.WatchlistWhereUniqueInput | Prisma.WatchlistWhereUniqueInput[]
+  delete?: Prisma.WatchlistWhereUniqueInput | Prisma.WatchlistWhereUniqueInput[]
+  connect?: Prisma.WatchlistWhereUniqueInput | Prisma.WatchlistWhereUniqueInput[]
+  update?: Prisma.WatchlistUpdateWithWhereUniqueWithoutUserInput | Prisma.WatchlistUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.WatchlistUpdateManyWithWhereWithoutUserInput | Prisma.WatchlistUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.WatchlistScalarWhereInput | Prisma.WatchlistScalarWhereInput[]
+}
+
 export type WatchlistCreateWithoutItemsInput = {
   name: string
   description?: string | null
-  userId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutWatchlistsInput
 }
 
 export type WatchlistUncheckedCreateWithoutItemsInput = {
@@ -430,9 +484,9 @@ export type WatchlistUpdateToOneWithWhereWithoutItemsInput = {
 export type WatchlistUpdateWithoutItemsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutWatchlistsNestedInput
 }
 
 export type WatchlistUncheckedUpdateWithoutItemsInput = {
@@ -440,6 +494,94 @@ export type WatchlistUncheckedUpdateWithoutItemsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type WatchlistCreateWithoutUserInput = {
+  name: string
+  description?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  items?: Prisma.WatchlistItemCreateNestedManyWithoutWatchlistInput
+}
+
+export type WatchlistUncheckedCreateWithoutUserInput = {
+  id?: number
+  name: string
+  description?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  items?: Prisma.WatchlistItemUncheckedCreateNestedManyWithoutWatchlistInput
+}
+
+export type WatchlistCreateOrConnectWithoutUserInput = {
+  where: Prisma.WatchlistWhereUniqueInput
+  create: Prisma.XOR<Prisma.WatchlistCreateWithoutUserInput, Prisma.WatchlistUncheckedCreateWithoutUserInput>
+}
+
+export type WatchlistCreateManyUserInputEnvelope = {
+  data: Prisma.WatchlistCreateManyUserInput | Prisma.WatchlistCreateManyUserInput[]
+  skipDuplicates?: boolean
+}
+
+export type WatchlistUpsertWithWhereUniqueWithoutUserInput = {
+  where: Prisma.WatchlistWhereUniqueInput
+  update: Prisma.XOR<Prisma.WatchlistUpdateWithoutUserInput, Prisma.WatchlistUncheckedUpdateWithoutUserInput>
+  create: Prisma.XOR<Prisma.WatchlistCreateWithoutUserInput, Prisma.WatchlistUncheckedCreateWithoutUserInput>
+}
+
+export type WatchlistUpdateWithWhereUniqueWithoutUserInput = {
+  where: Prisma.WatchlistWhereUniqueInput
+  data: Prisma.XOR<Prisma.WatchlistUpdateWithoutUserInput, Prisma.WatchlistUncheckedUpdateWithoutUserInput>
+}
+
+export type WatchlistUpdateManyWithWhereWithoutUserInput = {
+  where: Prisma.WatchlistScalarWhereInput
+  data: Prisma.XOR<Prisma.WatchlistUpdateManyMutationInput, Prisma.WatchlistUncheckedUpdateManyWithoutUserInput>
+}
+
+export type WatchlistScalarWhereInput = {
+  AND?: Prisma.WatchlistScalarWhereInput | Prisma.WatchlistScalarWhereInput[]
+  OR?: Prisma.WatchlistScalarWhereInput[]
+  NOT?: Prisma.WatchlistScalarWhereInput | Prisma.WatchlistScalarWhereInput[]
+  id?: Prisma.IntFilter<"Watchlist"> | number
+  name?: Prisma.StringFilter<"Watchlist"> | string
+  description?: Prisma.StringNullableFilter<"Watchlist"> | string | null
+  userId?: Prisma.StringFilter<"Watchlist"> | string
+  createdAt?: Prisma.DateTimeFilter<"Watchlist"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Watchlist"> | Date | string
+}
+
+export type WatchlistCreateManyUserInput = {
+  id?: number
+  name: string
+  description?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type WatchlistUpdateWithoutUserInput = {
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  items?: Prisma.WatchlistItemUpdateManyWithoutWatchlistNestedInput
+}
+
+export type WatchlistUncheckedUpdateWithoutUserInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  items?: Prisma.WatchlistItemUncheckedUpdateManyWithoutWatchlistNestedInput
+}
+
+export type WatchlistUncheckedUpdateManyWithoutUserInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -482,6 +624,7 @@ export type WatchlistSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   userId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   items?: boolean | Prisma.Watchlist$itemsArgs<ExtArgs>
   _count?: boolean | Prisma.WatchlistCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["watchlist"]>
@@ -493,6 +636,7 @@ export type WatchlistSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   userId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["watchlist"]>
 
 export type WatchlistSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -502,6 +646,7 @@ export type WatchlistSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   userId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["watchlist"]>
 
 export type WatchlistSelectScalar = {
@@ -515,15 +660,21 @@ export type WatchlistSelectScalar = {
 
 export type WatchlistOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "userId" | "createdAt" | "updatedAt", ExtArgs["result"]["watchlist"]>
 export type WatchlistInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   items?: boolean | Prisma.Watchlist$itemsArgs<ExtArgs>
   _count?: boolean | Prisma.WatchlistCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type WatchlistIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type WatchlistIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type WatchlistIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
+export type WatchlistIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
 
 export type $WatchlistPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Watchlist"
   objects: {
+    user: Prisma.$UserPayload<ExtArgs>
     items: Prisma.$WatchlistItemPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -927,6 +1078,7 @@ readonly fields: WatchlistFieldRefs;
  */
 export interface Prisma__WatchlistClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   items<T extends Prisma.Watchlist$itemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Watchlist$itemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$WatchlistItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1217,6 +1369,10 @@ export type WatchlistCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Exten
    */
   data: Prisma.WatchlistCreateManyInput | Prisma.WatchlistCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WatchlistIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1287,6 +1443,10 @@ export type WatchlistUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Exten
    * Limit how many Watchlists to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WatchlistIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**

@@ -5,12 +5,12 @@ import {Link} from '@/i18n/navigation';
 import {useTranslations} from 'next-intl';
 
 type SyncLog = {
-  id: string;
-  entityType: string;
+  id: number;
+  entity: string;
   status: string;
-  processedCount: number;
-  errorCount: number;
-  durationMs: number | null;
+  processed: number;
+  errors: number;
+  duration: number | null;
   startedAt: string;
   endedAt: string | null;
 };
@@ -42,7 +42,7 @@ function StatusBadge({status, t}: {status: string; t: (key: string) => string}) 
 }
 
 function formatDuration(ms: number | null): string {
-  if (ms === null) return '—';
+  if (ms == null) return '\u2014';
   if (ms < 1000) return `${ms}ms`;
   return `${(ms / 1000).toFixed(1)}s`;
 }
@@ -71,25 +71,14 @@ export default function AdminSyncHistoryPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
-      {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <Link
             href="/admin"
             className="text-foreground/60 hover:text-white transition-colors"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </Link>
           <h1 className="text-3xl font-bold text-white">{t('syncHistoryPage.title')}</h1>
@@ -99,7 +88,6 @@ export default function AdminSyncHistoryPage() {
         </p>
       </div>
 
-      {/* Sync Logs Table */}
       <div className="bg-surface border border-border rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -131,29 +119,11 @@ export default function AdminSyncHistoryPage() {
             <tbody>
               {loading && !data && (
                 <tr>
-                  <td
-                    colSpan={7}
-                    className="px-6 py-8 text-center text-foreground/40"
-                  >
+                  <td colSpan={7} className="px-6 py-8 text-center text-foreground/40">
                     <div className="flex items-center justify-center gap-2">
-                      <svg
-                        className="animate-spin h-5 w-5 text-primary"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                        />
+                      <svg className="animate-spin h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                       </svg>
                       {t('loadingSyncLogs')}
                     </div>
@@ -161,32 +131,29 @@ export default function AdminSyncHistoryPage() {
                 </tr>
               )}
               {data?.logs.map((log) => (
-                <tr
-                  key={log.id}
-                  className="border-b border-border last:border-0"
-                >
+                <tr key={log.id} className="border-b border-border last:border-0">
                   <td className="px-6 py-3">
                     <span className="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-foreground/10 text-foreground/60">
-                      {log.entityType}
+                      {log.entity}
                     </span>
                   </td>
                   <td className="px-6 py-3">
                     <StatusBadge status={log.status} t={t} />
                   </td>
                   <td className="px-6 py-3 text-foreground/70">
-                    {log.processedCount.toLocaleString()}
+                    {(log.processed ?? 0).toLocaleString()}
                   </td>
                   <td className="px-6 py-3">
-                    {log.errorCount > 0 ? (
+                    {(log.errors ?? 0) > 0 ? (
                       <span className="text-red-400 font-medium">
-                        {log.errorCount.toLocaleString()}
+                        {(log.errors ?? 0).toLocaleString()}
                       </span>
                     ) : (
                       <span className="text-foreground/40">0</span>
                     )}
                   </td>
                   <td className="px-6 py-3 text-foreground/60">
-                    {formatDuration(log.durationMs)}
+                    {formatDuration(log.duration ?? null)}
                   </td>
                   <td className="px-6 py-3 text-foreground/60">
                     {new Date(log.startedAt).toLocaleString('en-US', {
@@ -204,16 +171,13 @@ export default function AdminSyncHistoryPage() {
                           hour: '2-digit',
                           minute: '2-digit',
                         })
-                      : '—'}
+                      : '\u2014'}
                   </td>
                 </tr>
               ))}
               {data && data.logs.length === 0 && (
                 <tr>
-                  <td
-                    colSpan={7}
-                    className="px-6 py-8 text-center text-foreground/40"
-                  >
+                  <td colSpan={7} className="px-6 py-8 text-center text-foreground/40">
                     {t('syncHistoryPage.noLogs')}
                   </td>
                 </tr>
@@ -222,7 +186,6 @@ export default function AdminSyncHistoryPage() {
           </table>
         </div>
 
-        {/* Pagination */}
         {data && data.totalPages > 1 && (
           <div className="flex items-center justify-between px-6 py-4 border-t border-border">
             <p className="text-sm text-foreground/50">
@@ -239,9 +202,7 @@ export default function AdminSyncHistoryPage() {
               </button>
               <button
                 type="button"
-                onClick={() =>
-                  setPage((p) => Math.min(data.totalPages, p + 1))
-                }
+                onClick={() => setPage((p) => Math.min(data.totalPages, p + 1))}
                 disabled={page >= data.totalPages}
                 className="px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground/70 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               >
