@@ -29,7 +29,7 @@ function applyRateLimit(request: NextRequest): NextResponse | null {
 
   if (!pathname.startsWith('/api')) return null;
 
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 'anonymous';
+  const ip = request.headers.get('x-forwarded-for')?.split(',').pop()?.trim() || 'anonymous';
   const key = `${ip}:${pathname}`;
   const config = getRateLimitConfig(pathname);
   const now = Date.now();
