@@ -17,8 +17,6 @@ export function generateStaticParams() {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   themeColor: '#0a0a0a',
   viewportFit: 'cover',
 };
@@ -87,6 +85,10 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} className="dark">
+      <head>
+        {/* CDN for poster/backdrop images */}
+        <link rel="preconnect" href="https://image.tmdb.org" />
+      </head>
       <body className="min-h-screen flex flex-col bg-background text-foreground antialiased">
         <SessionProvider>
           <NextIntlClientProvider messages={messages}>
