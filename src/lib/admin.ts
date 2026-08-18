@@ -1,7 +1,13 @@
 import {auth} from '@/lib/auth/config';
 import {NextResponse} from 'next/server';
 
-type SessionUser = {id: string; name?: string | null; email?: string | null; role?: string};
+type SessionUser = {
+  id: string;
+  name?: string | null;
+  email?: string | null;
+  role?: string;
+  banned?: boolean;
+};
 
 /**
  * Check that the current session has ADMIN role.
@@ -9,10 +15,11 @@ type SessionUser = {id: string; name?: string | null; email?: string | null; rol
  */
 export async function requireAdmin(): Promise<{user: SessionUser; response?: never} | {user?: never; response: NextResponse}> {
   const session = await auth();
+  const user = session?.user as SessionUser | undefined;
 
-  if (!session?.user || (session.user as SessionUser).role !== 'ADMIN') {
+  if (!user || user.role !== 'ADMIN' || user.banned === true) {
     return {response: NextResponse.json({error: 'Forbidden'}, {status: 403})};
   }
 
-  return {user: session.user as SessionUser};
+  return {user};
 }
