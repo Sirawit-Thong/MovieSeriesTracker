@@ -140,19 +140,24 @@ export default function Filmography({combinedCredits, localizedTitles = {}}: Fil
       c.department?.toLowerCase() !== 'production'
   );
 
-  const sortByYearDesc = <T extends {releaseDate: string | null}>(items: T[]): T[] =>
-    [...items].sort((a, b) => extractYear(b.releaseDate) - extractYear(a.releaseDate));
+  const sortByDateDesc = <T extends {releaseDate: string | null}>(items: T[]): T[] =>
+    [...items].sort((a, b) => {
+      if (!a.releaseDate && !b.releaseDate) return 0;
+      if (!a.releaseDate) return 1;
+      if (!b.releaseDate) return -1;
+      return b.releaseDate.localeCompare(a.releaseDate);
+    });
 
   const sections: Array<{
     title: string;
     items: CombinedCredit[];
     isCast: boolean;
   }> = [
-    {title: t('actingCreditsMovies'), items: sortByYearDesc(actingMovies), isCast: true},
-    {title: t('actingCreditsTv'), items: sortByYearDesc(actingTv), isCast: true},
-    {title: t('directingCredits'), items: sortByYearDesc(directingCredits), isCast: false},
-    {title: t('producingCredits'), items: sortByYearDesc(producingCredits), isCast: false},
-    {title: t('otherCrewCredits'), items: sortByYearDesc(otherCrewCredits), isCast: false},
+    {title: t('actingCreditsMovies'), items: sortByDateDesc(actingMovies), isCast: true},
+    {title: t('actingCreditsTv'), items: sortByDateDesc(actingTv), isCast: true},
+    {title: t('directingCredits'), items: sortByDateDesc(directingCredits), isCast: false},
+    {title: t('producingCredits'), items: sortByDateDesc(producingCredits), isCast: false},
+    {title: t('otherCrewCredits'), items: sortByDateDesc(otherCrewCredits), isCast: false},
   ];
 
   const activeSections = sections.filter((s) => s.items.length > 0);
