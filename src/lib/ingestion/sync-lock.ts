@@ -2,6 +2,16 @@ import prisma from '../db';
 
 const LOCK_TIMEOUT_MS = 30 * 60 * 1000;
 
+const ENTITY_ALIASES: Record<string, string> = {movies: 'movie', persons: 'person'};
+
+export function normalizeEntity(entity: string): string {
+  return ENTITY_ALIASES[entity] ?? entity;
+}
+
+export function isLockConflict(activeEntity: string, newEntity: string): boolean {
+  return activeEntity === 'all' || newEntity === 'all' || activeEntity === newEntity;
+}
+
 export function isSyncLockExpired(createdAt: Date, now: number = Date.now()): boolean {
   return now - createdAt.getTime() > LOCK_TIMEOUT_MS;
 }
@@ -9,16 +19,20 @@ export function isSyncLockExpired(createdAt: Date, now: number = Date.now()): bo
 export async function acquireSyncLock(
   entity: string
 ): Promise<{id: number} | null> {
+  const normalized = normalizeEntity(entity);
   const now = new Date();
 
   const active = await prisma.syncLog.findFirst({
     where: {
-      entity,
       status: 'running',
     },
   });
 
-  if (active && !isSyncLockExpired(active.startedAt, now.getTime())) {
+  if (
+    active &&
+    !isSyncLockExpired(active.startedAt, now.getTime()) &&
+    isLockConflict(normalizeEntity(active.entity), normalized)
+  ) {
     return null;
   }
 
@@ -30,7 +44,7 @@ export async function acquireSyncLock(
   }
 
   return prisma.syncLog.create({
-    data: {entity, status: 'running'},
+    data: {entity: normalized, status: 'running'},
     select: {id: true},
   });
 }
