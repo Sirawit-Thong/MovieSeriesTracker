@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import TmdbImage from '@/components/ui/TmdbImage';
 import {useTranslations} from 'next-intl';
 import {Link} from '@/i18n/navigation';
 
@@ -239,7 +239,7 @@ function MovieResultCard({movie}: MovieResultCardProps) {
       {/* Poster */}
       <div className="relative aspect-[2/3] w-full overflow-hidden">
         {posterSrc ? (
-          <Image
+<TmdbImage 
             src={posterSrc}
             alt={movie.title}
             fill
@@ -317,7 +317,7 @@ function TvSeriesResultCard({series}: TvSeriesResultCardProps) {
       {/* Poster */}
       <div className="relative aspect-[2/3] w-full overflow-hidden">
         {posterSrc ? (
-          <Image
+<TmdbImage 
             src={posterSrc}
             alt={series.name}
             fill
@@ -389,7 +389,7 @@ function PersonResultCard({person}: PersonResultCardProps) {
       {/* Profile image */}
       <div className="relative aspect-[2/3] w-full overflow-hidden">
         {profileSrc ? (
-          <Image
+<TmdbImage 
             src={profileSrc}
             alt={person.name}
             fill

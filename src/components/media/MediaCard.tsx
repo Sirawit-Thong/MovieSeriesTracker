@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import TmdbImage from '@/components/ui/TmdbImage';
 import {Link} from '@/i18n/navigation';
 
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
@@ -38,7 +38,7 @@ export default function MediaCard({
       {/* Poster */}
       <div className="relative aspect-[2/3] w-full overflow-hidden">
         {posterSrc ? (
-          <Image
+<TmdbImage 
             src={posterSrc}
             alt={title}
             fill

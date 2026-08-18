@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import TmdbImage from '@/components/ui/TmdbImage';
 import {useTranslations} from 'next-intl';
 import {Link} from '@/i18n/navigation';
 import MovieInfo from './MovieInfo';
@@ -245,7 +245,7 @@ export default function MovieDetail({movie, locale}: MovieDetailProps) {
       <section className="relative w-full h-[50vh] md:h-[70vh] overflow-hidden">
         {/* Backdrop image */}
         {backdropSrc ? (
-          <Image
+<TmdbImage 
             src={backdropSrc}
             alt={displayTitle}
             fill
@@ -266,7 +266,7 @@ export default function MovieDetail({movie, locale}: MovieDetailProps) {
           {/* Poster */}
           {posterSrc && (
             <div className="relative flex-shrink-0 w-[120px] md:w-[200px] aspect-[2/3] rounded-lg overflow-hidden shadow-2xl border border-white/10">
-              <Image
+    <TmdbImage 
                 src={posterSrc}
                 alt={displayTitle}
                 fill
@@ -553,7 +553,7 @@ export default function MovieDetail({movie, locale}: MovieDetailProps) {
                       className="flex items-center gap-3 bg-surface rounded-lg px-4 py-3 border border-border"
                     >
                       {company.logoPath && (
-                        <Image
+              <TmdbImage 
                           src={`${TMDB_IMAGE_BASE}/w92${company.logoPath}`}
                           alt={company.name}
                           width={40}
@@ -623,7 +623,7 @@ export default function MovieDetail({movie, locale}: MovieDetailProps) {
                 >
                   {movie.collection.posterPath && (
                     <div className="relative w-16 h-24 flex-shrink-0 rounded overflow-hidden">
-                      <Image
+            <TmdbImage 
                         src={`${TMDB_IMAGE_BASE}/w154${movie.collection.posterPath}`}
                         alt={movie.collection.name}
                         fill
@@ -674,7 +674,7 @@ export default function MovieDetail({movie, locale}: MovieDetailProps) {
                     >
                       <div className="relative w-10 h-10 flex-shrink-0 rounded-full overflow-hidden bg-muted">
                         {credit.person.profilePath ? (
-                          <Image
+                <TmdbImage 
                             src={`${TMDB_IMAGE_BASE}/w185${credit.person.profilePath}`}
                             alt={credit.person.name}
                             fill

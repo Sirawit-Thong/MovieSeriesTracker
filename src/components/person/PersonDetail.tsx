@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import TmdbImage from '@/components/ui/TmdbImage';
 import {useTranslations} from 'next-intl';
 import {Link} from '@/i18n/navigation';
 import PersonInfo from './PersonInfo';
@@ -164,7 +164,7 @@ export default function PersonDetail({person, locale}: PersonDetailProps) {
           <div className="flex-shrink-0 w-full lg:w-[300px]">
             <div className="relative aspect-[2/3] w-full max-w-[300px] lg:max-w-none mx-auto lg:mx-0 rounded-lg overflow-hidden shadow-2xl border border-white/10">
               {profileSrc ? (
-                <Image
+<TmdbImage 
                   src={profileSrc}
                   alt={displayName}
                   fill
@@ -267,11 +267,12 @@ export default function PersonDetail({person, locale}: PersonDetailProps) {
                         >
                           <div className="relative aspect-[2/3] w-full overflow-hidden bg-muted">
                             {posterSrc ? (
-                              <img
+                              <TmdbImage
                                 src={posterSrc}
                                 alt={credit.title ?? ''}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                loading="lazy"
+                                fill
+                                sizes="150px"
+                                className="object-cover group-hover:scale-105 transition-transform duration-300"
                               />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center text-sm text-foreground/30">

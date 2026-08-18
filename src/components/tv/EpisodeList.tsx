@@ -1,7 +1,7 @@
 'use client';
 
 import {useState} from 'react';
-import Image from 'next/image';
+import TmdbImage from '@/components/ui/TmdbImage';
 import {useTranslations} from 'next-intl';
 
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
@@ -72,7 +72,7 @@ function EpisodeCard({
       {/* Still image */}
       <div className="relative flex-shrink-0 w-[120px] md:w-[160px] aspect-video rounded overflow-hidden bg-muted">
         {stillSrc ? (
-          <Image
+<TmdbImage 
             src={stillSrc}
             alt={`E${episode.episodeNumber} - ${episode.name}`}
             fill

@@ -6,6 +6,8 @@ import {useLocale, useTranslations} from 'next-intl';
 import {Link} from '@/i18n/navigation';
 import {translateJob, translateDepartment} from '@/lib/crew-translations';
 
+import TmdbImage from '@/components/ui/TmdbImage';
+
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
 
 type CombinedCredit = {
@@ -184,11 +186,12 @@ export default function Filmography({combinedCredits, localizedTitles = {}}: Fil
                       {/* Thumbnail */}
                       <div className="relative flex-shrink-0 w-10 h-14 rounded overflow-hidden bg-muted">
                         {credit.posterPath ? (
-                          <img
+                          <TmdbImage
                             src={`${TMDB_IMAGE_BASE}/w92${credit.posterPath}`}
                             alt={credit.title ?? ''}
-                            className="w-full h-full object-cover"
-                            loading="lazy"
+                            width={40}
+                            height={56}
+                            className="object-cover"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-xs text-foreground/30">

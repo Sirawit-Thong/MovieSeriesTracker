@@ -15,6 +15,7 @@ const MEDIA_SELECT = {
   backdropPath: true,
   voteAverage: true,
   overview: true,
+  releaseDate: true,
 } as const;
 
 // ============================================================

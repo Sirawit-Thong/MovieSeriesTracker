@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import TmdbImage from '@/components/ui/TmdbImage';
 import {Link} from '@/i18n/navigation';
 
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
@@ -42,7 +42,7 @@ export default function CastList({items}: CastListProps) {
               {/* Profile image */}
               <div className="relative aspect-[2/3] w-full overflow-hidden bg-muted">
                 {profileSrc ? (
-                  <Image
+<TmdbImage 
                     src={profileSrc}
                     alt={member.name}
                     fill

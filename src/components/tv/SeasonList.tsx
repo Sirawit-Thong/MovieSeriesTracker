@@ -1,7 +1,7 @@
 'use client';
 
 import {useState} from 'react';
-import Image from 'next/image';
+import TmdbImage from '@/components/ui/TmdbImage';
 import {useTranslations} from 'next-intl';
 import EpisodeList, {type Episode} from './EpisodeList';
 
@@ -85,7 +85,7 @@ function SeasonCard({
         {/* Season poster */}
         <div className="relative flex-shrink-0 w-[60px] h-[80px] rounded overflow-hidden bg-muted">
           {posterSrc ? (
-            <Image
+<TmdbImage 
               src={posterSrc}
               alt={season.name}
               fill
