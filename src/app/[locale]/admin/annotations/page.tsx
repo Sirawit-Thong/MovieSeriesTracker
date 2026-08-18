@@ -6,6 +6,7 @@ import {useLocale, useTranslations} from 'next-intl';
 import AdminPagination from '@/components/admin/AdminPagination';
 import AdminSpinner from '@/components/admin/AdminSpinner';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
+import ConfirmButton from '@/components/admin/ConfirmButton';
 import {formatDate} from '@/lib/format-date';
 
 type Annotation = {
@@ -53,6 +54,7 @@ export default function AdminAnnotationsPage() {
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState('');
   const [entityType, setEntityType] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const fetchAnnotations = useCallback(
     async (p: number, statusFilter: string, typeFilter: string) => {
@@ -63,13 +65,21 @@ export default function AdminAnnotationsPage() {
         if (typeFilter) params.set('entityType', typeFilter);
         const res = await fetch(`/api/admin/annotations?${params.toString()}`);
         if (res.ok) {
-          setData(await res.json());
+          const nextData: AnnotationsResponse = await res.json();
+          setData(nextData);
+          setError(null);
+          return nextData;
         }
+        setError(t('loadError'));
+        return null;
+      } catch {
+        setError(t('loadError'));
+        return null;
       } finally {
         setLoading(false);
       }
     },
-    [],
+    [t],
   );
 
   useEffect(() => {
@@ -142,6 +152,12 @@ export default function AdminAnnotationsPage() {
         </select>
       </div>
 
+      {error && (
+        <div className="mb-4 px-4 py-3 text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg">
+          {error}
+        </div>
+      )}
+
       {/* Annotations Table */}
       <div className="bg-surface border border-border rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
@@ -169,12 +185,15 @@ export default function AdminAnnotationsPage() {
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
                   {t('annotationsPage.created')}
                 </th>
+                <th className="text-left px-6 py-3 text-foreground/50 font-medium">
+                  {t('actions')}
+                </th>
               </tr>
             </thead>
             <tbody>
               {loading && !data && (
                 <tr>
-                  <td colSpan={7}>
+                  <td colSpan={8}>
                     <AdminSpinner label={t('loadingAnnotations')} />
                   </td>
                 </tr>
@@ -243,11 +262,31 @@ export default function AdminAnnotationsPage() {
                   <td className="px-6 py-3 text-foreground/60">
                     {formatDate(annotation.createdAt, locale)}
                   </td>
+                  <td className="px-6 py-3">
+                    <ConfirmButton
+                      onConfirm={async () => {
+                        try {
+                          const res = await fetch(`/api/admin/annotations?id=${annotation.id}`, {method: 'DELETE'});
+                          if (res.ok) {
+                            const next = await fetchAnnotations(page, status, entityType);
+                            if (next && page > next.totalPages) setPage(Math.max(1, next.totalPages));
+                          } else {
+                            setError(t('annotationsPage.deleteError'));
+                          }
+                        } catch {
+                          setError(t('annotationsPage.deleteError'));
+                        }
+                      }}
+                      confirmLabel={t('annotationsPage.confirmDelete')}
+                    >
+                      {t('annotationsPage.delete')}
+                    </ConfirmButton>
+                  </td>
                 </tr>
               ))}
               {data && data.annotations.length === 0 && (
                 <tr>
-                  <td colSpan={7}>
+                  <td colSpan={8}>
                     <AdminEmptyState message={t('annotationsPage.noAnnotations')} />
                   </td>
                 </tr>

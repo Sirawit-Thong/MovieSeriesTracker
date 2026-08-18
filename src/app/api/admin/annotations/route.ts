@@ -70,3 +70,29 @@ export async function GET(request: Request) {
     return NextResponse.json({error: 'Internal server error'}, {status: 500});
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    const auth = await requireAdmin();
+    if (auth.response) return auth.response;
+
+    const {searchParams} = new URL(request.url);
+    const rawId = searchParams.get('id');
+    if (!rawId || !Number.isInteger(Number(rawId))) {
+      return NextResponse.json({error: 'id is required and must be an integer'}, {status: 400});
+    }
+    const id = Number(rawId);
+
+    const existing = await prisma.userAnnotation.findUnique({where: {id}, select: {id: true}});
+    if (!existing) {
+      return NextResponse.json({error: 'Annotation not found'}, {status: 404});
+    }
+
+    await prisma.userAnnotation.delete({where: {id}});
+
+    return NextResponse.json({success: true});
+  } catch (error) {
+    console.error('[admin:annotations:delete]', error);
+    return NextResponse.json({error: 'Internal server error'}, {status: 500});
+  }
+}
