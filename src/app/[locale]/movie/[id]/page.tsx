@@ -95,7 +95,7 @@ const getMovieById = cache(async function getMovieById(id: number, locale: strin
   const [recMovies, recTv] = await Promise.all([
     recMovieIds.length > 0
       ? prisma.movie.findMany({
-          where: {id: {in: recMovieIds}},
+          where: {tmdbId: {in: recMovieIds}},
           select: {
             id: true,
             tmdbId: true,
@@ -109,7 +109,7 @@ const getMovieById = cache(async function getMovieById(id: number, locale: strin
       : [],
     recTvIds.length > 0
       ? prisma.tvSeries.findMany({
-          where: {id: {in: recTvIds}},
+          where: {tmdbId: {in: recTvIds}},
           select: {
             id: true,
             tmdbId: true,
