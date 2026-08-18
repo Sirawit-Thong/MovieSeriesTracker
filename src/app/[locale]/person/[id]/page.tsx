@@ -1,3 +1,4 @@
+import {cache} from 'react';
 import {notFound} from 'next/navigation';
 import type {Metadata} from 'next';
 import {setRequestLocale} from 'next-intl/server';
@@ -18,42 +19,50 @@ type PersonPageProps = {
  * partial credits from media-credit-sync (when only one movie/TV was visited)
  * would otherwise be treated as "already synced".
  */
-async function getPersonById(id: number, locale: string) {
-  // First, fetch the person
+const getPersonById = cache(async function getPersonById(id: number, locale: string) {
   const person = await prisma.person.findUnique({
     where: {tmdbId: id},
-    select: {id: true, tmdbId: true},
+    select: {
+      id: true,
+      tmdbId: true,
+      biography: true,
+      birthday: true,
+      placeOfBirth: true,
+      lastFetchedAt: true,
+    },
   });
 
   if (!person) return null;
 
-  // Check if this is a stub person (created by movie/TV credit sync) — upgrade to full record
-  const personDetails = await prisma.person.findUnique({
-    where: {tmdbId: id},
-    select: {biography: true, birthday: true, placeOfBirth: true},
-  });
   const personTranslations = await prisma.translation.findMany({
     where: {entityType: 'person', entityId: person.id},
     take: 1,
   });
-  const isStub = !personDetails?.biography && !personDetails?.birthday && !personDetails?.placeOfBirth && personTranslations.length === 0;
+  const isStub = !person.biography && !person.birthday && !person.placeOfBirth && personTranslations.length === 0;
+
+  const CREDITS_STALE_MS = 7 * 24 * 60 * 60 * 1000;
+  const creditsStale =
+    !person.lastFetchedAt ||
+    Date.now() - person.lastFetchedAt.getTime() > CREDITS_STALE_MS;
 
   if (isStub) {
     console.log(`[person-page] Upgrading stub person ${id} to full record`);
     await fetchAndUpsertPerson(person.tmdbId);
   }
 
-  // Always re-sync credits from TMDB to ensure completeness.
+  // Re-sync credits from TMDB only when the person is a stub (partial credits
+  // from media-credit-sync) or the last full sync is older than 7 days.
   // Pass user locale to TMDB so titles come back in the correct language.
-  const tmdbLanguage = locale === 'th' ? 'th-TH' : 'en-US';
-  const client = new TmdbClient({language: tmdbLanguage});
-  const [personDetails2] = await Promise.all([
-    client.getPersonDetails(person.tmdbId, 'combined_credits'),
-    syncPersonCredits(person.tmdbId, client),
-  ]);
-  // Also sync combined credits (used by Filmography — doesn't require FK to movie/TV)
-  if (personDetails2.combined_credits) {
-    await syncCombinedCredits(person.id, personDetails2.combined_credits);
+  if (isStub || creditsStale) {
+    const tmdbLanguage = locale === 'th' ? 'th-TH' : 'en-US';
+    const client = new TmdbClient({language: tmdbLanguage});
+    const [personDetails2] = await Promise.all([
+      client.getPersonDetails(person.tmdbId, 'combined_credits'),
+      syncPersonCredits(person.tmdbId, client),
+    ]);
+    if (personDetails2.combined_credits) {
+      await syncCombinedCredits(person.id, personDetails2.combined_credits);
+    }
   }
 
   // Now fetch the full person with all relations
@@ -168,7 +177,7 @@ async function getPersonById(id: number, locale: string) {
       biography: getLocalizedField(translations, locale, 'biography', fullPerson.biography),
     },
   };
-}
+});
 
 export async function generateMetadata({
   params,
