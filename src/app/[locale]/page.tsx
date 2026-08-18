@@ -146,19 +146,21 @@ function HomePageContent({
         localizedTitles={localizedTitles}
       />
 
-      {/* Popular Movies — grid */}
+      {/* Popular Movies — horizontal scroll */}
       <MediaSection
         title={t('popularMovies')}
         items={popularMovies}
         type="movie"
+        horizontal
         localizedTitles={localizedTitles}
       />
 
-      {/* Popular TV Series — grid */}
+      {/* Popular TV Series — horizontal scroll */}
       <MediaSection
         title={t('popularTv')}
         items={popularTv}
         type="tv"
+        horizontal
         localizedTitles={localizedTitles}
       />
 

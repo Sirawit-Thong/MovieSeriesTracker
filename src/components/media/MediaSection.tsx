@@ -1,3 +1,6 @@
+'use client';
+
+import {useRef, useState, useEffect, useCallback} from 'react';
 import MediaCard from './MediaCard';
 
 type MediaSectionProps = {
@@ -13,11 +16,112 @@ type MediaSectionProps = {
     firstAirDate?: string | null;
   }>;
   type: 'movie' | 'tv';
-  /** When true, renders a horizontal scroll container instead of a grid. */
   horizontal?: boolean;
-  /** Map of tmdbId → localized title from translations. */
   localizedTitles?: Record<number, string>;
 };
+
+function HorizontalScroll({
+  items,
+  type,
+  localizedTitles,
+}: {
+  items: MediaSectionProps['items'];
+  type: 'movie' | 'tv';
+  localizedTitles: Record<number, string>;
+}) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 10);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    checkScroll();
+    el.addEventListener('scroll', checkScroll, {passive: true});
+    window.addEventListener('resize', checkScroll);
+    return () => {
+      el.removeEventListener('scroll', checkScroll);
+      window.removeEventListener('resize', checkScroll);
+    };
+  }, [checkScroll, items.length]);
+
+  const scroll = (direction: 'left' | 'right') => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const cardWidth = el.querySelector<HTMLElement>(':scope > div')?.offsetWidth ?? 160;
+    const scrollAmount = cardWidth * 3 + 12 * 3;
+    el.scrollBy({left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth'});
+  };
+
+  return (
+    <div className="relative group/scroll">
+      {/* Left arrow */}
+      {canScrollLeft && (
+        <button
+          type="button"
+          onClick={() => scroll('left')}
+          className="absolute left-0 top-0 bottom-0 z-10 w-12 flex items-center justify-center
+            bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent
+            opacity-0 group-hover/scroll:opacity-100 transition-opacity duration-200
+            cursor-pointer"
+          aria-label="Scroll left"
+        >
+          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+      )}
+
+      {/* Right arrow */}
+      {canScrollRight && (
+        <button
+          type="button"
+          onClick={() => scroll('right')}
+          className="absolute right-0 top-0 bottom-0 z-10 w-12 flex items-center justify-center
+            bg-gradient-to-l from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent
+            opacity-0 group-hover/scroll:opacity-100 transition-opacity duration-200
+            cursor-pointer"
+          aria-label="Scroll right"
+        >
+          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      )}
+
+      {/* Scrollable container */}
+      <div
+        ref={scrollRef}
+        className="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-4 px-4
+          [&::-webkit-scrollbar]:hidden [&::-webkit-scrollbar]:w-0
+          [-ms-overflow-style:none] [scrollbar-width:none]"
+      >
+        {items.map((item) => (
+          <div
+            key={item.id}
+            className="w-[140px] md:w-[160px] flex-shrink-0 snap-start"
+          >
+            <MediaCard
+              tmdbId={item.tmdbId}
+              title={localizedTitles[item.tmdbId] || item.title || item.name || ''}
+              posterPath={item.posterPath}
+              voteAverage={item.voteAverage}
+              type={type}
+              releaseDate={item.releaseDate ?? item.firstAirDate}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 /**
  * Section wrapper that displays a title and a grid of MediaCards.
@@ -44,22 +148,12 @@ export default function MediaSection({
 
       {/* Content container */}
       {horizontal ? (
-        /* Horizontal scroll on mobile and tablet */
-        <div className="overflow-x-auto scrollbar-hide">
-          <div className="flex gap-3 px-4 pb-4 min-w-max max-w-7xl mx-auto">
-            {items.map((item) => (
-              <div key={item.id} className="w-[140px] md:w-[160px] flex-shrink-0">
-                <MediaCard
-                  tmdbId={item.tmdbId}
-                  title={localizedTitles[item.tmdbId] || item.title || item.name || ''}
-                  posterPath={item.posterPath}
-                  voteAverage={item.voteAverage}
-                  type={type}
-                  releaseDate={item.releaseDate ?? item.firstAirDate}
-                />
-              </div>
-            ))}
-          </div>
+        <div className="max-w-7xl mx-auto">
+          <HorizontalScroll
+            items={items}
+            type={type}
+            localizedTitles={localizedTitles}
+          />
         </div>
       ) : (
         /* Responsive grid */
