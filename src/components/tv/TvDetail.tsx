@@ -13,6 +13,7 @@ import RecommendationList from '@/components/media/RecommendationList';
 import {translateJob, translateDepartment, translateStatus} from '@/lib/crew-translations';
 import AddToLibraryButton from '@/components/library/AddToLibraryButton';
 import SyncButton from '@/components/shared/SyncButton';
+import AnnotationPanel from '@/components/user/AnnotationPanel';
 
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
 
@@ -748,7 +749,10 @@ export default function TvDetail({series, locale}: TvDetailProps) {
           </div>
 
           {/* Right: sidebar */}
-          <aside className="w-full lg:w-80 flex-shrink-0">
+          <aside className="w-full lg:w-80 flex-shrink-0 space-y-5">
+            {/* Annotation Panel (watch status, rating, episode tracking, notes) */}
+            <AnnotationPanel entityType="TV" entityId={series.id} />
+
             <div className="bg-surface rounded-lg border border-border p-6 space-y-5 sticky top-24">
               {/* Status */}
               <InfoRow label={t('status')} value={translateStatus(series.status, locale)} />

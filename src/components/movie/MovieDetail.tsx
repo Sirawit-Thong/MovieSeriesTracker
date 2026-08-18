@@ -13,6 +13,7 @@ import RecommendationList from '@/components/media/RecommendationList';
 import {translateJob, translateDepartment, translateStatus} from '@/lib/crew-translations';
 import AddToLibraryButton from '@/components/library/AddToLibraryButton';
 import SyncButton from '@/components/shared/SyncButton';
+import AnnotationPanel from '@/components/user/AnnotationPanel';
 
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
 
@@ -714,11 +715,14 @@ export default function MovieDetail({movie, locale}: MovieDetailProps) {
           </div>
 
           {/* Right: sidebar */}
-          <aside className="w-full lg:w-80 flex-shrink-0">
+          <aside className="w-full lg:w-80 flex-shrink-0 space-y-5">
+            {/* Annotation Panel (watch status, rating, notes) */}
+            <AnnotationPanel entityType="MOVIE" entityId={movie.id} />
+
             <MovieInfo movie={movie} />
 
             {/* External Links */}
-            <div className="mt-5 bg-surface rounded-lg border border-border p-6">
+            <div className="bg-surface rounded-lg border border-border p-6">
               <h3 className="text-xs font-semibold text-foreground/50 uppercase tracking-wider mb-3">
                 {t('externalLinks')}
               </h3>

@@ -154,15 +154,19 @@ export async function getPopularPeople(limit = 20) {
 /**
  * Get movies for the listing page with pagination.
  */
-export async function getMoviesList(limit = 20, offset = 0) {
+export async function getMoviesList(limit = 20, offset = 0, genreId?: number) {
+  const where = genreId
+    ? {genres: {some: {genreId}}}
+    : {};
   const [items, total] = await Promise.all([
     prisma.movie.findMany({
+      where,
       select: {...MEDIA_SELECT, releaseDate: true},
       orderBy: {popularity: 'desc'},
       take: limit,
       skip: offset,
     }),
-    prisma.movie.count(),
+    prisma.movie.count({where}),
   ]);
   return {items, total};
 }
@@ -170,9 +174,13 @@ export async function getMoviesList(limit = 20, offset = 0) {
 /**
  * Get TV series for the listing page with pagination.
  */
-export async function getTvSeriesList(limit = 20, offset = 0) {
+export async function getTvSeriesList(limit = 20, offset = 0, genreId?: number) {
+  const where = genreId
+    ? {genres: {some: {genreId}}}
+    : {};
   const [items, total] = await Promise.all([
     prisma.tvSeries.findMany({
+      where,
       select: {
         id: true, tmdbId: true, name: true, posterPath: true, backdropPath: true,
         voteAverage: true, overview: true, firstAirDate: true,
@@ -181,7 +189,7 @@ export async function getTvSeriesList(limit = 20, offset = 0) {
       take: limit,
       skip: offset,
     }),
-    prisma.tvSeries.count(),
+    prisma.tvSeries.count({where}),
   ]);
   return {items, total};
 }
@@ -242,4 +250,14 @@ export function toMediaItem(
     overview: record.overview as string | null,
     releaseDate: (record.releaseDate ?? record.firstAirDate) as string | Date | null,
   };
+}
+
+/**
+ * Get all genres for filter pills.
+ */
+export async function getAllGenres() {
+  return prisma.genre.findMany({
+    orderBy: {name: 'asc'},
+    select: {id: true, name: true},
+  });
 }
