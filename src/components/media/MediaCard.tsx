@@ -85,11 +85,11 @@ export default function MediaCard({
 
       {/* Title + Year */}
       <div className="p-3">
-        <h3 className="text-sm font-medium text-foreground line-clamp-2 group-hover:text-primary transition-colors">
+        <p className="text-sm font-medium text-foreground line-clamp-2 group-hover:text-primary transition-colors">
           {title}
-        </h3>
+        </p>
         {year && year > 0 && (
-          <p className="text-xs text-foreground/40 mt-1">{year}</p>
+          <p className="text-xs text-foreground/60 mt-1">{year}</p>
         )}
       </div>
     </Link>
