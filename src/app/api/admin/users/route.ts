@@ -6,6 +6,7 @@
 
 import {NextResponse} from 'next/server';
 import {requireAdmin} from '@/lib/admin';
+import {parsePageParam} from '@/lib/admin-params';
 import prisma from '@/lib/db';
 import {createLogger} from '@/lib/logger';
 
@@ -21,7 +22,10 @@ export async function GET(request: Request) {
     if (auth.response) return auth.response;
 
     const {searchParams} = new URL(request.url);
-    const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10));
+    const page = parsePageParam(searchParams.get('page'));
+    if (page === null) {
+      return NextResponse.json({error: 'Invalid page parameter'}, {status: 400});
+    }
     const search = searchParams.get('search');
     const role = searchParams.get('role');
     const skip = (page - 1) * PAGE_SIZE;
