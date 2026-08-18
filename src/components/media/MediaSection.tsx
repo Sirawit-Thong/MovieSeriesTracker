@@ -103,7 +103,7 @@ function HorizontalScroll({
           [&::-webkit-scrollbar]:hidden [&::-webkit-scrollbar]:w-0
           [-ms-overflow-style:none] [scrollbar-width:none]"
       >
-        {items.map((item) => (
+        {items.map((item, index) => (
           <div
             key={item.id}
             className="w-[140px] md:w-[160px] flex-shrink-0 snap-start"
@@ -115,6 +115,7 @@ function HorizontalScroll({
               voteAverage={item.voteAverage}
               type={type}
               releaseDate={item.releaseDate ?? item.firstAirDate}
+              priority={index < 4}
             />
           </div>
         ))}
@@ -150,7 +151,7 @@ export default function MediaSection({
       {/* Mobile: always vertical grid */}
       <div className="md:hidden px-4">
         <div className="grid grid-cols-2 gap-3">
-          {items.map((item) => (
+          {items.map((item, index) => (
             <MediaCard
               key={item.id}
               tmdbId={item.tmdbId}
@@ -159,6 +160,7 @@ export default function MediaSection({
               voteAverage={item.voteAverage}
               type={type}
               releaseDate={item.releaseDate ?? item.firstAirDate}
+              priority={index < 2}
             />
           ))}
         </div>
@@ -177,7 +179,7 @@ export default function MediaSection({
         ) : (
           <div className="max-w-7xl mx-auto px-4">
             <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
-              {items.map((item) => (
+              {items.map((item, index) => (
                 <MediaCard
                   key={item.id}
                   tmdbId={item.tmdbId}
@@ -186,6 +188,7 @@ export default function MediaSection({
                   voteAverage={item.voteAverage}
                   type={type}
                   releaseDate={item.releaseDate ?? item.firstAirDate}
+                  priority={index < 6}
                 />
               ))}
             </div>

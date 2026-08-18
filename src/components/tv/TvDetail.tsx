@@ -249,7 +249,8 @@ export default function TvDetail({series, locale}: TvDetailProps) {
             src={backdropSrc}
             alt={displayName}
             fill
-            priority
+            fetchPriority="high"
+            loading="eager"
             sizes="100vw"
             className="object-cover object-top"
           />
@@ -270,7 +271,8 @@ export default function TvDetail({series, locale}: TvDetailProps) {
                 src={posterSrc}
                 alt={displayName}
                 fill
-                priority
+                fetchPriority="high"
+                loading="eager"
                 sizes="(max-width: 768px) 120px, 200px"
                 className="object-cover"
               />

@@ -250,7 +250,8 @@ export default function MovieDetail({movie, locale}: MovieDetailProps) {
             src={backdropSrc}
             alt={displayTitle}
             fill
-            priority
+            fetchPriority="high"
+            loading="eager"
             sizes="100vw"
             className="object-cover object-top"
           />
@@ -271,7 +272,8 @@ export default function MovieDetail({movie, locale}: MovieDetailProps) {
                 src={posterSrc}
                 alt={displayTitle}
                 fill
-                priority
+                fetchPriority="high"
+                loading="eager"
                 sizes="(max-width: 768px) 120px, 200px"
                 className="object-cover"
               />

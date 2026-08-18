@@ -111,7 +111,7 @@ export default async function TvSeriesPage({
       ) : (
         <>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
-            {items.map((tv) => (
+            {items.map((tv, index) => (
               <MediaCard
                 key={tv.id}
                 tmdbId={tv.tmdbId}
@@ -121,6 +121,7 @@ export default async function TvSeriesPage({
                 type="tv"
                 releaseDate={tv.firstAirDate}
                 countryCodes={tv.productionCountries.map((c) => c.iso31661)}
+                priority={index < 6}
               />
             ))}
           </div>

@@ -13,6 +13,7 @@ type MediaCardProps = {
   type: 'movie' | 'tv';
   releaseDate?: string | Date | null;
   countryCodes?: string[];
+  priority?: boolean;
 };
 
 export default function MediaCard({
@@ -23,6 +24,7 @@ export default function MediaCard({
   type,
   releaseDate,
   countryCodes,
+  priority = false,
 }: MediaCardProps) {
   const locale = useLocale();
   const detailHref = type === 'movie' ? `/movie/${tmdbId}` : `/tv/${tmdbId}`;
@@ -50,7 +52,8 @@ export default function MediaCard({
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
             className="object-cover"
-            priority={false}
+            fetchPriority={priority ? 'high' : 'auto'}
+            loading={priority ? 'eager' : 'lazy'}
           />
         ) : (
           <div className="w-full h-full bg-muted flex items-center justify-center text-sm text-foreground/40">

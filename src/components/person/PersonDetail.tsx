@@ -168,7 +168,8 @@ export default function PersonDetail({person, locale}: PersonDetailProps) {
                   src={profileSrc}
                   alt={displayName}
                   fill
-                  priority
+                  fetchPriority="high"
+                  loading="eager"
                   sizes="(max-width: 1024px) 300px, 300px"
                   className="object-cover"
                 />
