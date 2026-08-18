@@ -29,7 +29,7 @@ export default function LanguageSwitcher() {
               ? 'bg-primary text-white'
               : 'text-foreground/60 hover:text-white hover:bg-surface-hover'
           }`}
-          aria-label={t('label')}
+          aria-label={`${label}: ${t('locale', {locale: code})}`}
           title={code === 'en' ? 'English' : 'Thai'}
         >
           <span className="mr-1">{flag}</span>
