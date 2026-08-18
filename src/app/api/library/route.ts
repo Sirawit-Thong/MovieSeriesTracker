@@ -19,6 +19,8 @@ export async function GET(request: Request) {
   const search = searchParams.get('search');
   const sortBy = searchParams.get('sortBy') ?? 'updatedAt';
   const locale = searchParams.get('locale') ?? 'en';
+  const countryRaw = searchParams.getAll('country');
+  const countryCodes = countryRaw.length > 0 ? countryRaw : null;
 
   // Fetch annotations
   const annotations = await prisma.userAnnotation.findMany({
@@ -98,6 +100,28 @@ export async function GET(request: Request) {
 
   const movieMap = new Map(movies.map((m) => [m.id, m]));
   const tvMap = new Map(tvSeries.map((tv) => [tv.id, tv]));
+
+  // Country filtering — fetch production country relationships and filter
+  let allowedMovieIds: Set<number> | null = null;
+  let allowedTvIds: Set<number> | null = null;
+  if (countryCodes && countryCodes.length > 0) {
+    const [movieCountries, tvCountries] = await Promise.all([
+      allMovieIds.length > 0
+        ? prisma.movieProductionCountry.findMany({
+            where: {movieId: {in: allMovieIds}, iso31661: {in: countryCodes}},
+            select: {movieId: true},
+          })
+        : [],
+      allTvIds.length > 0
+        ? prisma.tvSeriesProductionCountry.findMany({
+            where: {tvSeriesId: {in: allTvIds}, iso31661: {in: countryCodes}},
+            select: {tvSeriesId: true},
+          })
+        : [],
+    ]);
+    allowedMovieIds = new Set(movieCountries.map((mc) => mc.movieId));
+    allowedTvIds = new Set(tvCountries.map((tc) => tc.tvSeriesId));
+  }
 
   // Resolve localized titles for all movies/TV
   const [movieTranslations, tvTranslations] = await Promise.all([
@@ -191,8 +215,21 @@ export async function GET(request: Request) {
 
   const allResults = [...annotatedResults, ...watchlistResults];
 
-  // Filter by search term
+  // Filter by country
   let filtered = allResults;
+  if (allowedMovieIds && allowedTvIds) {
+    filtered = allResults.filter((a) => {
+      if (a.entityType === 'MOVIE' && a.movie) {
+        return allowedMovieIds!.has(a.movie.id);
+      }
+      if (a.entityType === 'TV' && a.tvSeries) {
+        return allowedTvIds!.has(a.tvSeries.id);
+      }
+      return false;
+    });
+  }
+
+  // Filter by search term
   if (search) {
     const q = search.toLowerCase();
     filtered = allResults.filter((a) => {

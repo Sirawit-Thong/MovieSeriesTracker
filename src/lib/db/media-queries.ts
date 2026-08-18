@@ -154,10 +154,18 @@ export async function getPopularPeople(limit = 20) {
 /**
  * Get movies for the listing page with pagination.
  */
-export async function getMoviesList(limit = 20, offset = 0, genreId?: number) {
-  const where = genreId
-    ? {genres: {some: {genreId}}}
-    : {};
+export async function getMoviesList(
+  limit = 20,
+  offset = 0,
+  genreId?: number,
+  countryCodes?: string[],
+) {
+  const conditions: Record<string, unknown>[] = [];
+  if (genreId) conditions.push({genres: {some: {genreId}}});
+  if (countryCodes?.length) {
+    conditions.push({productionCountries: {some: {iso31661: {in: countryCodes}}}});
+  }
+  const where = conditions.length > 0 ? {AND: conditions} : {};
   const [items, total] = await Promise.all([
     prisma.movie.findMany({
       where,
@@ -174,10 +182,18 @@ export async function getMoviesList(limit = 20, offset = 0, genreId?: number) {
 /**
  * Get TV series for the listing page with pagination.
  */
-export async function getTvSeriesList(limit = 20, offset = 0, genreId?: number) {
-  const where = genreId
-    ? {genres: {some: {genreId}}}
-    : {};
+export async function getTvSeriesList(
+  limit = 20,
+  offset = 0,
+  genreId?: number,
+  countryCodes?: string[],
+) {
+  const conditions: Record<string, unknown>[] = [];
+  if (genreId) conditions.push({genres: {some: {genreId}}});
+  if (countryCodes?.length) {
+    conditions.push({productionCountries: {some: {iso31661: {in: countryCodes}}}});
+  }
+  const where = conditions.length > 0 ? {AND: conditions} : {};
   const [items, total] = await Promise.all([
     prisma.tvSeries.findMany({
       where,
@@ -259,5 +275,22 @@ export async function getAllGenres() {
   return prisma.genre.findMany({
     orderBy: {name: 'asc'},
     select: {id: true, name: true},
+  });
+}
+
+/**
+ * Get all production countries that have at least one movie or TV series.
+ * Ordered alphabetically by name.
+ */
+export async function getAllCountries() {
+  return prisma.productionCountry.findMany({
+    where: {
+      OR: [
+        {movies: {some: {}}},
+        {tvSeries: {some: {}}},
+      ],
+    },
+    orderBy: {name: 'asc'},
+    select: {iso31661: true, name: true},
   });
 }

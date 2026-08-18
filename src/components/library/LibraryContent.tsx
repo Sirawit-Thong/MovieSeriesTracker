@@ -5,6 +5,7 @@ import {useTranslations} from 'next-intl';
 import {useRouter} from '@/i18n/navigation';
 import {Link} from '@/i18n/navigation';
 import {useSession} from 'next-auth/react';
+import CountryFilter from '@/components/media/CountryFilter';
 
 const TMDB_IMG = 'https://image.tmdb.org/t/p';
 const TMDB_IMG_W300 = `${TMDB_IMG}/w300`;
@@ -80,6 +81,16 @@ export default function LibraryContent({locale}: {locale: string}) {
   const [localSearch, setLocalSearch] = useState('');
   const [sortBy, setSortBy] = useState<'updatedAt' | 'rating' | 'title'>('updatedAt');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [filterCountry, setFilterCountry] = useState<string[]>([]);
+  const [countries, setCountries] = useState<Array<{iso31661: string; name: string}>>([]);
+
+  // Fetch available countries on mount
+  useEffect(() => {
+    fetch('/api/countries')
+      .then((res) => res.ok ? res.json() : [])
+      .then((data) => setCountries(data))
+      .catch(() => {});
+  }, []);
 
   // TMDB search state
   const [tmdbQuery, setTmdbQuery] = useState('');
@@ -99,6 +110,7 @@ export default function LibraryContent({locale}: {locale: string}) {
         if (filterType !== 'ALL') params.set('entityType', filterType);
         if (filterStatus !== 'ALL') params.set('status', filterStatus);
         if (localSearch) params.set('search', localSearch);
+        filterCountry.forEach((c) => params.append('country', c));
         params.set('sortBy', sortBy);
         params.set('locale', locale);
 
@@ -115,7 +127,7 @@ export default function LibraryContent({locale}: {locale: string}) {
 
     fetchLibrary();
     return () => { cancelled = true; };
-  }, [session, filterType, filterStatus, localSearch, sortBy, locale]);
+  }, [session, filterType, filterStatus, localSearch, filterCountry, sortBy, locale]);
 
   // TMDB search with debounce
   const handleTmdbSearch = useCallback((query: string) => {
@@ -473,6 +485,12 @@ export default function LibraryContent({locale}: {locale: string}) {
           <option value="WANT_TO_WATCH">{t('wantToWatch')}</option>
           <option value="DROPPED">{t('dropped')}</option>
         </select>
+
+        <CountryFilter
+          countries={countries}
+          value={filterCountry}
+          onChange={setFilterCountry}
+        />
 
         <select
           value={sortBy}
