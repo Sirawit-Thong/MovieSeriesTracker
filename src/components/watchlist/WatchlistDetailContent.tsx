@@ -1,6 +1,6 @@
 'use client';
 
-import {useState, useEffect} from 'react';
+import {useState} from 'react';
 import Link from 'next/link';
 
 type WatchlistItemData = {
@@ -36,66 +36,16 @@ type Props = {
     description: string | null;
     items: WatchlistItemData[];
   };
+  initialMedia: Record<string, MediaData>;
   translations: Translations;
 };
 
 const TMDB_IMG = 'https://image.tmdb.org/t/p/w200';
 
-export default function WatchlistDetailContent({locale, watchlist, translations: t}: Props) {
+export default function WatchlistDetailContent({locale, watchlist, initialMedia, translations: t}: Props) {
   const [items, setItems] = useState<WatchlistItemData[]>(watchlist.items);
-  const [mediaCache, setMediaCache] = useState<Record<string, MediaData>>({});
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Fetch media data for all items
-  useEffect(() => {
-    if (items.length === 0) {
-      setIsLoading(false);
-      return;
-    }
-
-    let cancelled = false;
-
-    async function fetchMedia() {
-      const entries = items.map(async (item) => {
-        const endpoint = item.entityType === 'MOVIE'
-          ? `/api/movies/${item.entityId}`
-          : `/api/tv-series/${item.entityId}`;
-        try {
-          const res = await fetch(endpoint);
-          if (res.ok) {
-            const data = await res.json();
-            const key = `${item.entityType}-${item.entityId}`;
-            return [key, {
-              id: data.id,
-              title: data.title ?? data.name,
-              posterPath: data.posterPath,
-              voteAverage: data.voteAverage,
-              releaseDate: data.releaseDate,
-              firstAirDate: data.firstAirDate,
-            }] as const;
-          }
-        } catch {
-          // ignore
-        }
-        return null;
-      });
-
-      const results = await Promise.allSettled(entries);
-      if (!cancelled) {
-        const cache: Record<string, MediaData> = {};
-        for (const result of results) {
-          if (result.status === 'fulfilled' && result.value) {
-            cache[result.value[0]] = result.value[1];
-          }
-        }
-        setMediaCache(cache);
-        setIsLoading(false);
-      }
-    }
-
-    fetchMedia();
-    return () => { cancelled = true; };
-  }, [items]);
+  const [mediaCache] = useState<Record<string, MediaData>>(initialMedia);
+  const [isLoading] = useState(false);
 
   async function handleRemove(item: WatchlistItemData) {
     try {
@@ -157,8 +107,10 @@ export default function WatchlistDetailContent({locale, watchlist, translations:
             if (!media) return null;
 
             const link = item.entityType === 'MOVIE'
-              ? `/${locale}/movies/${item.entityId}`
-              : `/${locale}/tv-series/${item.entityId}`;
+              ? `/${locale}/movie/${item.entityId}`
+              : item.entityType === 'TV'
+                ? `/${locale}/tv/${item.entityId}`
+                : `/${locale}/person/${item.entityId}`;
 
             return (
               <div key={item.id} className="group relative">
@@ -180,7 +132,7 @@ export default function WatchlistDetailContent({locale, watchlist, translations:
                     {media.title}
                   </h3>
                   <p className="text-xs text-foreground/40">
-                    {item.entityType === 'MOVIE' ? 'Movie' : 'TV'}
+                    {item.entityType === 'MOVIE' ? 'Movie' : item.entityType === 'TV' ? 'TV' : 'Person'}
                     {media.voteAverage ? ` · ★ ${media.voteAverage.toFixed(1)}` : ''}
                   </p>
                 </Link>

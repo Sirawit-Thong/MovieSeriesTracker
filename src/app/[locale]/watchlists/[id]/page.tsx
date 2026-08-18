@@ -38,6 +38,58 @@ export default async function WatchlistDetailPage({
     notFound();
   }
 
+  const movieItems = watchlist.items.filter((i) => i.entityType === 'MOVIE');
+  const tvItems = watchlist.items.filter((i) => i.entityType === 'TV');
+  const personItems = watchlist.items.filter((i) => i.entityType === 'PERSON');
+
+  const [movies, tvSeries, persons] = await Promise.all([
+    movieItems.length > 0
+      ? prisma.movie.findMany({
+          where: {tmdbId: {in: movieItems.map((i) => i.entityId)}},
+          select: {tmdbId: true, title: true, posterPath: true, voteAverage: true, releaseDate: true},
+        })
+      : [],
+    tvItems.length > 0
+      ? prisma.tvSeries.findMany({
+          where: {tmdbId: {in: tvItems.map((i) => i.entityId)}},
+          select: {tmdbId: true, name: true, posterPath: true, voteAverage: true, firstAirDate: true},
+        })
+      : [],
+    personItems.length > 0
+      ? prisma.person.findMany({
+          where: {tmdbId: {in: personItems.map((i) => i.entityId)}},
+          select: {tmdbId: true, name: true, profilePath: true},
+        })
+      : [],
+  ]);
+
+  const initialMedia: Record<string, {
+    id: number;
+    title: string;
+    posterPath: string | null;
+    voteAverage: number | null;
+    firstAirDate?: string | null;
+    releaseDate?: string | null;
+  }> = {};
+  for (const m of movies) {
+    initialMedia[`MOVIE-${m.tmdbId}`] = {
+      id: m.tmdbId, title: m.title, posterPath: m.posterPath,
+      voteAverage: m.voteAverage, releaseDate: m.releaseDate?.toISOString() ?? null,
+    };
+  }
+  for (const t of tvSeries) {
+    initialMedia[`TV-${t.tmdbId}`] = {
+      id: t.tmdbId, title: t.name, posterPath: t.posterPath,
+      voteAverage: t.voteAverage, firstAirDate: t.firstAirDate,
+    };
+  }
+  for (const p of persons) {
+    initialMedia[`PERSON-${p.tmdbId}`] = {
+      id: p.tmdbId, title: p.name, posterPath: p.profilePath,
+      voteAverage: null,
+    };
+  }
+
   const t = await getTranslations({locale, namespace: 'Watchlist'});
   const tAnnotation = await getTranslations({locale, namespace: 'annotation'});
 
@@ -54,6 +106,7 @@ export default async function WatchlistDetailPage({
           entityId: item.entityId,
         })),
       }}
+      initialMedia={initialMedia}
       translations={{
         title: watchlist.name,
         items: t('items'),
