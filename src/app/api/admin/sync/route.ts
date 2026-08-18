@@ -3,10 +3,10 @@
 
 import {NextResponse} from 'next/server';
 import {requireAdmin} from '@/lib/admin';
-import prisma from '@/lib/db';
 import {syncMovies} from '@/lib/ingestion/movie-sync';
 import {syncTvSeries} from '@/lib/ingestion/tv-sync';
 import {syncPersons} from '@/lib/ingestion/person-sync';
+import {acquireSyncLock, finishSyncLog} from '@/lib/ingestion/sync-lock';
 import {TmdbClient} from '@/lib/tmdb/client';
 
 export async function POST(request: Request) {
@@ -24,9 +24,15 @@ export async function POST(request: Request) {
     const entity = (body.entity as string) ?? 'all';
     const limit = (body.limit as number) ?? 0;
 
-    const syncLog = await prisma.syncLog.create({
-      data: {entity, status: 'running'},
-    });
+    const lock = await acquireSyncLock(entity);
+    if (!lock) {
+      return NextResponse.json(
+        {error: 'A sync is already running', message: 'Wait for the current sync to finish before starting another.'},
+        {status: 409}
+      );
+    }
+
+    const syncLog = lock;
 
     const results: Record<string, unknown> = {};
     let totalProcessed = 0;
@@ -73,17 +79,7 @@ export async function POST(request: Request) {
 
       const totalDuration = Date.now() - startTime;
 
-      await prisma.syncLog.update({
-        where: {id: syncLog.id},
-        data: {
-          status: 'completed',
-          processed: totalProcessed,
-          errors: totalErrors,
-          duration: totalDuration,
-          details: JSON.stringify(results),
-          endedAt: new Date(),
-        },
-      });
+      await finishSyncLog(syncLog.id, 'completed', totalProcessed, totalErrors, totalDuration, JSON.stringify(results));
 
       return NextResponse.json({
         success: true,
@@ -94,20 +90,10 @@ export async function POST(request: Request) {
     } catch (syncError) {
       const totalDuration = Date.now() - startTime;
 
-      await prisma.syncLog.update({
-        where: {id: syncLog.id},
-        data: {
-          status: 'failed',
-          processed: totalProcessed,
-          errors: totalErrors + 1,
-          duration: totalDuration,
-          details: JSON.stringify({
-            ...results,
-            error: syncError instanceof Error ? syncError.message : 'Unknown error',
-          }),
-          endedAt: new Date(),
-        },
-      });
+      await finishSyncLog(syncLog.id, 'failed', totalProcessed, totalErrors + 1, totalDuration, JSON.stringify({
+        ...results,
+        error: syncError instanceof Error ? syncError.message : 'Unknown error',
+      }));
 
       throw syncError;
     }
