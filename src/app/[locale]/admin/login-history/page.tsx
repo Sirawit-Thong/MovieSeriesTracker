@@ -2,7 +2,11 @@
 
 import {useEffect, useState, useCallback} from 'react';
 import {Link} from '@/i18n/navigation';
-import {useTranslations} from 'next-intl';
+import {useLocale, useTranslations} from 'next-intl';
+import {formatDateTime} from '@/lib/format-date';
+import AdminPagination from '@/components/admin/AdminPagination';
+import AdminSpinner from '@/components/admin/AdminSpinner';
+import AdminEmptyState from '@/components/admin/AdminEmptyState';
 
 type LoginLog = {
   id: string;
@@ -39,12 +43,15 @@ const SUCCESS_OPTIONS = [
 
 export default function AdminLoginHistoryPage() {
   const t = useTranslations('Admin');
+  const locale = useLocale();
   const [data, setData] = useState<LoginLogsResponse | null>(null);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [method, setMethod] = useState('');
   const [success, setSuccess] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const fetchLogs = useCallback(
     async (p: number, q: string, m: string, s: string) => {
@@ -57,22 +64,33 @@ export default function AdminLoginHistoryPage() {
         const res = await fetch(`/api/admin/login-logs?${params.toString()}`);
         if (res.ok) {
           setData(await res.json());
+          setError(null);
+        } else {
+          setError(t('loadError'));
         }
+      } catch {
+        setError(t('loadError'));
       } finally {
         setLoading(false);
       }
     },
-    [],
+    [t],
   );
 
   useEffect(() => {
-    fetchLogs(page, search, method, success);
-  }, [page, fetchLogs, search, method, success]);
+    fetchLogs(page, debouncedSearch, method, success);
+  }, [page, fetchLogs, debouncedSearch, method, success]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search.trim());
+      setPage(1);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   function handleSearch(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setPage(1);
-    fetchLogs(1, search, method, success);
   }
 
   function handleMethodFilter(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -144,6 +162,12 @@ export default function AdminLoginHistoryPage() {
         </select>
       </div>
 
+      {error && (
+        <div className="mb-4 px-4 py-3 text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg">
+          {error}
+        </div>
+      )}
+
       <div className="bg-surface border border-border rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -172,14 +196,8 @@ export default function AdminLoginHistoryPage() {
             <tbody>
               {loading && !data && (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-foreground/40">
-                    <div className="flex items-center justify-center gap-2">
-                      <svg className="animate-spin h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                      </svg>
-                      {t('loginHistoryPage.loadingLogs')}
-                    </div>
+                  <td colSpan={6}>
+                    <AdminSpinner label={t('loginHistoryPage.loadingLogs')} />
                   </td>
                 </tr>
               )}
@@ -218,19 +236,14 @@ export default function AdminLoginHistoryPage() {
                     {log.reason ?? '\u2014'}
                   </td>
                   <td className="px-6 py-3 text-foreground/60">
-                    {new Date(log.createdAt).toLocaleString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
+                    {formatDateTime(log.createdAt, locale)}
                   </td>
                 </tr>
               ))}
               {data && data.logs.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-foreground/40">
-                    {t('loginHistoryPage.noLogs')}
+                  <td colSpan={6}>
+                    <AdminEmptyState message={t('loginHistoryPage.noLogs')} />
                   </td>
                 </tr>
               )}
@@ -238,30 +251,13 @@ export default function AdminLoginHistoryPage() {
           </table>
         </div>
 
-        {data && data.totalPages > 1 && (
-          <div className="flex items-center justify-between px-6 py-4 border-t border-border">
-            <p className="text-sm text-foreground/50">
-              {t('pagination', {page: data.page, totalPages: data.totalPages, count: data.total})}
-            </p>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page <= 1}
-                className="px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground/70 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                {t('previous')}
-              </button>
-              <button
-                type="button"
-                onClick={() => setPage((p) => Math.min(data.totalPages, p + 1))}
-                disabled={page >= data.totalPages}
-                className="px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground/70 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                {t('next')}
-              </button>
-            </div>
-          </div>
+        {data && (
+          <AdminPagination
+            page={data.page}
+            totalPages={data.totalPages}
+            total={data.total}
+            onPageChange={setPage}
+          />
         )}
       </div>
     </div>

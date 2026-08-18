@@ -2,7 +2,11 @@
 
 import {useEffect, useState, useCallback} from 'react';
 import {Link} from '@/i18n/navigation';
-import {useTranslations} from 'next-intl';
+import {useLocale, useTranslations} from 'next-intl';
+import {formatDate} from '@/lib/format-date';
+import AdminPagination from '@/components/admin/AdminPagination';
+import AdminSpinner from '@/components/admin/AdminSpinner';
+import AdminEmptyState from '@/components/admin/AdminEmptyState';
 
 type User = {
   id: string;
@@ -23,37 +27,58 @@ type UsersResponse = {
 
 export default function AdminUsersPage() {
   const t = useTranslations('Admin');
+  const locale = useLocale();
   const [data, setData] = useState<UsersResponse | null>(null);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [role, setRole] = useState('');
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
-  const fetchUsers = useCallback(async (p: number, searchQuery: string, roleFilter: string) => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({page: String(p)});
-      if (searchQuery) params.set('search', searchQuery);
-      if (roleFilter) params.set('role', roleFilter);
-      const res = await fetch(`/api/admin/users?${params.toString()}`);
-      if (res.ok) {
-        setData(await res.json());
+  const fetchUsers = useCallback(
+    async (p: number, searchQuery: string, roleFilter: string) => {
+      setLoading(true);
+      try {
+        const params = new URLSearchParams({page: String(p)});
+        if (searchQuery) params.set('search', searchQuery);
+        if (roleFilter) params.set('role', roleFilter);
+        const res = await fetch(`/api/admin/users?${params.toString()}`);
+        if (res.ok) {
+          const nextData: UsersResponse = await res.json();
+          setData(nextData);
+          setError(null);
+          return nextData;
+        }
+        setError(t('loadError'));
+        return null;
+      } catch {
+        setError(t('loadError'));
+        return null;
+      } finally {
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    },
+    [t],
+  );
 
   useEffect(() => {
-    fetchUsers(page, search, role);
-  }, [page, fetchUsers, search, role]);
+    fetchUsers(page, debouncedSearch, role);
+  }, [page, fetchUsers, debouncedSearch, role]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search.trim());
+      setPage(1);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   function handleSearch(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setPage(1);
-    fetchUsers(1, search, role);
   }
 
   function handleRoleFilter(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -72,8 +97,13 @@ export default function AdminUsersPage() {
       });
 
       if (res.ok) {
-        await fetchUsers(page, search, role);
+        setActionError(null);
+        await fetchUsers(page, debouncedSearch, role);
+      } else {
+        setActionError(t('actionError'));
       }
+    } catch {
+      setActionError(t('actionError'));
     } finally {
       setUpdatingId(null);
     }
@@ -89,8 +119,13 @@ export default function AdminUsersPage() {
       });
 
       if (res.ok) {
-        await fetchUsers(page, search, role);
+        setActionError(null);
+        await fetchUsers(page, debouncedSearch, role);
+      } else {
+        setActionError(t('actionError'));
       }
+    } catch {
+      setActionError(t('actionError'));
     } finally {
       setUpdatingId(null);
     }
@@ -105,8 +140,16 @@ export default function AdminUsersPage() {
 
       if (res.ok) {
         setDeleteConfirmId(null);
-        await fetchUsers(page, search, role);
+        setActionError(null);
+        const nextData = await fetchUsers(page, debouncedSearch, role);
+        if (nextData && nextData.page > nextData.totalPages) {
+          setPage(Math.max(1, nextData.totalPages));
+        }
+      } else {
+        setActionError(t('actionError'));
       }
+    } catch {
+      setActionError(t('actionError'));
     } finally {
       setUpdatingId(null);
     }
@@ -170,6 +213,12 @@ export default function AdminUsersPage() {
         </select>
       </div>
 
+      {(error || actionError) && (
+        <div className="mb-4 px-4 py-3 text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg">
+          {error ?? actionError}
+        </div>
+      )}
+
       {/* Users Table */}
       <div className="bg-surface border border-border rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
@@ -199,32 +248,8 @@ export default function AdminUsersPage() {
             <tbody>
               {loading && !data && (
                 <tr>
-                  <td
-                    colSpan={6}
-                    className="px-6 py-8 text-center text-foreground/40"
-                  >
-                    <div className="flex items-center justify-center gap-2">
-                      <svg
-                        className="animate-spin h-5 w-5 text-primary"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        />
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                        />
-                      </svg>
-                      {t('loadingUsers')}
-                    </div>
+                  <td colSpan={6}>
+                    <AdminSpinner label={t('loadingUsers')} />
                   </td>
                 </tr>
               )}
@@ -268,11 +293,7 @@ export default function AdminUsersPage() {
                     </span>
                   </td>
                   <td className="px-6 py-3 text-foreground/60">
-                    {new Date(user.createdAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                    })}
+                    {formatDate(user.createdAt, locale)}
                   </td>
                   <td className="px-6 py-3">
                     <div className="flex items-center justify-end gap-2">
@@ -326,11 +347,8 @@ export default function AdminUsersPage() {
               ))}
               {data && data.users.length === 0 && (
                 <tr>
-                  <td
-                    colSpan={6}
-                    className="px-6 py-8 text-center text-foreground/40"
-                  >
-                    {t('noUsers')}
+                  <td colSpan={6}>
+                    <AdminEmptyState message={t('noUsers')} />
                   </td>
                 </tr>
               )}
@@ -339,32 +357,13 @@ export default function AdminUsersPage() {
         </div>
 
         {/* Pagination */}
-        {data && data.totalPages > 1 && (
-          <div className="flex items-center justify-between px-6 py-4 border-t border-border">
-            <p className="text-sm text-foreground/50">
-              {t('pagination', {page: data.page, totalPages: data.totalPages, count: data.total})}
-            </p>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page <= 1}
-                className="px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground/70 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                {t('previous')}
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  setPage((p) => Math.min(data.totalPages, p + 1))
-                }
-                disabled={page >= data.totalPages}
-                className="px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground/70 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                {t('next')}
-              </button>
-            </div>
-          </div>
+        {data && (
+          <AdminPagination
+            page={data.page}
+            totalPages={data.totalPages}
+            total={data.total}
+            onPageChange={setPage}
+          />
         )}
       </div>
     </div>

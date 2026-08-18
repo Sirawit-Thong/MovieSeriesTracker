@@ -36,6 +36,17 @@ export async function GET(request: Request) {
     const [logs, total] = await Promise.all([
       prisma.loginLog.findMany({
         where,
+        select: {
+          id: true,
+          userId: true,
+          email: true,
+          name: true,
+          method: true,
+          ip: true,
+          success: true,
+          reason: true,
+          createdAt: true,
+        },
         orderBy: {createdAt: 'desc'},
         skip,
         take: pageSize,

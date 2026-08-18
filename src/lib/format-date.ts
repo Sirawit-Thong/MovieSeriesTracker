@@ -9,3 +9,17 @@ export function formatDate(
     day: 'numeric',
   });
 }
+
+export function formatDateTime(
+  date: string | Date | null | undefined,
+  locale: string,
+): string {
+  if (date === null || date === undefined) return '—';
+  return new Date(date).toLocaleString(locale, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
