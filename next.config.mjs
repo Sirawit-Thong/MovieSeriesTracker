@@ -44,6 +44,11 @@ const withPwa = withPWA({
         },
       },
     },
+    // API responses — NetworkOnly (never cache user-specific data)
+    {
+      urlPattern: /^https?:\/\/.*\/api\/.*/i,
+      handler: 'NetworkOnly',
+    },
     // Pages — NetworkFirst
     {
       urlPattern: /^https?:\/\/.*/i,
