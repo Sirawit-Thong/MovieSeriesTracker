@@ -1,3 +1,6 @@
+'use client';
+
+import {useRef, useState, useEffect, useCallback} from 'react';
 import TmdbImage from '@/components/ui/TmdbImage';
 import {Link} from '@/i18n/navigation';
 
@@ -23,11 +26,82 @@ type CastListProps = {
  * Links to person detail page.
  */
 export default function CastList({items}: CastListProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 10);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    checkScroll();
+    el.addEventListener('scroll', checkScroll, {passive: true});
+    window.addEventListener('resize', checkScroll);
+    return () => {
+      el.removeEventListener('scroll', checkScroll);
+      window.removeEventListener('resize', checkScroll);
+    };
+  }, [checkScroll, items.length]);
+
+  const scroll = (direction: 'left' | 'right') => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const cardWidth = el.querySelector<HTMLElement>(':scope > div')?.offsetWidth ?? 140;
+    const scrollAmount = cardWidth * 3 + 12 * 3;
+    el.scrollBy({left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth'});
+  };
+
   if (!items || items.length === 0) return null;
 
   return (
-    <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
-      <div className="flex gap-3 min-w-max pb-2">
+    <div className="relative group/scroll -mx-4">
+      {/* Left arrow */}
+      {canScrollLeft && (
+        <button
+          type="button"
+          onClick={() => scroll('left')}
+          className="absolute left-0 top-0 bottom-0 z-10 w-12 flex items-center justify-center
+            bg-gradient-to-r from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent
+            opacity-0 group-hover/scroll:opacity-100 transition-opacity duration-200
+            cursor-pointer"
+          aria-label="Scroll left"
+        >
+          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+      )}
+
+      {/* Right arrow */}
+      {canScrollRight && (
+        <button
+          type="button"
+          onClick={() => scroll('right')}
+          className="absolute right-0 top-0 bottom-0 z-10 w-12 flex items-center justify-center
+            bg-gradient-to-l from-[#0a0a0a] via-[#0a0a0a]/80 to-transparent
+            opacity-0 group-hover/scroll:opacity-100 transition-opacity duration-200
+            cursor-pointer"
+          aria-label="Scroll right"
+        >
+          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      )}
+
+      {/* Scrollable container */}
+      <div
+        ref={scrollRef}
+        className="flex gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-4 px-4
+          [&::-webkit-scrollbar]:hidden [&::-webkit-scrollbar]:w-0
+          [-ms-overflow-style:none] [scrollbar-width:none]"
+      >
         {items.map((member) => {
           const profileSrc = member.profilePath
             ? `${TMDB_IMAGE_BASE}/w185${member.profilePath}`
@@ -37,12 +111,12 @@ export default function CastList({items}: CastListProps) {
             <Link
               key={member.creditId ?? `person-${member.id}-${member.order ?? 0}`}
               href={`/person/${member.tmdbId}`}
-              className="group w-[120px] md:w-[140px] flex-shrink-0 bg-surface hover:bg-surface-hover rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 hover:scale-[1.03]"
+              className="group w-[120px] md:w-[140px] flex-shrink-0 snap-start bg-surface hover:bg-surface-hover rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 hover:scale-[1.03]"
             >
               {/* Profile image */}
               <div className="relative aspect-[2/3] w-full overflow-hidden bg-muted">
                 {profileSrc ? (
-<TmdbImage 
+                  <TmdbImage
                     src={profileSrc}
                     alt={member.name}
                     fill

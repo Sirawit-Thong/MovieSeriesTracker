@@ -1,5 +1,6 @@
 'use client';
 
+import {useRef, useState, useCallback, useEffect} from 'react';
 import TmdbImage from '@/components/ui/TmdbImage';
 import {useTranslations} from 'next-intl';
 import {Link} from '@/i18n/navigation';
@@ -155,6 +156,34 @@ export default function PersonDetail({person, locale}: PersonDetailProps) {
 
   const knownFor = getKnownFor(person.combinedCredits);
 
+  // Known For horizontal scroll
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateScrollState = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 2);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 2);
+  }, []);
+
+  useEffect(() => {
+    updateScrollState();
+    const el = scrollRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(updateScrollState);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [updateScrollState, knownFor.length]);
+
+  const scrollBy = useCallback((direction: number) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const cardWidth = el.querySelector('a')?.offsetWidth ?? 150;
+    el.scrollBy({left: direction * (cardWidth + 12) * 2, behavior: 'smooth'});
+  }, []);
+
   return (
     <div className="min-h-screen">
       {/* ─── Hero Section ─────────────────────────────────── */}
@@ -249,59 +278,85 @@ export default function PersonDetail({person, locale}: PersonDetailProps) {
                 <h2 className="text-lg font-semibold text-foreground mb-4">
                   {t('knownForSection')}
                 </h2>
-                <div className="overflow-x-auto scrollbar-hide -mx-4 px-4">
-                  <div className="flex gap-3 min-w-max pb-2">
-                    {knownFor.map((credit) => {
-                      const detailHref =
-                        credit.mediaType === 'movie'
-                          ? `/movie/tmdb/${credit.mediaId}`
-                          : `/tv/tmdb/${credit.mediaId}`;
-                      const posterSrc = credit.posterPath
-                        ? `${TMDB_IMAGE_BASE}/w342${credit.posterPath}`
-                        : null;
+                <div className="relative group/scroll overflow-hidden">
+                  {/* Left arrow */}
+                  <button
+                    type="button"
+                    onClick={() => scrollBy(-1)}
+                    className="absolute left-0 top-0 bottom-2 w-8 z-10 flex items-center justify-center bg-gradient-to-r from-background via-background/90 to-transparent opacity-0 group-hover/scroll:opacity-100 transition-opacity cursor-pointer"
+                  >
+                    <svg className="w-5 h-5 text-foreground/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  {/* Right arrow */}
+                  <button
+                    type="button"
+                    onClick={() => scrollBy(1)}
+                    className="absolute right-0 top-0 bottom-2 w-8 z-10 flex items-center justify-center bg-gradient-to-l from-background via-background/90 to-transparent opacity-0 group-hover/scroll:opacity-100 transition-opacity cursor-pointer"
+                  >
+                    <svg className="w-5 h-5 text-foreground/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                  <div
+                    ref={scrollRef}
+                    onScroll={updateScrollState}
+                    className="overflow-x-auto scrollbar-hide"
+                  >
+                    <div className="flex gap-3 min-w-max pb-2">
+                      {knownFor.map((credit) => {
+                        const detailHref =
+                          credit.mediaType === 'movie'
+                            ? `/movie/tmdb/${credit.mediaId}`
+                            : `/tv/tmdb/${credit.mediaId}`;
+                        const posterSrc = credit.posterPath
+                          ? `${TMDB_IMAGE_BASE}/w342${credit.posterPath}`
+                          : null;
 
-                      return (
-                        <Link
-                          key={credit.id}
-                          href={detailHref}
-                          className="group w-[130px] md:w-[150px] flex-shrink-0 bg-surface hover:bg-surface-hover rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 hover:scale-[1.03]"
-                        >
-                          <div className="relative aspect-[2/3] w-full overflow-hidden bg-muted">
-                            {posterSrc ? (
-                              <TmdbImage
-                                src={posterSrc}
-                                alt={credit.title ?? ''}
-                                fill
-                                sizes="150px"
-                                className="object-cover group-hover:scale-105 transition-transform duration-300"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-sm text-foreground/30">
-                                —
-                              </div>
-                            )}
-                            {credit.voteAverage !== null && credit.voteAverage > 0 && (
-                              <div className="absolute top-1.5 right-1.5 flex items-center gap-0.5 bg-black/70 backdrop-blur-sm text-[10px] font-semibold text-yellow-400 px-1.5 py-0.5 rounded">
-                                <svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 20 20">
-                                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                </svg>
-                                {credit.voteAverage.toFixed(1)}
-                              </div>
-                            )}
-                          </div>
-                          <div className="p-2">
-                            <p className="text-xs font-medium text-foreground/90 group-hover:text-white line-clamp-2 transition-colors">
-                              {credit.title}
-                            </p>
-                            {credit.character && (
-                              <p className="text-[11px] text-foreground/50 line-clamp-1 mt-0.5">
-                                {credit.character}
+                        return (
+                          <Link
+                            key={credit.id}
+                            href={detailHref}
+                            className="group w-[130px] md:w-[150px] flex-shrink-0 bg-surface hover:bg-surface-hover rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 hover:scale-[1.03]"
+                          >
+                            <div className="relative aspect-[2/3] w-full overflow-hidden bg-muted">
+                              {posterSrc ? (
+                                <TmdbImage
+                                  src={posterSrc}
+                                  alt={credit.title ?? ''}
+                                  fill
+                                  sizes="150px"
+                                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-sm text-foreground/30">
+                                  —
+                                </div>
+                              )}
+                              {credit.voteAverage !== null && credit.voteAverage > 0 && (
+                                <div className="absolute top-1.5 right-1.5 flex items-center gap-0.5 bg-black/70 backdrop-blur-sm text-[10px] font-semibold text-yellow-400 px-1.5 py-0.5 rounded">
+                                  <svg className="w-2.5 h-2.5 fill-current" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                  </svg>
+                                  {credit.voteAverage.toFixed(1)}
+                                </div>
+                              )}
+                            </div>
+                            <div className="p-2">
+                              <p className="text-xs font-medium text-foreground/90 group-hover:text-white line-clamp-2 transition-colors">
+                                {credit.title}
                               </p>
-                            )}
-                          </div>
-                        </Link>
-                      );
-                    })}
+                              {credit.character && (
+                                <p className="text-[11px] text-foreground/50 line-clamp-1 mt-0.5">
+                                  {credit.character}
+                                </p>
+                              )}
+                            </div>
+                          </Link>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               </div>

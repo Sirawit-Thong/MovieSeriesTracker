@@ -463,7 +463,7 @@ export default function TvDetail({series, locale}: TvDetailProps) {
 
             {/* Videos */}
             {series.videos.length > 0 && (
-              <div className="mb-8">
+              <div className="mb-8 overflow-hidden">
                 <h2 className="text-lg font-semibold text-foreground mb-3">
                   {t('videos')}
                 </h2>
@@ -682,8 +682,8 @@ export default function TvDetail({series, locale}: TvDetailProps) {
             )}
 
             {/* Cast */}
-            {cast.length > 0 && (
-              <div className="mb-8">
+            {series.castCredits.length > 0 && (
+              <div className="mb-8 overflow-hidden">
                 <h2 className="text-lg font-semibold text-foreground mb-4">
                   {t('cast')}
                 </h2>

@@ -385,7 +385,7 @@ export default function MovieDetail({movie, locale}: MovieDetailProps) {
 
             {/* Videos */}
             {movie.videos.length > 0 && (
-              <div className="mb-8">
+              <div className="mb-8 overflow-hidden">
                 <h2 className="text-lg font-semibold text-foreground mb-3">
                   {t('videos')}
                 </h2>
@@ -649,7 +649,7 @@ export default function MovieDetail({movie, locale}: MovieDetailProps) {
 
             {/* Cast */}
             {cast.length > 0 && (
-              <div className="mb-8">
+              <div className="mb-8 overflow-hidden">
                 <h2 className="text-lg font-semibold text-foreground mb-4">
                   {t('cast')}
                 </h2>

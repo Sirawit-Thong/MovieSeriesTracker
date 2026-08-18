@@ -1,0 +1,1276 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "MST" [ref=e4] [cursor=pointer]:
+        - /url: /en
+      - navigation [ref=e5]:
+        - link "Movies" [ref=e6] [cursor=pointer]:
+          - /url: /en/movies
+        - link "TV Series" [ref=e7] [cursor=pointer]:
+          - /url: /en/tv-series
+        - link "People" [ref=e8] [cursor=pointer]:
+          - /url: /en/people
+      - textbox "Search" [ref=e11]
+      - generic [ref=e14]:
+        - generic [ref=e15]:
+          - 'button "EN: English" [ref=e16]': 🇺🇸EN
+          - 'button "TH: Thai" [ref=e17]': 🇹🇭TH
+        - link "Sign in" [ref=e18] [cursor=pointer]:
+          - /url: /en/login
+        - link "Sign up" [ref=e19] [cursor=pointer]:
+          - /url: /en/register
+  - main [ref=e20]:
+    - generic [ref=e21]:
+      - generic [ref=e22]:
+        - 'img "Léon: The Professional" [ref=e23]'
+        - generic [ref=e26]:
+          - 'img "Léon: The Professional" [ref=e28]'
+          - generic [ref=e29]:
+            - 'heading "Léon: The Professional" [level=1] [ref=e30]'
+            - paragraph [ref=e31]: Léon
+            - paragraph [ref=e32]: “If you want the job done right, hire a professional.”
+            - generic [ref=e33]:
+              - generic [ref=e34]:
+                - text: "8.3"
+                - generic [ref=e37]: (16,356)
+              - generic [ref=e38]: September 14, 1994
+              - generic [ref=e39]: 1h 51m
+              - generic [ref=e40]: Released
+            - button "Sync" [ref=e42]
+      - generic [ref=e46]:
+        - generic [ref=e47]:
+          - generic [ref=e48]:
+            - heading "Overview" [level=2] [ref=e49]
+            - paragraph [ref=e50]: Léon, the top hit man in New York, has earned a rep as an effective "cleaner". But when his next-door neighbors are wiped out by a loose-cannon DEA agent, he becomes the unwilling custodian of 12-year-old Mathilda. Before long, Mathilda's thoughts turn to revenge, and she considers following in Léon's footsteps.
+          - generic [ref=e51]:
+            - heading "Where to Watch" [level=2] [ref=e52]
+            - generic [ref=e53]:
+              - generic [ref=e54]:
+                - heading "Stream" [level=4] [ref=e55]
+                - generic [ref=e56]:
+                  - generic "fuboTV" [ref=e57]:
+                    - img "fuboTV" [ref=e58]
+                  - generic "Philo" [ref=e60]:
+                    - img "Philo" [ref=e61]
+                  - generic "Sundance Now" [ref=e63]:
+                    - img "Sundance Now" [ref=e64]
+              - generic [ref=e66]:
+                - heading "Free with Ads" [level=4] [ref=e67]
+                - generic "YouTube Free" [ref=e69]:
+                  - img "YouTube Free" [ref=e70]
+              - generic [ref=e72]:
+                - heading "Rent" [level=4] [ref=e73]
+                - generic [ref=e74]:
+                  - generic "Amazon Video" [ref=e75]:
+                    - img "Amazon Video" [ref=e76]
+                  - generic "Apple TV Store" [ref=e78]:
+                    - img "Apple TV Store" [ref=e79]
+                  - generic "Google Play Movies" [ref=e81]:
+                    - img "Google Play Movies" [ref=e82]
+                  - generic "YouTube" [ref=e84]:
+                    - img "YouTube" [ref=e85]
+                  - generic "Fandango At Home" [ref=e87]:
+                    - img "Fandango At Home" [ref=e88]
+                  - generic "Plex" [ref=e90]:
+                    - img "Plex" [ref=e91]
+          - generic [ref=e93]:
+            - heading "Genres" [level=2] [ref=e94]
+            - generic [ref=e95]:
+              - link "Crime" [ref=e96] [cursor=pointer]:
+                - /url: /en/movies?genre=80
+              - link "Drama" [ref=e97] [cursor=pointer]:
+                - /url: /en/movies?genre=18
+              - link "Action" [ref=e98] [cursor=pointer]:
+                - /url: /en/movies?genre=28
+          - generic [ref=e99]:
+            - heading "Videos" [level=2] [ref=e100]
+            - generic [ref=e102]:
+              - link "Official Clip - Charades Clip Official Clip - Charades" [ref=e103] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=Ar2Xjmy_i5o
+                - generic [ref=e104]:
+                  - img "Official Clip - Charades" [ref=e105]
+                  - generic [ref=e110]: Clip
+                - paragraph [ref=e111]: Official Clip - Charades
+              - link "30 Year Anniversary 4K Restoration - Official Trailer Trailer 30 Year Anniversary 4K Restoration - Official Trailer" [ref=e112] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=DD-6bmOY__g
+                - generic [ref=e113]:
+                  - img "30 Year Anniversary 4K Restoration - Official Trailer" [ref=e114]
+                  - generic [ref=e119]: Trailer
+                - paragraph [ref=e120]: 30 Year Anniversary 4K Restoration - Official Trailer
+              - link "Official Trailer Trailer Official Trailer" [ref=e121] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=Nq101UyQyTo
+                - generic [ref=e122]:
+                  - img "Official Trailer" [ref=e123]
+                  - generic [ref=e128]: Trailer
+                - paragraph [ref=e129]: Official Trailer
+              - link "Sting - Shape of My Heart (Leon) Featurette Sting - Shape of My Heart (Leon)" [ref=e130] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=QK-Z1K67uaA
+                - generic [ref=e131]:
+                  - img "Sting - Shape of My Heart (Leon)" [ref=e132]
+                  - generic [ref=e137]: Featurette
+                - paragraph [ref=e138]: Sting - Shape of My Heart (Leon)
+              - link "Trailer Trailer Trailer" [ref=e139] [cursor=pointer]:
+                - /url: https://www.youtube.com/watch?v=aNQqoExfQsg
+                - generic [ref=e140]:
+                  - img "Trailer" [ref=e141]
+                  - generic [ref=e146]: Trailer
+                - paragraph [ref=e147]: Trailer
+          - generic [ref=e148]:
+            - heading "Release Dates" [level=2] [ref=e149]
+            - generic [ref=e151]:
+              - generic [ref=e152]:
+                - heading "AR" [level=4] [ref=e153]
+                - generic [ref=e155]:
+                  - generic [ref=e156]: "16"
+                  - generic [ref=e157]: 1995-02-09T00:00:00.000Z
+                  - generic [ref=e158]: (Theatrical)
+              - generic [ref=e159]:
+                - heading "AU" [level=4] [ref=e160]
+                - generic [ref=e162]:
+                  - generic [ref=e163]: MA 15+
+                  - generic [ref=e164]: 1995-04-27T00:00:00.000Z
+                  - generic [ref=e165]: (Theatrical)
+              - generic [ref=e166]:
+                - heading "BR" [level=4] [ref=e167]
+                - generic [ref=e169]:
+                  - generic [ref=e170]: "14"
+                  - generic [ref=e171]: 1995-02-17T00:00:00.000Z
+                  - generic [ref=e172]: (Theatrical)
+              - generic [ref=e173]:
+                - heading "CA" [level=4] [ref=e174]
+                - generic [ref=e176]:
+                  - generic [ref=e177]: 18A
+                  - generic [ref=e178]: 1994-11-18T00:00:00.000Z
+                  - generic [ref=e179]: (Theatrical)
+              - generic [ref=e180]:
+                - heading "CH" [level=4] [ref=e181]
+                - generic [ref=e182]:
+                  - generic [ref=e183]:
+                    - generic [ref=e184]: "16"
+                    - generic [ref=e185]: 1995-01-20T00:00:00.000Z
+                    - generic [ref=e186]: (Theatrical)
+                  - generic [ref=e187]:
+                    - generic [ref=e188]: 1994-09-14T00:00:00.000Z
+                    - generic [ref=e189]: (Theatrical)
+              - generic [ref=e190]:
+                - heading "CN" [level=4] [ref=e191]
+                - generic [ref=e193]:
+                  - generic [ref=e194]: 2024-11-01T00:00:00.000Z
+                  - generic [ref=e195]: (Theatrical)
+              - generic [ref=e196]:
+                - heading "CZ" [level=4] [ref=e197]
+                - generic [ref=e198]:
+                  - generic [ref=e199]:
+                    - generic [ref=e200]: 12+
+                    - generic [ref=e201]: 1995-08-03T00:00:00.000Z
+                    - generic [ref=e202]: (Theatrical)
+                  - generic [ref=e203]:
+                    - generic [ref=e204]: 2009-10-20T00:00:00.000Z
+                    - generic [ref=e205]: (Physical)
+              - generic [ref=e206]:
+                - heading "DE" [level=4] [ref=e207]
+                - generic [ref=e208]:
+                  - generic [ref=e209]:
+                    - generic [ref=e210]: "16"
+                    - generic [ref=e211]: 1995-01-19T00:00:00.000Z
+                    - generic [ref=e212]: (Theatrical)
+                  - generic [ref=e213]:
+                    - generic [ref=e214]: 1996-06-13T00:00:00.000Z
+                    - generic [ref=e215]: (Theatrical)
+              - generic [ref=e216]:
+                - heading "DK" [level=4] [ref=e217]
+                - generic [ref=e219]:
+                  - generic [ref=e220]: "15"
+                  - generic [ref=e221]: 1995-01-13T00:00:00.000Z
+                  - generic [ref=e222]: (Theatrical)
+              - generic [ref=e223]:
+                - heading "ES" [level=4] [ref=e224]
+                - generic [ref=e226]:
+                  - generic [ref=e227]: "18"
+                  - generic [ref=e228]: 1995-04-06T00:00:00.000Z
+                  - generic [ref=e229]: (Theatrical)
+              - generic [ref=e230]:
+                - heading "FI" [level=4] [ref=e231]
+                - generic [ref=e233]:
+                  - generic [ref=e234]: K-18
+                  - generic [ref=e235]: 1995-02-17T00:00:00.000Z
+                  - generic [ref=e236]: (Theatrical)
+              - generic [ref=e237]:
+                - heading "FR" [level=4] [ref=e238]
+                - generic [ref=e239]:
+                  - generic [ref=e240]:
+                    - generic [ref=e241]: "12"
+                    - generic [ref=e242]: 1994-09-14T00:00:00.000Z
+                    - generic [ref=e243]: (Theatrical (limited))
+                  - generic [ref=e244]:
+                    - generic [ref=e245]: 1996-06-26T00:00:00.000Z
+                    - generic [ref=e246]: (Theatrical)
+                  - generic [ref=e247]:
+                    - generic [ref=e248]: 1995-11-07T00:00:00.000Z
+                    - generic [ref=e249]: (Physical)
+                  - generic [ref=e250]:
+                    - generic [ref=e251]: "12"
+                    - generic [ref=e252]: 2026-03-15T00:00:00.000Z
+                    - generic [ref=e253]: (TV)
+              - generic [ref=e254]:
+                - heading "GB" [level=4] [ref=e255]
+                - generic [ref=e256]:
+                  - generic [ref=e257]:
+                    - generic [ref=e258]: "18"
+                    - generic [ref=e259]: 1995-02-03T00:00:00.000Z
+                    - generic [ref=e260]: (Theatrical)
+                  - generic [ref=e261]:
+                    - generic [ref=e262]: "15"
+                    - generic [ref=e263]: 2009-07-20T00:00:00.000Z
+                    - generic [ref=e264]: (Digital)
+              - generic [ref=e265]:
+                - heading "GR" [level=4] [ref=e266]
+                - generic [ref=e268]:
+                  - generic [ref=e269]: 1995-04-06T00:00:00.000Z
+                  - generic [ref=e270]: (Theatrical)
+              - generic [ref=e271]:
+                - heading "HK" [level=4] [ref=e272]
+                - generic [ref=e273]:
+                  - generic [ref=e274]:
+                    - generic [ref=e275]: IIB
+                    - generic [ref=e276]: 1997-06-26T00:00:00.000Z
+                    - generic [ref=e277]: (Theatrical)
+                  - generic [ref=e278]:
+                    - generic [ref=e279]: IIB
+                    - generic [ref=e280]: 2025-08-21T00:00:00.000Z
+                    - generic [ref=e281]: (Theatrical)
+                  - generic [ref=e282]:
+                    - generic [ref=e283]: 1995-11-23T00:00:00.000Z
+                    - generic [ref=e284]: (Physical)
+              - generic [ref=e285]:
+                - heading "HU" [level=4] [ref=e286]
+                - generic [ref=e288]:
+                  - generic [ref=e289]: "18"
+                  - generic [ref=e290]: 1995-09-07T00:00:00.000Z
+                  - generic [ref=e291]: (Theatrical)
+              - generic [ref=e292]:
+                - heading "IE" [level=4] [ref=e293]
+                - generic [ref=e295]:
+                  - generic [ref=e296]: "18"
+                  - generic [ref=e297]: 1995-02-10T00:00:00.000Z
+                  - generic [ref=e298]: (Theatrical)
+              - generic [ref=e299]:
+                - heading "IN" [level=4] [ref=e300]
+                - generic [ref=e302]:
+                  - generic [ref=e303]: A
+                  - generic [ref=e304]: 1996-09-23T00:00:00.000Z
+                  - generic [ref=e305]: (Theatrical)
+              - generic [ref=e306]:
+                - heading "IT" [level=4] [ref=e307]
+                - generic [ref=e309]:
+                  - generic [ref=e310]: T
+                  - generic [ref=e311]: 1995-04-07T00:00:00.000Z
+                  - generic [ref=e312]: (Theatrical)
+              - generic [ref=e313]:
+                - heading "JP" [level=4] [ref=e314]
+                - generic [ref=e315]:
+                  - generic [ref=e316]:
+                    - generic [ref=e317]: 1995-03-25T00:00:00.000Z
+                    - generic [ref=e318]: (Theatrical)
+                  - generic [ref=e319]:
+                    - generic [ref=e320]: PG12
+                    - generic [ref=e321]: 1996-10-05T00:00:00.000Z
+                    - generic [ref=e322]: (Theatrical)
+              - generic [ref=e323]:
+                - heading "KR" [level=4] [ref=e324]
+                - generic [ref=e325]:
+                  - generic [ref=e326]:
+                    - generic [ref=e327]: "19"
+                    - generic [ref=e328]: 1995-02-18T00:00:00.000Z
+                    - generic [ref=e329]: (Theatrical)
+                  - generic [ref=e330]:
+                    - generic [ref=e331]: "19"
+                    - generic [ref=e332]: 2013-04-11T00:00:00.000Z
+                    - generic [ref=e333]: (Theatrical)
+                  - generic [ref=e334]:
+                    - generic [ref=e335]: "19"
+                    - generic [ref=e336]: 1998-01-24T00:00:00.000Z
+                    - generic [ref=e337]: (Theatrical)
+              - generic [ref=e338]:
+                - heading "MX" [level=4] [ref=e339]
+                - generic [ref=e341]:
+                  - generic [ref=e342]: 1994-09-14T00:00:00.000Z
+                  - generic [ref=e343]: (Theatrical)
+              - generic [ref=e344]:
+                - heading "NL" [level=4] [ref=e345]
+                - generic [ref=e346]:
+                  - generic [ref=e347]:
+                    - generic [ref=e348]: "16"
+                    - generic [ref=e349]: 1995-02-23T00:00:00.000Z
+                    - generic [ref=e350]: (Theatrical)
+                  - generic [ref=e351]:
+                    - generic [ref=e352]: "16"
+                    - generic [ref=e353]: 2010-06-01T00:00:00.000Z
+                    - generic [ref=e354]: (Physical)
+                  - generic [ref=e355]:
+                    - generic [ref=e356]: "16"
+                    - generic [ref=e357]: 2003-04-19T00:00:00.000Z
+                    - generic [ref=e358]: (TV)
+              - generic [ref=e359]:
+                - heading "NO" [level=4] [ref=e360]
+                - generic [ref=e362]:
+                  - generic [ref=e363]: "18"
+                  - generic [ref=e364]: 1995-01-20T00:00:00.000Z
+                  - generic [ref=e365]: (Theatrical)
+              - generic [ref=e366]:
+                - heading "PH" [level=4] [ref=e367]
+                - generic [ref=e369]:
+                  - generic [ref=e370]: R-18
+                  - generic [ref=e371]: 1995-06-28T00:00:00.000Z
+                  - generic [ref=e372]: (Theatrical)
+              - generic [ref=e373]:
+                - heading "PL" [level=4] [ref=e374]
+                - generic [ref=e376]:
+                  - generic [ref=e377]: 1995-05-26T00:00:00.000Z
+                  - generic [ref=e378]: (Theatrical)
+              - generic [ref=e379]:
+                - heading "PT" [level=4] [ref=e380]
+                - generic [ref=e382]:
+                  - generic [ref=e383]: M/16
+                  - generic [ref=e384]: 1995-04-28T00:00:00.000Z
+                  - generic [ref=e385]: (Theatrical)
+              - generic [ref=e386]:
+                - heading "RU" [level=4] [ref=e387]
+                - generic [ref=e388]:
+                  - generic [ref=e389]:
+                    - generic [ref=e390]: 16+
+                    - generic [ref=e391]: 1998-09-23T00:00:00.000Z
+                    - generic [ref=e392]: (Theatrical)
+                  - generic [ref=e393]:
+                    - generic [ref=e394]: 1999-09-03T00:00:00.000Z
+                    - generic [ref=e395]: (Theatrical)
+              - generic [ref=e396]:
+                - heading "SE" [level=4] [ref=e397]
+                - generic [ref=e398]:
+                  - generic [ref=e399]:
+                    - generic [ref=e400]: "15"
+                    - generic [ref=e401]: 1995-02-24T00:00:00.000Z
+                    - generic [ref=e402]: (Theatrical)
+                  - generic [ref=e403]:
+                    - generic [ref=e404]: "15"
+                    - generic [ref=e405]: 2009-11-04T00:00:00.000Z
+                    - generic [ref=e406]: (Physical)
+                  - generic [ref=e407]:
+                    - generic [ref=e408]: "15"
+                    - generic [ref=e409]: 2000-05-10T00:00:00.000Z
+                    - generic [ref=e410]: (Physical)
+              - generic [ref=e411]:
+                - heading "SK" [level=4] [ref=e412]
+                - generic [ref=e414]:
+                  - generic [ref=e415]: 1995-09-07T00:00:00.000Z
+                  - generic [ref=e416]: (Theatrical)
+              - generic [ref=e417]:
+                - heading "TR" [level=4] [ref=e418]
+                - generic [ref=e419]:
+                  - generic [ref=e420]:
+                    - generic [ref=e421]: 1995-04-28T00:00:00.000Z
+                    - generic [ref=e422]: (Theatrical)
+                  - generic [ref=e423]:
+                    - generic [ref=e424]: 2025-06-20T00:00:00.000Z
+                    - generic [ref=e425]: (Theatrical)
+              - generic [ref=e426]:
+                - heading "TW" [level=4] [ref=e427]
+                - generic [ref=e429]:
+                  - generic [ref=e430]: 輔15
+                  - generic [ref=e431]: 1995-02-11T00:00:00.000Z
+                  - generic [ref=e432]: (Theatrical)
+              - generic [ref=e433]:
+                - heading "US" [level=4] [ref=e434]
+                - generic [ref=e436]:
+                  - generic [ref=e437]: R
+                  - generic [ref=e438]: 1994-11-18T00:00:00.000Z
+                  - generic [ref=e439]: (Theatrical)
+              - generic [ref=e440]:
+                - heading "UY" [level=4] [ref=e441]
+                - generic [ref=e443]:
+                  - generic [ref=e444]: 1995-04-07T00:00:00.000Z
+                  - generic [ref=e445]: (Theatrical)
+          - generic [ref=e446]:
+            - heading "Alternative Titles" [level=2] [ref=e447]
+            - generic [ref=e449]:
+              - generic [ref=e450]:
+                - generic [ref=e451]: The Professional
+                - generic [ref=e452]: US
+              - generic [ref=e454]:
+                - generic [ref=e455]: Леон-кілер
+                - generic [ref=e456]: UA
+              - generic [ref=e458]:
+                - generic [ref=e459]: "Léon: Profesionalac"
+                - generic [ref=e460]: HR
+              - generic [ref=e462]:
+                - generic [ref=e463]: "Léon: Der Profi"
+                - generic [ref=e464]: DE
+              - generic [ref=e466]:
+                - generic [ref=e467]: Leon Zawodowiec
+                - generic [ref=e468]: PL
+              - generic [ref=e470]:
+                - generic [ref=e471]: "Léon: El Profesional"
+                - generic [ref=e472]: CL
+              - generic [ref=e474]:
+                - generic [ref=e475]: Léon, a profi
+                - generic [ref=e476]: HU
+              - generic [ref=e478]:
+                - generic [ref=e479]: 레옹
+                - generic [ref=e480]: KR
+              - generic [ref=e482]:
+                - generic [ref=e483]: レオン オリジナル版
+                - generic [ref=e484]: JP
+              - generic [ref=e486]:
+                - generic [ref=e487]: 这个杀手不太冷
+                - generic [ref=e488]: CN
+              - generic [ref=e490]:
+                - generic [ref=e491]: 這個殺手不太冷
+                - generic [ref=e492]: HK
+              - generic [ref=e494]:
+                - generic [ref=e495]: 終極追殺令
+                - generic [ref=e496]: TW
+          - generic [ref=e498]:
+            - heading "Translations" [level=2] [ref=e499]
+            - generic [ref=e500]:
+              - generic [ref=e501]:
+                - text: English
+                - generic [ref=e502]: (en)
+              - generic [ref=e503]:
+                - text: German
+                - generic [ref=e504]: (de)
+              - generic [ref=e505]:
+                - text: French
+                - generic [ref=e506]: (fr)
+              - generic [ref=e507]:
+                - text: Romanian
+                - generic [ref=e508]: (ro)
+              - generic [ref=e509]:
+                - text: Swedish
+                - generic [ref=e510]: (sv)
+              - generic [ref=e511]:
+                - text: Russian
+                - generic [ref=e512]: (ru)
+              - generic [ref=e513]:
+                - text: Italian
+                - generic [ref=e514]: (it)
+              - generic [ref=e515]:
+                - text: Czech
+                - generic [ref=e516]: (cs)
+              - generic [ref=e517]:
+                - text: Hungarian
+                - generic [ref=e518]: (hu)
+              - generic [ref=e519]:
+                - text: Norwegian Bokmål
+                - generic [ref=e520]: (nb)
+              - generic [ref=e521]:
+                - text: Mandarin
+                - generic [ref=e522]: (zh)
+              - generic [ref=e523]:
+                - text: Turkish
+                - generic [ref=e524]: (tr)
+              - generic [ref=e525]:
+                - text: Spanish
+                - generic [ref=e526]: (es)
+              - generic [ref=e527]:
+                - text: Finnish
+                - generic [ref=e528]: (fi)
+              - generic [ref=e529]:
+                - text: Portuguese
+                - generic [ref=e530]: (pt)
+              - generic [ref=e531]:
+                - text: Dutch
+                - generic [ref=e532]: (nl)
+              - generic [ref=e533]:
+                - text: Polish
+                - generic [ref=e534]: (pl)
+              - generic [ref=e535]:
+                - text: Ukrainian
+                - generic [ref=e536]: (uk)
+              - generic [ref=e537]:
+                - text: Danish
+                - generic [ref=e538]: (da)
+              - generic [ref=e539]:
+                - text: Serbian
+                - generic [ref=e540]: (sr)
+              - generic [ref=e541]:
+                - text: Greek
+                - generic [ref=e542]: (el)
+              - generic [ref=e543]:
+                - text: Thai
+                - generic [ref=e544]: (th)
+              - generic [ref=e545]:
+                - text: Korean
+                - generic [ref=e546]: (ko)
+              - generic [ref=e547]:
+                - text: Bulgarian
+                - generic [ref=e548]: (bg)
+              - generic [ref=e549]:
+                - text: Hebrew
+                - generic [ref=e550]: (he)
+              - generic [ref=e551]:
+                - text: Persian
+                - generic [ref=e552]: (fa)
+              - generic [ref=e553]:
+                - text: Portuguese
+                - generic [ref=e554]: (pt)
+              - generic [ref=e555]:
+                - text: French
+                - generic [ref=e556]: (fr)
+              - generic [ref=e557]:
+                - text: Japanese
+                - generic [ref=e558]: (ja)
+              - generic [ref=e559]:
+                - text: Spanish
+                - generic [ref=e560]: (es)
+              - generic [ref=e561]:
+                - text: Mandarin
+                - generic [ref=e562]: (zh)
+              - generic [ref=e563]:
+                - text: Slovak
+                - generic [ref=e564]: (sk)
+              - generic [ref=e565]:
+                - text: Norwegian
+                - generic [ref=e566]: (no)
+              - generic [ref=e567]:
+                - text: Lithuanian
+                - generic [ref=e568]: (lt)
+              - generic [ref=e569]:
+                - text: Latvian
+                - generic [ref=e570]: (lv)
+              - generic [ref=e571]:
+                - text: Mandarin
+                - generic [ref=e572]: (zh)
+              - generic [ref=e573]:
+                - text: Slovenian
+                - generic [ref=e574]: (sl)
+              - generic [ref=e575]:
+                - text: Vietnamese
+                - generic [ref=e576]: (vi)
+              - generic [ref=e577]:
+                - text: Arabic
+                - generic [ref=e578]: (ar)
+              - generic [ref=e579]:
+                - text: Georgian
+                - generic [ref=e580]: (ka)
+              - generic [ref=e581]:
+                - text: Croatian
+                - generic [ref=e582]: (hr)
+              - generic [ref=e583]:
+                - text: Catalan
+                - generic [ref=e584]: (ca)
+              - generic [ref=e585]:
+                - text: Estonian
+                - generic [ref=e586]: (et)
+          - generic [ref=e587]:
+            - heading "Images (28)" [level=2] [ref=e588]
+            - generic [ref=e589]:
+              - button "All (28)" [ref=e590]
+              - button "Backdrops (8)" [ref=e591]
+              - button "Posters (20)" [ref=e592]
+            - generic [ref=e593]:
+              - button [ref=e594] [cursor=pointer]:
+                - img "Image 80135" [ref=e595]
+              - button [ref=e599] [cursor=pointer]:
+                - img "Image 80137" [ref=e600]
+              - button [ref=e604] [cursor=pointer]:
+                - img "Image 80136" [ref=e605]
+              - button [ref=e609] [cursor=pointer]:
+                - img "Image 80138" [ref=e610]
+              - button [ref=e614] [cursor=pointer]:
+                - img "Image 80139" [ref=e615]
+              - button [ref=e619] [cursor=pointer]:
+                - img "Image 80140" [ref=e620]
+              - button [ref=e624] [cursor=pointer]:
+                - img "Image 80126" [ref=e625]
+              - button [ref=e629] [cursor=pointer]:
+                - img "Image 80141" [ref=e630]
+              - button [ref=e634] [cursor=pointer]:
+                - img "Image 80142" [ref=e635]
+              - button [ref=e639] [cursor=pointer]:
+                - img "Image 80143" [ref=e640]
+              - button [ref=e644] [cursor=pointer]:
+                - img "Image 80134" [ref=e645]
+              - button [ref=e649] [cursor=pointer]:
+                - img "Image 80144" [ref=e650]
+              - button [ref=e654] [cursor=pointer]:
+                - img "Image 80145" [ref=e655]
+              - button [ref=e659] [cursor=pointer]:
+                - img "Image 80146" [ref=e660]
+              - button [ref=e664] [cursor=pointer]:
+                - img "Image 80148" [ref=e665]
+              - button [ref=e669] [cursor=pointer]:
+                - img "Image 80147" [ref=e670]
+              - button [ref=e674] [cursor=pointer]:
+                - img "Image 80150" [ref=e675]
+              - button [ref=e679] [cursor=pointer]:
+                - img "Image 80128" [ref=e680]
+              - button [ref=e684] [cursor=pointer]:
+                - img "Image 80127" [ref=e685]
+              - button [ref=e689] [cursor=pointer]:
+                - img "Image 80151" [ref=e690]
+              - button [ref=e694] [cursor=pointer]:
+                - img "Image 80152" [ref=e695]
+              - button [ref=e699] [cursor=pointer]:
+                - img "Image 80153" [ref=e700]
+              - button [ref=e704] [cursor=pointer]:
+                - img "Image 80149" [ref=e705]
+              - button [ref=e709] [cursor=pointer]:
+                - img "Image 80129" [ref=e710]
+              - button [ref=e714] [cursor=pointer]:
+                - img "Image 80130" [ref=e715]
+              - button [ref=e719] [cursor=pointer]:
+                - img "Image 80131" [ref=e720]
+              - button [ref=e724] [cursor=pointer]:
+                - img "Image 80132" [ref=e725]
+              - button [ref=e729] [cursor=pointer]:
+                - img "Image 80133" [ref=e730]
+          - generic [ref=e734]:
+            - heading "Financial" [level=2] [ref=e735]
+            - generic [ref=e736]:
+              - generic [ref=e737]:
+                - text: Budget
+                - paragraph [ref=e738]: $16,000,000
+              - generic [ref=e739]:
+                - text: Revenue
+                - paragraph [ref=e740]: $20,330,788
+          - generic [ref=e741]:
+            - heading "Production Companies" [level=2] [ref=e742]
+            - generic [ref=e743]:
+              - generic [ref=e744]:
+                - img "Gaumont" [ref=e745]
+                - generic [ref=e746]: Gaumont
+              - generic [ref=e747]: Les Films du Dauphin
+          - generic [ref=e749]:
+            - heading "Production Countries" [level=2] [ref=e750]
+            - generic [ref=e751]: France
+          - generic [ref=e753]:
+            - heading "Spoken Languages" [level=2] [ref=e754]
+            - generic [ref=e755]:
+              - generic [ref=e756]:
+                - text: English
+                - generic [ref=e757]: (English)
+              - generic [ref=e758]:
+                - text: Français
+                - generic [ref=e759]: (French)
+              - generic [ref=e760]:
+                - text: Italiano
+                - generic [ref=e761]: (Italian)
+          - generic [ref=e762]:
+            - heading "Cast" [level=2] [ref=e763]
+            - generic [ref=e764]:
+              - button "Scroll left" [ref=e765] [cursor=pointer]
+              - button "Scroll right" [ref=e768] [cursor=pointer]
+              - generic [ref=e771]:
+                - link "Jean Reno 1 Jean Reno Léon Montana" [ref=e772] [cursor=pointer]:
+                  - /url: /en/person/1003
+                  - generic [ref=e773]:
+                    - img "Jean Reno" [ref=e774]
+                    - generic [ref=e775]: "1"
+                  - generic [ref=e776]:
+                    - paragraph [ref=e777]: Jean Reno
+                    - paragraph [ref=e778]: Léon Montana
+                - link "Natalie Portman 2 Natalie Portman Mathilda Lando" [ref=e779] [cursor=pointer]:
+                  - /url: /en/person/524
+                  - generic [ref=e780]:
+                    - img "Natalie Portman" [ref=e781]
+                    - generic [ref=e782]: "2"
+                  - generic [ref=e783]:
+                    - paragraph [ref=e784]: Natalie Portman
+                    - paragraph [ref=e785]: Mathilda Lando
+                - link "Gary Oldman 3 Gary Oldman Norman Stansfield" [ref=e786] [cursor=pointer]:
+                  - /url: /en/person/64
+                  - generic [ref=e787]:
+                    - img "Gary Oldman" [ref=e788]
+                    - generic [ref=e789]: "3"
+                  - generic [ref=e790]:
+                    - paragraph [ref=e791]: Gary Oldman
+                    - paragraph [ref=e792]: Norman Stansfield
+                - link "Danny Aiello 4 Danny Aiello Old Tony" [ref=e793] [cursor=pointer]:
+                  - /url: /en/person/1004
+                  - generic [ref=e794]:
+                    - img "Danny Aiello" [ref=e795]
+                    - generic [ref=e796]: "4"
+                  - generic [ref=e797]:
+                    - paragraph [ref=e798]: Danny Aiello
+                    - paragraph [ref=e799]: Old Tony
+                - link "Peter Appel 5 Peter Appel Agent Malky" [ref=e800] [cursor=pointer]:
+                  - /url: /en/person/1005
+                  - generic [ref=e801]:
+                    - img "Peter Appel" [ref=e802]
+                    - generic [ref=e803]: "5"
+                  - generic [ref=e804]:
+                    - paragraph [ref=e805]: Peter Appel
+                    - paragraph [ref=e806]: Agent Malky
+                - link "Michael Badalucco 6 Michael Badalucco Mathilda's Father" [ref=e807] [cursor=pointer]:
+                  - /url: /en/person/1010
+                  - generic [ref=e808]:
+                    - img "Michael Badalucco" [ref=e809]
+                    - generic [ref=e810]: "6"
+                  - generic [ref=e811]:
+                    - paragraph [ref=e812]: Michael Badalucco
+                    - paragraph [ref=e813]: Mathilda's Father
+                - link "Ellen Greene 7 Ellen Greene Mathilda's Mother" [ref=e814] [cursor=pointer]:
+                  - /url: /en/person/13420
+                  - generic [ref=e815]:
+                    - img "Ellen Greene" [ref=e816]
+                    - generic [ref=e817]: "7"
+                  - generic [ref=e818]:
+                    - paragraph [ref=e819]: Ellen Greene
+                    - paragraph [ref=e820]: Mathilda's Mother
+                - link "Frank Senger 8 Frank Senger Fatman" [ref=e821] [cursor=pointer]:
+                  - /url: /en/person/138401
+                  - generic [ref=e822]:
+                    - img "Frank Senger" [ref=e823]
+                    - generic [ref=e824]: "8"
+                  - generic [ref=e825]:
+                    - paragraph [ref=e826]: Frank Senger
+                    - paragraph [ref=e827]: Fatman
+                - link "Elizabeth Regen 9 Elizabeth Regen Mathilda's Sister" [ref=e828] [cursor=pointer]:
+                  - /url: /en/person/122230
+                  - generic [ref=e829]:
+                    - img "Elizabeth Regen" [ref=e830]
+                    - generic [ref=e831]: "9"
+                  - generic [ref=e832]:
+                    - paragraph [ref=e833]: Elizabeth Regen
+                    - paragraph [ref=e834]: Mathilda's Sister
+                - link "Carl J. Matusovich 10 Carl J. Matusovich Mathilda's Brother" [ref=e835] [cursor=pointer]:
+                  - /url: /en/person/977543
+                  - generic [ref=e836]:
+                    - img "Carl J. Matusovich" [ref=e837]
+                    - generic [ref=e838]: "10"
+                  - generic [ref=e839]:
+                    - paragraph [ref=e840]: Carl J. Matusovich
+                    - paragraph [ref=e841]: Mathilda's Brother
+                - link "Eric Challier 11 Eric Challier Bodyguard Chief" [ref=e842] [cursor=pointer]:
+                  - /url: /en/person/1171233
+                  - generic [ref=e843]:
+                    - img "Eric Challier" [ref=e844]
+                    - generic [ref=e845]: "11"
+                  - generic [ref=e846]:
+                    - paragraph [ref=e847]: Eric Challier
+                    - paragraph [ref=e848]: Bodyguard Chief
+                - link "Willi One Blood 12 Willi One Blood 1st Stansfield Man" [ref=e849] [cursor=pointer]:
+                  - /url: /en/person/1006
+                  - generic [ref=e850]:
+                    - img "Willi One Blood" [ref=e851]
+                    - generic [ref=e852]: "12"
+                  - generic [ref=e853]:
+                    - paragraph [ref=e854]: Willi One Blood
+                    - paragraph [ref=e855]: 1st Stansfield Man
+                - link "Don Creech 13 Don Creech 2nd Stansfield man" [ref=e856] [cursor=pointer]:
+                  - /url: /en/person/1007
+                  - generic [ref=e857]:
+                    - img "Don Creech" [ref=e858]
+                    - generic [ref=e859]: "13"
+                  - generic [ref=e860]:
+                    - paragraph [ref=e861]: Don Creech
+                    - paragraph [ref=e862]: 2nd Stansfield man
+                - link "Keith A. Glascoe 14 Keith A. Glascoe 3rd Stansfield man (Benny)" [ref=e863] [cursor=pointer]:
+                  - /url: /en/person/1008
+                  - generic [ref=e864]:
+                    - img "Keith A. Glascoe" [ref=e865]
+                    - generic [ref=e866]: "14"
+                  - generic [ref=e867]:
+                    - paragraph [ref=e868]: Keith A. Glascoe
+                    - paragraph [ref=e869]: 3rd Stansfield man (Benny)
+                - link "Jernard Burks 15 Jernard Burks Stansfield man" [ref=e870] [cursor=pointer]:
+                  - /url: /en/person/55275
+                  - generic [ref=e871]:
+                    - img "Jernard Burks" [ref=e872]
+                    - generic [ref=e873]: "15"
+                  - generic [ref=e874]:
+                    - paragraph [ref=e875]: Jernard Burks
+                    - paragraph [ref=e876]: Stansfield man
+                - link "M 16 Matt De Matt Stansfield man" [ref=e877] [cursor=pointer]:
+                  - /url: /en/person/60638
+                  - generic [ref=e878]:
+                    - generic [ref=e879]: M
+                    - generic [ref=e880]: "16"
+                  - generic [ref=e881]:
+                    - paragraph [ref=e882]: Matt De Matt
+                    - paragraph [ref=e883]: Stansfield man
+                - link "Stuart Rudin 17 Stuart Rudin Leon's Taxi driver" [ref=e884] [cursor=pointer]:
+                  - /url: /en/person/94435
+                  - generic [ref=e885]:
+                    - img "Stuart Rudin" [ref=e886]
+                    - generic [ref=e887]: "17"
+                  - generic [ref=e888]:
+                    - paragraph [ref=e889]: Stuart Rudin
+                    - paragraph [ref=e890]: Leon's Taxi driver
+                - link "Lucius Wyatt Cherokee 18 Lucius Wyatt Cherokee Tonto" [ref=e891] [cursor=pointer]:
+                  - /url: /en/person/1684441
+                  - generic [ref=e892]:
+                    - img "Lucius Wyatt Cherokee" [ref=e893]
+                    - generic [ref=e894]: "18"
+                  - generic [ref=e895]:
+                    - paragraph [ref=e896]: Lucius Wyatt Cherokee
+                    - paragraph [ref=e897]: Tonto
+                - link "Maïwenn 19 Maïwenn Blond Babe" [ref=e898] [cursor=pointer]:
+                  - /url: /en/person/64210
+                  - generic [ref=e899]:
+                    - img "Maïwenn" [ref=e900]
+                    - generic [ref=e901]: "19"
+                  - generic [ref=e902]:
+                    - paragraph [ref=e903]: Maïwenn
+                    - paragraph [ref=e904]: Blond Babe
+                - link "Luc Bernard 20 Luc Bernard Mickey" [ref=e905] [cursor=pointer]:
+                  - /url: /en/person/185351
+                  - generic [ref=e906]:
+                    - img "Luc Bernard" [ref=e907]
+                    - generic [ref=e908]: "20"
+                  - generic [ref=e909]:
+                    - paragraph [ref=e910]: Luc Bernard
+                    - paragraph [ref=e911]: Mickey
+                - link "Joseph Malerba 21 Joseph Malerba Stairway Swat" [ref=e912] [cursor=pointer]:
+                  - /url: /en/person/225004
+                  - generic [ref=e913]:
+                    - img "Joseph Malerba" [ref=e914]
+                    - generic [ref=e915]: "21"
+                  - generic [ref=e916]:
+                    - paragraph [ref=e917]: Joseph Malerba
+                    - paragraph [ref=e918]: Stairway Swat
+                - link "A 22 Adam Busch Manolo" [ref=e919] [cursor=pointer]:
+                  - /url: /en/person/136183
+                  - generic [ref=e920]:
+                    - generic [ref=e921]: A
+                    - generic [ref=e922]: "22"
+                  - generic [ref=e923]:
+                    - paragraph [ref=e924]: Adam Busch
+                    - paragraph [ref=e925]: Manolo
+                - link "Jessie Keosian 23 Jessie Keosian Old Lady" [ref=e926] [cursor=pointer]:
+                  - /url: /en/person/58533
+                  - generic [ref=e927]:
+                    - img "Jessie Keosian" [ref=e928]
+                    - generic [ref=e929]: "23"
+                  - generic [ref=e930]:
+                    - paragraph [ref=e931]: Jessie Keosian
+                    - paragraph [ref=e932]: Old Lady
+                - link "George Martin 24 George Martin Receptionist" [ref=e933] [cursor=pointer]:
+                  - /url: /en/person/2701
+                  - generic [ref=e934]:
+                    - img "George Martin" [ref=e935]
+                    - generic [ref=e936]: "24"
+                  - generic [ref=e937]:
+                    - paragraph [ref=e938]: George Martin
+                    - paragraph [ref=e939]: Receptionist
+                - link "Alex Dezen 25 Alex Dezen Ball Kid" [ref=e940] [cursor=pointer]:
+                  - /url: /en/person/1684474
+                  - generic [ref=e941]:
+                    - img "Alex Dezen" [ref=e942]
+                    - generic [ref=e943]: "25"
+                  - generic [ref=e944]:
+                    - paragraph [ref=e945]: Alex Dezen
+                    - paragraph [ref=e946]: Ball Kid
+                - link "M 26 Michael Mundra Cigarette Kid" [ref=e947] [cursor=pointer]:
+                  - /url: /en/person/1171240
+                  - generic [ref=e948]:
+                    - generic [ref=e949]: M
+                    - generic [ref=e950]: "26"
+                  - generic [ref=e951]:
+                    - paragraph [ref=e952]: Michael Mundra
+                    - paragraph [ref=e953]: Cigarette Kid
+                - link "Kent Broadhurst 27 Kent Broadhurst 1st Policeman" [ref=e954] [cursor=pointer]:
+                  - /url: /en/person/20914
+                  - generic [ref=e955]:
+                    - img "Kent Broadhurst" [ref=e956]
+                    - generic [ref=e957]: "27"
+                  - generic [ref=e958]:
+                    - paragraph [ref=e959]: Kent Broadhurst
+                    - paragraph [ref=e960]: 1st Policeman
+                - link "Tommy Hollis 28 Tommy Hollis 2nd Policeman" [ref=e961] [cursor=pointer]:
+                  - /url: /en/person/159887
+                  - generic [ref=e962]:
+                    - img "Tommy Hollis" [ref=e963]
+                    - generic [ref=e964]: "28"
+                  - generic [ref=e965]:
+                    - paragraph [ref=e966]: Tommy Hollis
+                    - paragraph [ref=e967]: 2nd Policeman
+                - link "Peter Linari 29 Peter Linari 1st Security man" [ref=e968] [cursor=pointer]:
+                  - /url: /en/person/28037
+                  - generic [ref=e969]:
+                    - img "Peter Linari" [ref=e970]
+                    - generic [ref=e971]: "29"
+                  - generic [ref=e972]:
+                    - paragraph [ref=e973]: Peter Linari
+                    - paragraph [ref=e974]: 1st Security man
+                - link "Betty Miller 30 Betty Miller Orphanage Headmistress" [ref=e975] [cursor=pointer]:
+                  - /url: /en/person/614230
+                  - generic [ref=e976]:
+                    - img "Betty Miller" [ref=e977]
+                    - generic [ref=e978]: "30"
+                  - generic [ref=e979]:
+                    - paragraph [ref=e980]: Betty Miller
+                    - paragraph [ref=e981]: Orphanage Headmistress
+                - link "Arsène Jiroyan 31 Arsène Jiroyan Swat Hostage" [ref=e982] [cursor=pointer]:
+                  - /url: /en/person/1684448
+                  - generic [ref=e983]:
+                    - img "Arsène Jiroyan" [ref=e984]
+                    - generic [ref=e985]: "31"
+                  - generic [ref=e986]:
+                    - paragraph [ref=e987]: Arsène Jiroyan
+                    - paragraph [ref=e988]: Swat Hostage
+                - link "Geoffrey Bateman 32 Geoffrey Bateman Swat Chief" [ref=e989] [cursor=pointer]:
+                  - /url: /en/person/185391
+                  - generic [ref=e990]:
+                    - img "Geoffrey Bateman" [ref=e991]
+                    - generic [ref=e992]: "32"
+                  - generic [ref=e993]:
+                    - paragraph [ref=e994]: Geoffrey Bateman
+                    - paragraph [ref=e995]: Swat Chief
+                - link "P 33 Peter Vizard Doctor" [ref=e996] [cursor=pointer]:
+                  - /url: /en/person/2312451
+                  - generic [ref=e997]:
+                    - generic [ref=e998]: P
+                    - generic [ref=e999]: "33"
+                  - generic [ref=e1000]:
+                    - paragraph [ref=e1001]: Peter Vizard
+                    - paragraph [ref=e1002]: Doctor
+                - link "D 34 David W. Butler Important Jogger" [ref=e1003] [cursor=pointer]:
+                  - /url: /en/person/1316938
+                  - generic [ref=e1004]:
+                    - generic [ref=e1005]: D
+                    - generic [ref=e1006]: "34"
+                  - generic [ref=e1007]:
+                    - paragraph [ref=e1008]: David W. Butler
+                    - paragraph [ref=e1009]: Important Jogger
+                - 'link "Robert LaSardo 35 Robert LaSardo Client #1" [ref=e1010] [cursor=pointer]':
+                  - /url: /en/person/65831
+                  - generic [ref=e1011]:
+                    - img "Robert LaSardo" [ref=e1012]
+                    - generic [ref=e1013]: "35"
+                  - generic [ref=e1014]:
+                    - paragraph [ref=e1015]: Robert LaSardo
+                    - paragraph [ref=e1016]: "Client #1"
+                - link "S 36 Steve Gonnelo 3rd Security Guard" [ref=e1017] [cursor=pointer]:
+                  - /url: /en/person/1542400
+                  - generic [ref=e1018]:
+                    - generic [ref=e1019]: S
+                    - generic [ref=e1020]: "36"
+                  - generic [ref=e1021]:
+                    - paragraph [ref=e1022]: Steve Gonnelo
+                    - paragraph [ref=e1023]: 3rd Security Guard
+                - link "W 37 William James Stiggers Jr. Subway Rapper" [ref=e1024] [cursor=pointer]:
+                  - /url: /en/person/95499
+                  - generic [ref=e1025]:
+                    - generic [ref=e1026]: W
+                    - generic [ref=e1027]: "37"
+                  - generic [ref=e1028]:
+                    - paragraph [ref=e1029]: William James Stiggers Jr.
+                    - paragraph [ref=e1030]: Subway Rapper
+                - link "S 38 Sonny Zito DEA Security Guard" [ref=e1031] [cursor=pointer]:
+                  - /url: /en/person/1392772
+                  - generic [ref=e1032]:
+                    - generic [ref=e1033]: S
+                    - generic [ref=e1034]: "38"
+                  - generic [ref=e1035]:
+                    - paragraph [ref=e1036]: Sonny Zito
+                    - paragraph [ref=e1037]: DEA Security Guard
+                - link "Randy Pearlstein 39 Randy Pearlstein Security Guard" [ref=e1038] [cursor=pointer]:
+                  - /url: /en/person/69803
+                  - generic [ref=e1039]:
+                    - img "Randy Pearlstein" [ref=e1040]
+                    - generic [ref=e1041]: "39"
+                  - generic [ref=e1042]:
+                    - paragraph [ref=e1043]: Randy Pearlstein
+                    - paragraph [ref=e1044]: Security Guard
+                - link "Jeff McBride 40 Jeff McBride Bodyguard" [ref=e1045] [cursor=pointer]:
+                  - /url: /en/person/1240453
+                  - generic [ref=e1046]:
+                    - img "Jeff McBride" [ref=e1047]
+                    - generic [ref=e1048]: "40"
+                  - generic [ref=e1049]:
+                    - paragraph [ref=e1050]: Jeff McBride
+                    - paragraph [ref=e1051]: Bodyguard
+                - link "F 41 Fred Fischer Newspaperman" [ref=e1052] [cursor=pointer]:
+                  - /url: /en/person/17926
+                  - generic [ref=e1053]:
+                    - generic [ref=e1054]: F
+                    - generic [ref=e1055]: "41"
+                  - generic [ref=e1056]:
+                    - paragraph [ref=e1057]: Fred Fischer
+                    - paragraph [ref=e1058]: Newspaperman
+                - link "Crystal Blake 42 Crystal Blake Girl" [ref=e1059] [cursor=pointer]:
+                  - /url: /en/person/3946117
+                  - generic [ref=e1060]:
+                    - img "Crystal Blake" [ref=e1061]
+                    - generic [ref=e1062]: "42"
+                  - generic [ref=e1063]:
+                    - paragraph [ref=e1064]: Crystal Blake
+                    - paragraph [ref=e1065]: Girl
+                - link "C 43 Cary Wong Chinatown Boss' sidekick" [ref=e1066] [cursor=pointer]:
+                  - /url: /en/person/1521740
+                  - generic [ref=e1067]:
+                    - generic [ref=e1068]: C
+                    - generic [ref=e1069]: "43"
+                  - generic [ref=e1070]:
+                    - paragraph [ref=e1071]: Cary Wong
+                    - paragraph [ref=e1072]: Chinatown Boss' sidekick
+                - link "M 44 Mario Todisco Tony's Barber" [ref=e1073] [cursor=pointer]:
+                  - /url: /en/person/176958
+                  - generic [ref=e1074]:
+                    - generic [ref=e1075]: M
+                    - generic [ref=e1076]: "44"
+                  - generic [ref=e1077]:
+                    - paragraph [ref=e1078]: Mario Todisco
+                    - paragraph [ref=e1079]: Tony's Barber
+                - link "Samy Naceri 45 Samy Naceri Swat 1" [ref=e1080] [cursor=pointer]:
+                  - /url: /en/person/20666
+                  - generic [ref=e1081]:
+                    - img "Samy Naceri" [ref=e1082]
+                    - generic [ref=e1083]: "45"
+                  - generic [ref=e1084]:
+                    - paragraph [ref=e1085]: Samy Naceri
+                    - paragraph [ref=e1086]: Swat 1
+                - link "C 46 Christophe Gautier Swat 2" [ref=e1087] [cursor=pointer]:
+                  - /url: /en/person/1684467
+                  - generic [ref=e1088]:
+                    - generic [ref=e1089]: C
+                    - generic [ref=e1090]: "46"
+                  - generic [ref=e1091]:
+                    - paragraph [ref=e1092]: Christophe Gautier
+                    - paragraph [ref=e1093]: Swat 2
+                - link "J 47 Junior Almeida Swat 3" [ref=e1094] [cursor=pointer]:
+                  - /url: /en/person/1684468
+                  - generic [ref=e1095]:
+                    - generic [ref=e1096]: J
+                    - generic [ref=e1097]: "47"
+                  - generic [ref=e1098]:
+                    - paragraph [ref=e1099]: Junior Almeida
+                    - paragraph [ref=e1100]: Swat 3
+                - link "D 48 David Gregg Swat 4" [ref=e1101] [cursor=pointer]:
+                  - /url: /en/person/1379154
+                  - generic [ref=e1102]:
+                    - generic [ref=e1103]: D
+                    - generic [ref=e1104]: "48"
+                  - generic [ref=e1105]:
+                    - paragraph [ref=e1106]: David Gregg
+                    - paragraph [ref=e1107]: Swat 4
+                - link "Michel Montanary 49 Michel Montanary Swat 5" [ref=e1108] [cursor=pointer]:
+                  - /url: /en/person/246297
+                  - generic [ref=e1109]:
+                    - img "Michel Montanary" [ref=e1110]
+                    - generic [ref=e1111]: "49"
+                  - generic [ref=e1112]:
+                    - paragraph [ref=e1113]: Michel Montanary
+                    - paragraph [ref=e1114]: Swat 5
+                - link "H 50 Hervé Husson Swat 6" [ref=e1115] [cursor=pointer]:
+                  - /url: /en/person/1684469
+                  - generic [ref=e1116]:
+                    - generic [ref=e1117]: H
+                    - generic [ref=e1118]: "50"
+                  - generic [ref=e1119]:
+                    - paragraph [ref=e1120]: Hervé Husson
+                    - paragraph [ref=e1121]: Swat 6
+                - link "D 51 Didier Legros Swat 7" [ref=e1122] [cursor=pointer]:
+                  - /url: /en/person/1684470
+                  - generic [ref=e1123]:
+                    - generic [ref=e1124]: D
+                    - generic [ref=e1125]: "51"
+                  - generic [ref=e1126]:
+                    - paragraph [ref=e1127]: Didier Legros
+                    - paragraph [ref=e1128]: Swat 7
+                - link "Marc Andréoni 52 Marc Andréoni Swat 8" [ref=e1129] [cursor=pointer]:
+                  - /url: /en/person/585700
+                  - generic [ref=e1130]:
+                    - img "Marc Andréoni" [ref=e1131]
+                    - generic [ref=e1132]: "52"
+                  - generic [ref=e1133]:
+                    - paragraph [ref=e1134]: Marc Andréoni
+                    - paragraph [ref=e1135]: Swat 8
+                - link "G 53 Gilles Kleber Swat 9" [ref=e1136] [cursor=pointer]:
+                  - /url: /en/person/1684471
+                  - generic [ref=e1137]:
+                    - generic [ref=e1138]: G
+                    - generic [ref=e1139]: "53"
+                  - generic [ref=e1140]:
+                    - paragraph [ref=e1141]: Gilles Kleber
+                    - paragraph [ref=e1142]: Swat 9
+                - link "Jean-Hugues Anglade 54 Jean-Hugues Anglade Extra (uncredited)" [ref=e1143] [cursor=pointer]:
+                  - /url: /en/person/7037
+                  - generic [ref=e1144]:
+                    - img "Jean-Hugues Anglade" [ref=e1145]
+                    - generic [ref=e1146]: "54"
+                  - generic [ref=e1147]:
+                    - paragraph [ref=e1148]: Jean-Hugues Anglade
+                    - paragraph [ref=e1149]: Extra (uncredited)
+                - link "Michael Wehrhahn 55 Michael Wehrhahn Jimmy, SWAT Team Member (uncredited)" [ref=e1150] [cursor=pointer]:
+                  - /url: /en/person/564101
+                  - generic [ref=e1151]:
+                    - img "Michael Wehrhahn" [ref=e1152]
+                    - generic [ref=e1153]: "55"
+                  - generic [ref=e1154]:
+                    - paragraph [ref=e1155]: Michael Wehrhahn
+                    - paragraph [ref=e1156]: Jimmy, SWAT Team Member (uncredited)
+          - generic [ref=e1157]:
+            - heading "Crew" [level=2] [ref=e1158]
+            - generic [ref=e1159]:
+              - link [ref=e1160] [cursor=pointer]:
+                - /url: /en/person/59
+                - img "Luc Besson" [ref=e1162]
+                - generic [ref=e1163]:
+                  - paragraph [ref=e1164]: Luc Besson
+                  - paragraph [ref=e1165]: Screenplay · Writing
+              - link [ref=e1166] [cursor=pointer]:
+                - /url: /en/person/60
+                - img "Patrice Ledoux" [ref=e1168]
+                - generic [ref=e1169]:
+                  - paragraph [ref=e1170]: Patrice Ledoux
+                  - paragraph [ref=e1171]: Producer · Production
+              - link [ref=e1172] [cursor=pointer]:
+                - /url: /en/person/998
+                - img "Sylvie Landra" [ref=e1174]
+                - generic [ref=e1175]:
+                  - paragraph [ref=e1176]: Sylvie Landra
+                  - paragraph [ref=e1177]: Editor · Editing
+              - link "F Françoise Benoît-Fresco Set Decoration · Art" [ref=e1178] [cursor=pointer]:
+                - /url: /en/person/1002
+                - generic [ref=e1179]: F
+                - generic [ref=e1181]:
+                  - paragraph [ref=e1182]: Françoise Benoît-Fresco
+                  - paragraph [ref=e1183]: Set Decoration · Art
+              - link [ref=e1184] [cursor=pointer]:
+                - /url: /en/person/997
+                - img "Thierry Arbogast" [ref=e1186]
+                - generic [ref=e1187]:
+                  - paragraph [ref=e1188]: Thierry Arbogast
+                  - paragraph [ref=e1189]: Director of Photography · Camera
+              - link [ref=e1190] [cursor=pointer]:
+                - /url: /en/person/1001
+                - img "Gerard Drolon" [ref=e1192]
+                - generic [ref=e1193]:
+                  - paragraph [ref=e1194]: Gerard Drolon
+                  - paragraph [ref=e1195]: Art Direction · Art
+              - link [ref=e1196] [cursor=pointer]:
+                - /url: /en/person/999
+                - img "Todd M. Thaler" [ref=e1198]
+                - generic [ref=e1199]:
+                  - paragraph [ref=e1200]: Todd M. Thaler
+                  - paragraph [ref=e1201]: Casting · Production
+              - link "M Magali Guidasci Costume Design · Costume & Make-Up" [ref=e1202] [cursor=pointer]:
+                - /url: /en/person/907
+                - generic [ref=e1203]: M
+                - generic [ref=e1205]:
+                  - paragraph [ref=e1206]: Magali Guidasci
+                  - paragraph [ref=e1207]: Costume Design · Costume & Make-Up
+              - link [ref=e1208] [cursor=pointer]:
+                - /url: /en/person/996
+                - img "Éric Serra" [ref=e1210]
+                - generic [ref=e1211]:
+                  - paragraph [ref=e1212]: Éric Serra
+                  - paragraph [ref=e1213]: Original Music Composer · Sound
+              - link "D Dan Weil Production Design · Art" [ref=e1214] [cursor=pointer]:
+                - /url: /en/person/1000
+                - generic [ref=e1215]: D
+                - generic [ref=e1217]:
+                  - paragraph [ref=e1218]: Dan Weil
+                  - paragraph [ref=e1219]: Production Design · Art
+              - link "G Geneviève Peyralade Makeup Artist · Costume & Make-Up" [ref=e1220] [cursor=pointer]:
+                - /url: /en/person/2394945
+                - generic [ref=e1221]: G
+                - generic [ref=e1223]:
+                  - paragraph [ref=e1224]: Geneviève Peyralade
+                  - paragraph [ref=e1225]: Makeup Artist · Costume & Make-Up
+              - link [ref=e1226] [cursor=pointer]:
+                - /url: /en/person/1346943
+                - img "Nick Allder" [ref=e1228]
+                - generic [ref=e1229]:
+                  - paragraph [ref=e1230]: Nick Allder
+                  - paragraph [ref=e1231]: Special Effects Supervisor · Visual Effects
+              - link "P Peggy Nicholson Hairstylist · Costume & Make-Up" [ref=e1232] [cursor=pointer]:
+                - /url: /en/person/1131063
+                - generic [ref=e1233]: P
+                - generic [ref=e1235]:
+                  - paragraph [ref=e1236]: Peggy Nicholson
+                  - paragraph [ref=e1237]: Hairstylist · Costume & Make-Up
+              - link "C Cecilia Kate Roque Production Manager · Production" [ref=e1238] [cursor=pointer]:
+                - /url: /en/person/1340647
+                - generic [ref=e1239]: C
+                - generic [ref=e1241]:
+                  - paragraph [ref=e1242]: Cecilia Kate Roque
+                  - paragraph [ref=e1243]: Production Manager · Production
+              - link [ref=e1244] [cursor=pointer]:
+                - /url: /en/person/8389
+                - img "Bernard Grenet" [ref=e1246]
+                - generic [ref=e1247]:
+                  - paragraph [ref=e1248]: Bernard Grenet
+                  - paragraph [ref=e1249]: Line Producer · Production
+              - link "E Eric McGinty First Assistant Director · Directing" [ref=e1250] [cursor=pointer]:
+                - /url: /en/person/2086426
+                - generic [ref=e1251]: E
+                - generic [ref=e1253]:
+                  - paragraph [ref=e1254]: Eric McGinty
+                  - paragraph [ref=e1255]: First Assistant Director · Directing
+              - link "C Claude Besson Executive Producer · Production" [ref=e1256] [cursor=pointer]:
+                - /url: /en/person/2181
+                - generic [ref=e1257]: C
+                - generic [ref=e1259]:
+                  - paragraph [ref=e1260]: Claude Besson
+                  - paragraph [ref=e1261]: Executive Producer · Production
+              - link "T Thierry Guilmard Unit Manager · Production" [ref=e1262] [cursor=pointer]:
+                - /url: /en/person/1412914
+                - generic [ref=e1263]: T
+                - generic [ref=e1265]:
+                  - paragraph [ref=e1266]: Thierry Guilmard
+                  - paragraph [ref=e1267]: Unit Manager · Production
+              - link "J John Garland Line Producer · Production" [ref=e1268] [cursor=pointer]:
+                - /url: /en/person/231527
+                - generic [ref=e1269]: J
+                - generic [ref=e1271]:
+                  - paragraph [ref=e1272]: John Garland
+                  - paragraph [ref=e1273]: Line Producer · Production
+              - link "C Camille Lipmann Second Assistant Director · Directing" [ref=e1274] [cursor=pointer]:
+                - /url: /en/person/1427298
+                - generic [ref=e1275]: C
+                - generic [ref=e1277]:
+                  - paragraph [ref=e1278]: Camille Lipmann
+                  - paragraph [ref=e1279]: Second Assistant Director · Directing
+            - button "Show more" [ref=e1280]
+          - generic [ref=e1281]:
+            - heading "Recommendations" [level=2] [ref=e1282]
+            - link [ref=e1285] [cursor=pointer]:
+              - /url: /en/movie/tmdb/311
+              - generic [ref=e1286]:
+                - img "Once Upon a Time in America" [ref=e1287]
+                - generic [ref=e1288]: "8.4"
+              - generic [ref=e1291]:
+                - paragraph [ref=e1292]: Once Upon a Time in America
+                - paragraph [ref=e1293]: "1984"
+        - complementary [ref=e1294]:
+          - paragraph [ref=e1296]: Failed to load annotations
+          - generic [ref=e1297]:
+            - generic [ref=e1298]:
+              - generic [ref=e1299]: Status
+              - text: Released
+            - generic [ref=e1300]:
+              - generic [ref=e1301]: Release Date
+              - text: September 14, 1994
+            - generic [ref=e1302]:
+              - generic [ref=e1303]: Runtime
+              - text: 1h 51m
+            - generic [ref=e1304]:
+              - generic [ref=e1305]: Budget
+              - text: $16.0M
+            - generic [ref=e1306]:
+              - generic [ref=e1307]: Revenue
+              - text: $20.3M
+            - generic [ref=e1308]:
+              - generic [ref=e1309]: Original Language
+              - text: FR
+            - generic [ref=e1310]:
+              - generic [ref=e1311]: Origin Country
+              - text: France
+          - generic [ref=e1312]:
+            - heading "External Links" [level=3] [ref=e1313]
+            - generic [ref=e1314]:
+              - link "IMDb" [ref=e1315] [cursor=pointer]:
+                - /url: https://www.imdb.com/title/tt0110413
+              - link "TMDB" [ref=e1318] [cursor=pointer]:
+                - /url: https://www.themoviedb.org/movie/101
+              - link "Wikidata" [ref=e1323] [cursor=pointer]:
+                - /url: https://www.wikidata.org/wiki/Q484675
+  - contentinfo [ref=e1326]:
+    - generic [ref=e1328]:
+      - paragraph [ref=e1330]: Track your favorite movies and TV series
+      - paragraph [ref=e1332]: © 2026 Movie Series Tracker. All rights reserved.
+  - button "Open Next.js Dev Tools" [ref=e1338] [cursor=pointer]
+  - alert [ref=e1342]
