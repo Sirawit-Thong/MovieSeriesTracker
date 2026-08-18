@@ -206,7 +206,7 @@ export default function AdminMediaPage() {
   const searchParams = useSearchParams();
   const urlType = searchParams.get('type');
   const initialType: MediaType =
-    urlType === 'tv' ? 'tv' : urlType === 'person' ? 'person' : 'movie';
+    urlType === 'tv' ? 'tv' : urlType === 'person' || urlType === 'persons' ? 'person' : 'movie';
   const [data, setData] = useState<MediaResponse | null>(null);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
