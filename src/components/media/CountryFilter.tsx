@@ -7,6 +7,9 @@ import {getDisplayName, searchCountries} from '@/lib/i18n/country-names';
 type Country = {
   iso31661: string;
   name: string;
+  movieCount: number;
+  tvCount: number;
+  totalCount: number;
 };
 
 type CountryFilterProps = {
@@ -47,9 +50,13 @@ export default function CountryFilter({
   }, [open]);
 
   const filtered = useMemo(() => {
-    if (!search) return countries;
-    return searchCountries(countries, search, locale);
-  }, [countries, search, locale]);
+    const list = search
+      ? searchCountries(countries, search, locale)
+      : countries;
+    const selected = list.filter((c) => value.includes(c.iso31661));
+    const unselected = list.filter((c) => !value.includes(c.iso31661));
+    return [...selected, ...unselected];
+  }, [countries, search, locale, value]);
 
   const toggle = (code: string) => {
     if (value.includes(code)) {
@@ -128,9 +135,11 @@ export default function CountryFilter({
                       )}
                     </span>
                     <span className="truncate">{getDisplayName(c.iso31661, c.name, locale)}</span>
-                    <span className="ml-auto text-[10px] text-foreground/30 font-mono">
-                      {c.iso31661}
-                    </span>
+                    {c.totalCount > 0 && (
+                      <span className="ml-auto flex-shrink-0 text-[10px] text-foreground/30 tabular-nums">
+                        {c.totalCount}
+                      </span>
+                    )}
                   </button>
                 );
               })

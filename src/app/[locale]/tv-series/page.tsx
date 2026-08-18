@@ -4,6 +4,7 @@ import {getTvSeriesList, getAllGenres, getAllCountries} from '@/lib/db/media-que
 import {resolveLocalizedTitles} from '@/lib/db/resolve-localized-titles';
 import MediaCard from '@/components/media/MediaCard';
 import MediaFilterBar from '@/components/media/MediaFilterBar';
+import CountryFilterRestore from '@/components/media/CountryFilterRestore';
 
 export const dynamic = 'force-dynamic';
 
@@ -55,6 +56,7 @@ export default async function TvSeriesPage({
 
   return (
     <div className="min-h-[calc(100vh-4rem)] max-w-7xl mx-auto px-4 py-8">
+      <CountryFilterRestore />
       <h1 className="text-3xl font-bold text-white mb-2">
         {activeGenre ? activeGenre.name : tNav('tvSeries')}
       </h1>
@@ -118,6 +120,7 @@ export default async function TvSeriesPage({
                 voteAverage={tv.voteAverage}
                 type="tv"
                 releaseDate={tv.firstAirDate}
+                countryCodes={tv.productionCountries.map((c) => c.iso31661)}
               />
             ))}
           </div>

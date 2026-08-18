@@ -169,7 +169,10 @@ export async function getMoviesList(
   const [items, total] = await Promise.all([
     prisma.movie.findMany({
       where,
-      select: {...MEDIA_SELECT, releaseDate: true},
+      select: {
+        ...MEDIA_SELECT, releaseDate: true,
+        productionCountries: {select: {iso31661: true}},
+      },
       orderBy: {popularity: 'desc'},
       take: limit,
       skip: offset,
@@ -200,6 +203,7 @@ export async function getTvSeriesList(
       select: {
         id: true, tmdbId: true, name: true, posterPath: true, backdropPath: true,
         voteAverage: true, overview: true, firstAirDate: true,
+        productionCountries: {select: {iso31661: true}},
       },
       orderBy: {popularity: 'desc'},
       take: limit,
@@ -279,18 +283,32 @@ export async function getAllGenres() {
 }
 
 /**
- * Get all production countries that have at least one movie or TV series.
- * Ordered alphabetically by name.
+ * Get all production countries with movie/TV counts.
+ * Ordered by total count descending (most content first).
  */
 export async function getAllCountries() {
-  return prisma.productionCountry.findMany({
+  const countries = await prisma.productionCountry.findMany({
     where: {
       OR: [
         {movies: {some: {}}},
         {tvSeries: {some: {}}},
       ],
     },
-    orderBy: {name: 'asc'},
-    select: {iso31661: true, name: true},
+    select: {
+      iso31661: true,
+      name: true,
+      _count: {
+        select: {movies: true, tvSeries: true},
+      },
+    },
   });
+  return countries
+    .map((c) => ({
+      iso31661: c.iso31661,
+      name: c.name,
+      movieCount: c._count.movies,
+      tvCount: c._count.tvSeries,
+      totalCount: c._count.movies + c._count.tvSeries,
+    }))
+    .sort((a, b) => b.totalCount - a.totalCount);
 }

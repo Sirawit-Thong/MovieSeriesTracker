@@ -185,7 +185,8 @@
     "gridView": "Grid",
     "listView": "List",
     "yourRating": "Your rating",
-    "remove": "Remove"
+    "remove": "Remove",
+    "clearFilters": "Clear filters"
   },
   "Watchlist": {
     "title": "My Watchlists",

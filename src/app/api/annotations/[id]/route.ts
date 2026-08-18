@@ -137,9 +137,9 @@ export async function PUT(
   }
 
   if (personalRating !== undefined) {
-    if (personalRating !== null && (typeof personalRating !== 'number' || !Number.isInteger(personalRating) || personalRating < 1 || personalRating > 10)) {
-      return NextResponse.json(
-        {error: 'personalRating must be an integer between 1 and 10, or null'},
+    if (personalRating !== null && (typeof personalRating !== 'number' || !Number.isInteger(personalRating) || personalRating < 1 || personalRating > 5)) {
+        return Response.json(
+          {error: 'personalRating must be an integer between 1 and 5, or null'},
         {status: 400}
       );
     }

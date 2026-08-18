@@ -185,7 +185,8 @@
     "gridView": "ตาราง",
     "listView": "รายการ",
     "yourRating": "คะแนนของคุณ",
-    "remove": "ลบ"
+    "remove": "ลบ",
+    "clearFilters": "ล้างตัวกรอง"
   },
   "Watchlist": {
     "title": "Watchlists ของฉัน",

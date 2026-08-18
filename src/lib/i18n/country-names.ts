@@ -214,11 +214,11 @@ export function getDisplayName(code: string, englishName: string, locale: string
   return englishName;
 }
 
-export function searchCountries(
-  countries: Array<{iso31661: string; name: string}>,
+export function searchCountries<T extends {iso31661: string; name: string}>(
+  countries: T[],
   query: string,
   locale: string,
-) {
+): T[] {
   const q = query.toLowerCase();
   return countries.filter((c) => {
     const displayName = getDisplayName(c.iso31661, c.name, locale);

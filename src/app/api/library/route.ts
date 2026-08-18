@@ -82,6 +82,7 @@ export async function GET(request: Request) {
             id: true, title: true, posterPath: true, backdropPath: true,
             voteAverage: true, overview: true, releaseDate: true, runtime: true,
             tmdbId: true,
+            productionCountries: {select: {iso31661: true}},
           },
         })
       : [],
@@ -93,6 +94,7 @@ export async function GET(request: Request) {
             voteAverage: true, overview: true, firstAirDate: true,
             numberOfSeasons: true, numberOfEpisodes: true,
             tmdbId: true,
+            productionCountries: {select: {iso31661: true}},
           },
         })
       : [],

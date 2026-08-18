@@ -1,11 +1,12 @@
 'use client';
 
-import {useState, useEffect, useCallback, useRef} from 'react';
-import {useTranslations} from 'next-intl';
+import {useState, useEffect, useCallback, useRef, useMemo} from 'react';
+import {useTranslations, useLocale} from 'next-intl';
 import {useRouter} from '@/i18n/navigation';
 import {Link} from '@/i18n/navigation';
 import {useSession} from 'next-auth/react';
 import CountryFilter from '@/components/media/CountryFilter';
+import {getDisplayName} from '@/lib/i18n/country-names';
 
 const TMDB_IMG = 'https://image.tmdb.org/t/p';
 const TMDB_IMG_W300 = `${TMDB_IMG}/w300`;
@@ -33,6 +34,7 @@ type LibraryItem = {
     releaseDate: string | null;
     runtime: number | null;
     tmdbId: number;
+    productionCountries: Array<{iso31661: string}>;
   } | null;
   tvSeries: {
     id: number;
@@ -45,6 +47,7 @@ type LibraryItem = {
     numberOfSeasons: number | null;
     numberOfEpisodes: number | null;
     tmdbId: number;
+    productionCountries: Array<{iso31661: string}>;
   } | null;
 };
 
@@ -81,16 +84,30 @@ export default function LibraryContent({locale}: {locale: string}) {
   const [localSearch, setLocalSearch] = useState('');
   const [sortBy, setSortBy] = useState<'updatedAt' | 'rating' | 'title'>('updatedAt');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [filterCountry, setFilterCountry] = useState<string[]>([]);
-  const [countries, setCountries] = useState<Array<{iso31661: string; name: string}>>([]);
+  const [filterCountry, setFilterCountry] = useState<string[]>(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const saved = localStorage.getItem('library-country-filter');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
+  const [countries, setCountries] = useState<Array<{iso31661: string; name: string; movieCount: number; tvCount: number; totalCount: number}>>([]);
 
-  // Fetch available countries on mount
+  // Fetch available countries from user's library
   useEffect(() => {
-    fetch('/api/countries')
+    if (!session?.user) return;
+    fetch('/api/library/countries')
       .then((res) => res.ok ? res.json() : [])
       .then((data) => setCountries(data))
       .catch(() => {});
-  }, []);
+  }, [session, items]);
+
+  // Persist country filter to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('library-country-filter', JSON.stringify(filterCountry));
+    } catch {}
+  }, [filterCountry]);
 
   // TMDB search state
   const [tmdbQuery, setTmdbQuery] = useState('');
@@ -185,9 +202,10 @@ export default function LibraryContent({locale}: {locale: string}) {
     if (newStatus === 'WATCHED' && item.tvSeries?.numberOfEpisodes) {
       patch.currentEpisode = item.tvSeries.numberOfEpisodes;
       patch.totalEpisodes = item.tvSeries.numberOfEpisodes;
-    }
-    if (item.watchStatus === 'WATCHED' && newStatus !== 'WATCHED') {
+    } else if (newStatus === 'WATCHING' || newStatus === 'WANT_TO_WATCH') {
       patch.currentEpisode = 0;
+    } else if (newStatus === 'DROPPED') {
+      // Keep current episode count when dropping
     }
 
     try {
@@ -371,7 +389,7 @@ export default function LibraryContent({locale}: {locale: string}) {
                     >
                       <div className="relative aspect-[2/3] w-full overflow-hidden">
                         {movie.posterPath ? (
-                          <img src={`${TMDB_IMG}/w300${movie.posterPath}`} alt={movie.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
+                          <img src={`${TMDB_IMG}/w300${movie.posterPath}`} alt={movie.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" loading="lazy" />
                         ) : (
                           <div className="w-full h-full bg-muted flex items-center justify-center text-sm text-foreground/40">No Image</div>
                         )}
@@ -408,7 +426,7 @@ export default function LibraryContent({locale}: {locale: string}) {
                     >
                       <div className="relative aspect-[2/3] w-full overflow-hidden">
                         {series.posterPath ? (
-                          <img src={`${TMDB_IMG}/w300${series.posterPath}`} alt={series.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
+                          <img src={`${TMDB_IMG}/w300${series.posterPath}`} alt={series.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" loading="lazy" />
                         ) : (
                           <div className="w-full h-full bg-muted flex items-center justify-center text-sm text-foreground/40">No Image</div>
                         )}
@@ -477,6 +495,7 @@ export default function LibraryContent({locale}: {locale: string}) {
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
+          style={{colorScheme: 'dark'}}
           className="px-3 py-2 rounded-lg border border-border bg-surface text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
         >
           <option value="ALL">{t('all')}</option>
@@ -492,9 +511,31 @@ export default function LibraryContent({locale}: {locale: string}) {
           onChange={setFilterCountry}
         />
 
+        {/* Quick-select top countries */}
+        {(() => {
+          const topCountries = countries
+            .filter((c) => c.totalCount > 0 && !filterCountry.includes(c.iso31661))
+            .slice(0, 5);
+          return topCountries.length > 0 ? (
+            <div className="flex flex-wrap gap-1.5">
+              {topCountries.map((c) => (
+                <button
+                  key={c.iso31661}
+                  type="button"
+                  onClick={() => setFilterCountry([...filterCountry, c.iso31661])}
+                  className="px-2 py-0.5 text-[11px] rounded-full border border-border text-foreground/50 hover:text-primary hover:border-primary/30 hover:bg-primary/5 transition-colors"
+                >
+                  + {getDisplayName(c.iso31661, c.name, locale)}
+                </button>
+              ))}
+            </div>
+          ) : null;
+        })()}
+
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+          style={{colorScheme: 'dark'}}
           className="px-3 py-2 rounded-lg border border-border bg-surface text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
         >
           <option value="updatedAt">{t('sortUpdated')}</option>
@@ -525,6 +566,40 @@ export default function LibraryContent({locale}: {locale: string}) {
         </div>
       </div>
 
+      {/* Active country pills + clear filters */}
+      {(filterCountry.length > 0 || filterType !== 'ALL' || filterStatus !== 'ALL' || localSearch) && (
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          {filterCountry.map((code) => {
+            const englishName = countries.find((c) => c.iso31661 === code)?.name ?? code;
+            return (
+              <button
+                key={code}
+                type="button"
+                onClick={() => setFilterCountry((prev) => prev.filter((c) => c !== code))}
+                className="flex items-center gap-1 px-2.5 py-1 text-xs rounded-full bg-primary/20 text-primary border border-primary/30 hover:bg-primary/30 transition-colors"
+              >
+                {getDisplayName(code, englishName, locale)}
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            );
+          })}
+          <button
+            type="button"
+            onClick={() => {
+              setFilterCountry([]);
+              setFilterType('ALL');
+              setFilterStatus('ALL');
+              setLocalSearch('');
+            }}
+            className="text-xs text-foreground/40 hover:text-red-400 transition-colors ml-1"
+          >
+            {t('clearFilters')}
+          </button>
+        </div>
+      )}
+
       {/* Library Content */}
       {isLoading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -550,19 +625,14 @@ export default function LibraryContent({locale}: {locale: string}) {
             const link = getLink(item);
             const year = getYear(item);
             const totalEps = item.tvSeries?.numberOfEpisodes;
-            const seasons = item.tvSeries?.numberOfSeasons;
-            const overview = item.entityType === 'MOVIE' ? item.movie?.overview : item.tvSeries?.overview;
-            const updatedDate = item.updatedAt
-              ? new Date(item.updatedAt).toLocaleDateString(locale === 'th' ? 'th-TH' : 'en-US', {year: 'numeric', month: 'short', day: 'numeric'})
-              : null;
 
             return (
               <div key={item.id} className="group flex flex-col">
-                {/* Poster + badges */}
+                {/* Poster */}
                 <Link href={link} className="block relative">
                   <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-surface mb-2">
                     {poster ? (
-                      <img src={poster} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
+                      <img src={poster} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" loading="lazy" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-foreground/30 text-sm">No Image</div>
                     )}
@@ -573,13 +643,6 @@ export default function LibraryContent({locale}: {locale: string}) {
                     }`}>
                       {item.entityType === 'MOVIE' ? t('movie') : t('tv')}
                     </div>
-
-                    {/* Status badge */}
-                    {item.watchStatus && (
-                      <div className={`absolute top-2 right-2 px-2 py-0.5 rounded text-[10px] font-medium ${STATUS_COLORS[item.watchStatus] ?? ''}`}>
-                        {tAnnotation(STATUS_LABELS[item.watchStatus] ?? item.watchStatus)}
-                      </div>
-                    )}
 
                     {/* Year badge — bottom left */}
                     {year && year > 0 && (
@@ -601,18 +664,6 @@ export default function LibraryContent({locale}: {locale: string}) {
                         </svg>
                       </button>
                     )}
-
-                    {/* Episode progress bar for TV */}
-                    {item.entityType === 'TV' && item.currentEpisode != null && item.totalEpisodes != null && item.totalEpisodes > 0 && (
-                      <div className="absolute bottom-0 left-0 right-0 bg-black/70 px-2 py-1">
-                        <div className="w-full bg-white/20 rounded-full h-1.5">
-                          <div
-                            className="bg-primary h-1.5 rounded-full"
-                            style={{width: `${Math.min(100, (item.currentEpisode / item.totalEpisodes) * 100)}%`}}
-                          />
-                        </div>
-                      </div>
-                    )}
                   </div>
                 </Link>
 
@@ -621,53 +672,16 @@ export default function LibraryContent({locale}: {locale: string}) {
                   <h3 className="text-sm font-medium text-white group-hover:text-primary transition-colors line-clamp-1">{title}</h3>
                 </Link>
 
-                {/* Notes preview */}
-                {item.notes && (
-                  <p className="text-[10px] text-foreground/40 mt-0.5 line-clamp-1 italic">"{item.notes}"</p>
-                )}
-
-                {/* Meta: seasons + episodes */}
-                <p className="text-xs text-foreground/40 mt-0.5">
-                  {item.entityType === 'TV' && seasons && seasons > 0 && (
-                    <span>{t('seasons', {count: seasons})}</span>
-                  )}
-                  {item.entityType === 'TV' && totalEps && totalEps > 0 && (
-                    <span>{seasons && seasons > 0 ? ' · ' : ''}{t('episodes', {count: totalEps})}</span>
-                  )}
-                  {item.entityType === 'TV' && item.currentEpisode != null && item.totalEpisodes != null && item.totalEpisodes > 0 && (
-                    <span className="block text-primary/80">{t('episodeOf', {current: item.currentEpisode, total: item.totalEpisodes})}</span>
-                  )}
-                </p>
-
-                {/* Quick rating (1-5 stars) */}
+                {/* Status + Rating row */}
                 {item.id > 0 && (
-                  <div className="flex gap-0.5 mt-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        type="button"
-                        onClick={() => updateRating(item.id, star)}
-                        className="cursor-pointer transition-colors"
-                        title={`${t('yourRating')}: ${star}`}
-                      >
-                        <svg
-                          className={`w-3.5 h-3.5 ${(item.personalRating ?? 0) >= star ? 'text-yellow-400 fill-yellow-400' : 'text-foreground/20 fill-current'}`}
-                          viewBox="0 0 20 20"
-                        >
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {/* Inline controls — only for annotated items */}
-                {item.id > 0 && (
-                  <div className="mt-1.5 space-y-1.5">
+                  <div className="flex items-center gap-1.5 mt-1.5">
                     <select
                       value={item.watchStatus ?? ''}
                       onChange={(e) => { const val = e.target.value; if (val) updateStatus(item.id, val); }}
-                      className="w-full px-2 py-1 rounded border border-border bg-surface text-foreground text-[11px] focus:outline-none focus:ring-1 focus:ring-primary/50 cursor-pointer appearance-none"
+                      style={{colorScheme: 'dark'}}
+                      className={`flex-1 px-2 py-1 rounded border text-[11px] focus:outline-none focus:ring-1 focus:ring-primary/50 cursor-pointer ${
+                        item.watchStatus ? STATUS_COLORS[item.watchStatus] ?? 'border-border bg-surface text-foreground' : 'border-border bg-surface text-foreground'
+                      }`}
                     >
                       <option value="WATCHING">{tAnnotation('watching')}</option>
                       <option value="WATCHED">{tAnnotation('watched')}</option>
@@ -675,18 +689,53 @@ export default function LibraryContent({locale}: {locale: string}) {
                       <option value="DROPPED">{tAnnotation('dropped')}</option>
                     </select>
 
-                    {item.entityType === 'TV' && totalEps && totalEps > 0 && (
-                      <select
-                        value={item.currentEpisode ?? 0}
-                        onChange={(e) => { const ep = Number(e.target.value); updateEpisode(item.id, ep, totalEps); }}
-                        className="w-full px-2 py-1 rounded border border-border bg-surface text-foreground text-[11px] focus:outline-none focus:ring-1 focus:ring-primary/50 cursor-pointer appearance-none"
-                      >
-                        {Array.from({length: totalEps + 1}, (_, i) => i).map((ep) => (
-                          <option key={ep} value={ep}>{ep === 0 ? t('noEpisodes') : `EP ${ep} / ${totalEps}`}</option>
-                        ))}
-                      </select>
-                    )}
+                    {/* Rating stars */}
+                    <div className="flex gap-0.5">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => updateRating(item.id, star)}
+                          className="cursor-pointer transition-colors"
+                        >
+                          <svg
+                            className={`w-3 h-3 ${(item.personalRating ?? 0) >= star ? 'text-yellow-400 fill-yellow-400' : 'text-foreground/20 fill-current'}`}
+                            viewBox="0 0 20 20"
+                          >
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                        </button>
+                      ))}
+                    </div>
                   </div>
+                )}
+
+                {/* Episode dropdown (TV only) */}
+                {item.entityType === 'TV' && item.id > 0 && totalEps && totalEps > 0 && (
+                  <div className="mt-1.5">
+                    <select
+                      value={item.currentEpisode ?? 0}
+                      onChange={(e) => { const ep = Number(e.target.value); updateEpisode(item.id, ep, totalEps); }}
+                      style={{colorScheme: 'dark'}}
+                      className="w-full px-2 py-1 rounded border border-border bg-surface text-foreground text-[11px] focus:outline-none focus:ring-1 focus:ring-primary/50 cursor-pointer"
+                    >
+                      {Array.from({length: totalEps + 1}, (_, i) => i).map((ep) => (
+                        <option key={ep} value={ep}>{ep === 0 ? t('noEpisodes') : `EP ${ep} / ${totalEps}`}</option>
+                      ))}
+                    </select>
+                    {/* Mini progress bar */}
+                    <div className="w-full bg-foreground/10 rounded-full h-1 mt-1">
+                      <div
+                        className="bg-primary h-1 rounded-full transition-all"
+                        style={{width: `${Math.min(100, ((item.currentEpisode ?? 0) / totalEps) * 100)}%`}}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Notes preview */}
+                {item.notes && (
+                  <p className="text-[10px] text-foreground/40 mt-1 line-clamp-1 italic">"{item.notes}"</p>
                 )}
               </div>
             );
@@ -714,7 +763,7 @@ export default function LibraryContent({locale}: {locale: string}) {
                 <Link href={link} className="flex-shrink-0">
                   <div className="relative w-[80px] aspect-[2/3] rounded-lg overflow-hidden bg-background">
                     {poster ? (
-                      <img src={poster} alt={title} className="w-full h-full object-cover" />
+                      <img src={poster} alt={title} className="w-full h-full object-cover" loading="lazy" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-foreground/30 text-xs">No Image</div>
                     )}
@@ -735,6 +784,11 @@ export default function LibraryContent({locale}: {locale: string}) {
                       </Link>
                       <p className="text-xs text-foreground/40 mt-0.5">
                         {year && <span>{year}</span>}
+                        {(() => {
+                          const codes = (item.entityType === 'MOVIE' ? item.movie?.productionCountries : item.tvSeries?.productionCountries);
+                          const primaryCountry = codes?.[0]?.iso31661;
+                          return primaryCountry ? <span> · {getDisplayName(primaryCountry, primaryCountry, locale)}</span> : null;
+                        })()}
                         {item.entityType === 'TV' && seasons && seasons > 0 && <span> · {t('seasons', {count: seasons})}</span>}
                         {item.entityType === 'TV' && totalEps && totalEps > 0 && <span> · {t('episodes', {count: totalEps})}</span>}
                         {rating != null && rating > 0 && <span> · ★ {rating.toFixed(1)}</span>}
@@ -772,7 +826,10 @@ export default function LibraryContent({locale}: {locale: string}) {
                       <select
                         value={item.watchStatus ?? ''}
                         onChange={(e) => { const val = e.target.value; if (val) updateStatus(item.id, val); }}
-                        className="px-2 py-1 rounded border border-border bg-background text-foreground text-[11px] focus:outline-none focus:ring-1 focus:ring-primary/50 cursor-pointer appearance-none"
+                        style={{colorScheme: 'dark'}}
+                        className={`px-2 py-1 rounded border text-[11px] focus:outline-none focus:ring-1 focus:ring-primary/50 cursor-pointer ${
+                          item.watchStatus ? STATUS_COLORS[item.watchStatus] ?? 'border-border bg-background text-foreground' : 'border-border bg-background text-foreground'
+                        }`}
                       >
                         <option value="WATCHING">{tAnnotation('watching')}</option>
                         <option value="WATCHED">{tAnnotation('watched')}</option>
@@ -781,12 +838,13 @@ export default function LibraryContent({locale}: {locale: string}) {
                       </select>
                     )}
 
-                    {/* Episode dropdown */}
+                    {/* Episode dropdown (TV only) */}
                     {item.entityType === 'TV' && totalEps && totalEps > 0 && item.id > 0 && (
                       <select
                         value={item.currentEpisode ?? 0}
                         onChange={(e) => { const ep = Number(e.target.value); updateEpisode(item.id, ep, totalEps); }}
-                        className="px-2 py-1 rounded border border-border bg-background text-foreground text-[11px] focus:outline-none focus:ring-1 focus:ring-primary/50 cursor-pointer appearance-none"
+                        style={{colorScheme: 'dark'}}
+                        className="px-2 py-1 rounded border border-border bg-background text-foreground text-[11px] focus:outline-none focus:ring-1 focus:ring-primary/50 cursor-pointer"
                       >
                         {Array.from({length: totalEps + 1}, (_, i) => i).map((ep) => (
                           <option key={ep} value={ep}>{ep === 0 ? t('noEpisodes') : `EP ${ep} / ${totalEps}`}</option>
