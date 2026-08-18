@@ -1,8 +1,13 @@
 'use client';
 
 import {useEffect, useState, useCallback} from 'react';
+import {useSearchParams} from 'next/navigation';
 import {Link} from '@/i18n/navigation';
-import {useTranslations} from 'next-intl';
+import {useTranslations, useLocale} from 'next-intl';
+import {formatDate} from '@/lib/format-date';
+import AdminPagination from '@/components/admin/AdminPagination';
+import AdminSpinner from '@/components/admin/AdminSpinner';
+import AdminEmptyState from '@/components/admin/AdminEmptyState';
 
 type MediaItem = {
   id: string;
@@ -32,7 +37,7 @@ const TYPE_TABS: {value: MediaType; labelKey: string}[] = [
   {value: 'person', labelKey: 'persons'},
 ];
 
-function MovieTable({items, t}: {items: MediaItem[]; t: (key: string) => string}) {
+function MovieTable({items, t, locale}: {items: MediaItem[]; t: (key: string) => string; locale: string}) {
   return (
     <table className="w-full text-sm">
       <thead>
@@ -60,30 +65,27 @@ function MovieTable({items, t}: {items: MediaItem[]; t: (key: string) => string}
             key={item.id}
             className="border-b border-border last:border-0"
           >
-            <td className="px-6 py-3 text-foreground font-medium">
-              {item.title ?? '—'}
+            <td className="px-6 py-3">
+              <Link
+                href={`/movie/${item.tmdbId}`}
+                className="text-foreground font-medium hover:text-primary transition-colors"
+              >
+                {item.title ?? '—'}
+              </Link>
             </td>
             <td className="px-6 py-3 text-foreground/70 font-mono text-xs">
               {item.tmdbId}
             </td>
             <td className="px-6 py-3 text-foreground/60">
               {item.releaseDate
-                ? new Date(item.releaseDate).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                  })
+                ? formatDate(item.releaseDate ?? item.firstAirDate ?? item.lastFetchedAt, locale)
                 : '—'}
             </td>
             <td className="px-6 py-3 text-foreground/70">
               {item.voteAverage?.toFixed(1) ?? '—'}
             </td>
             <td className="px-6 py-3 text-foreground/60">
-              {new Date(item.lastFetchedAt).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-              })}
+              {formatDate(item.lastFetchedAt, locale)}
             </td>
           </tr>
         ))}
@@ -92,7 +94,7 @@ function MovieTable({items, t}: {items: MediaItem[]; t: (key: string) => string}
   );
 }
 
-function TvTable({items, t}: {items: MediaItem[]; t: (key: string) => string}) {
+function TvTable({items, t, locale}: {items: MediaItem[]; t: (key: string) => string; locale: string}) {
   return (
     <table className="w-full text-sm">
       <thead>
@@ -120,30 +122,27 @@ function TvTable({items, t}: {items: MediaItem[]; t: (key: string) => string}) {
             key={item.id}
             className="border-b border-border last:border-0"
           >
-            <td className="px-6 py-3 text-foreground font-medium">
-              {item.name ?? '—'}
+            <td className="px-6 py-3">
+              <Link
+                href={`/tv/${item.tmdbId}`}
+                className="text-foreground font-medium hover:text-primary transition-colors"
+              >
+                {item.name ?? '—'}
+              </Link>
             </td>
             <td className="px-6 py-3 text-foreground/70 font-mono text-xs">
               {item.tmdbId}
             </td>
             <td className="px-6 py-3 text-foreground/60">
               {item.firstAirDate
-                ? new Date(item.firstAirDate).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                  })
+                ? formatDate(item.releaseDate ?? item.firstAirDate ?? item.lastFetchedAt, locale)
                 : '—'}
             </td>
             <td className="px-6 py-3 text-foreground/70">
               {item.voteAverage?.toFixed(1) ?? '—'}
             </td>
             <td className="px-6 py-3 text-foreground/60">
-              {new Date(item.lastFetchedAt).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-              })}
+              {formatDate(item.lastFetchedAt, locale)}
             </td>
           </tr>
         ))}
@@ -152,7 +151,7 @@ function TvTable({items, t}: {items: MediaItem[]; t: (key: string) => string}) {
   );
 }
 
-function PersonTable({items, t}: {items: MediaItem[]; t: (key: string) => string}) {
+function PersonTable({items, t, locale}: {items: MediaItem[]; t: (key: string) => string; locale: string}) {
   return (
     <table className="w-full text-sm">
       <thead>
@@ -177,8 +176,13 @@ function PersonTable({items, t}: {items: MediaItem[]; t: (key: string) => string
             key={item.id}
             className="border-b border-border last:border-0"
           >
-            <td className="px-6 py-3 text-foreground font-medium">
-              {item.name ?? '—'}
+            <td className="px-6 py-3">
+              <Link
+                href={`/person/${item.tmdbId}`}
+                className="text-foreground font-medium hover:text-primary transition-colors"
+              >
+                {item.name ?? '—'}
+              </Link>
             </td>
             <td className="px-6 py-3 text-foreground/70 font-mono text-xs">
               {item.tmdbId}
@@ -187,11 +191,7 @@ function PersonTable({items, t}: {items: MediaItem[]; t: (key: string) => string
               {item.department ?? '—'}
             </td>
             <td className="px-6 py-3 text-foreground/60">
-              {new Date(item.lastFetchedAt).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-              })}
+              {formatDate(item.lastFetchedAt, locale)}
             </td>
           </tr>
         ))}
@@ -202,11 +202,17 @@ function PersonTable({items, t}: {items: MediaItem[]; t: (key: string) => string
 
 export default function AdminMediaPage() {
   const t = useTranslations('Admin');
+  const locale = useLocale();
+  const searchParams = useSearchParams();
+  const urlType = searchParams.get('type');
+  const initialType: MediaType =
+    urlType === 'tv' ? 'tv' : urlType === 'person' ? 'person' : 'movie';
   const [data, setData] = useState<MediaResponse | null>(null);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [mediaType, setMediaType] = useState<MediaType>('movie');
+  const [mediaType, setMediaType] = useState<MediaType>(initialType);
   const [query, setQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
 
   const fetchMedia = useCallback(
     async (p: number, type: MediaType, q: string) => {
@@ -229,8 +235,16 @@ export default function AdminMediaPage() {
   );
 
   useEffect(() => {
-    fetchMedia(page, mediaType, query);
-  }, [page, fetchMedia, mediaType, query]);
+    const timer = setTimeout(() => {
+      setDebouncedQuery(query.trim());
+      setPage(1);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  useEffect(() => {
+    fetchMedia(page, mediaType, debouncedQuery);
+  }, [page, fetchMedia, mediaType, debouncedQuery]);
 
   function handleTypeChange(type: MediaType) {
     setMediaType(type);
@@ -239,8 +253,6 @@ export default function AdminMediaPage() {
 
   function handleSearch(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setPage(1);
-    fetchMedia(1, mediaType, query);
   }
 
   return (
@@ -312,70 +324,26 @@ export default function AdminMediaPage() {
       <div className="bg-surface border border-border rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           {loading && !data ? (
-            <div className="px-6 py-8 text-center text-foreground/40">
-              <div className="flex items-center justify-center gap-2">
-                <svg
-                  className="animate-spin h-5 w-5 text-primary"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                  />
-                </svg>
-                {t('loadingMedia')}
-              </div>
-            </div>
+            <AdminSpinner label={t('loadingMedia')} />
           ) : data && data.items.length === 0 ? (
-            <div className="px-6 py-8 text-center text-foreground/40">
-              {t('mediaPage.noResults')}
-            </div>
+            <AdminEmptyState message={t('mediaPage.noResults')} />
           ) : data ? (
             <>
-              {mediaType === 'movie' && <MovieTable items={data.items} t={t} />}
-              {mediaType === 'tv' && <TvTable items={data.items} t={t} />}
-              {mediaType === 'person' && <PersonTable items={data.items} t={t} />}
+              {mediaType === 'movie' && <MovieTable items={data.items} t={t} locale={locale} />}
+              {mediaType === 'tv' && <TvTable items={data.items} t={t} locale={locale} />}
+              {mediaType === 'person' && <PersonTable items={data.items} t={t} locale={locale} />}
             </>
           ) : null}
         </div>
 
         {/* Pagination */}
-        {data && data.totalPages > 1 && (
-          <div className="flex items-center justify-between px-6 py-4 border-t border-border">
-            <p className="text-sm text-foreground/50">
-              {t('pagination', {page: data.page, totalPages: data.totalPages, count: data.total})}
-            </p>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page <= 1}
-                className="px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground/70 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                {t('previous')}
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  setPage((p) => Math.min(data.totalPages, p + 1))
-                }
-                disabled={page >= data.totalPages}
-                className="px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground/70 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                {t('next')}
-              </button>
-            </div>
-          </div>
+        {data && (
+          <AdminPagination
+            page={data.page}
+            totalPages={data.totalPages}
+            total={data.total}
+            onPageChange={setPage}
+          />
         )}
       </div>
     </div>
