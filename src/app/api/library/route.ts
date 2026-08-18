@@ -4,6 +4,7 @@
 import {NextResponse} from 'next/server';
 import {auth} from '@/lib/auth/config';
 import {prisma} from '@/lib/db';
+import {getLocalizedField} from '@/lib/ingestion/translation-sync';
 import type {WatchStatus} from '../../../../generated/prisma/client';
 
 export async function GET(request: Request) {
@@ -17,6 +18,7 @@ export async function GET(request: Request) {
   const status = searchParams.get('status') as WatchStatus | null;
   const search = searchParams.get('search');
   const sortBy = searchParams.get('sortBy') ?? 'updatedAt';
+  const locale = searchParams.get('locale') ?? 'en';
 
   // Fetch annotations
   const annotations = await prisma.userAnnotation.findMany({
@@ -97,33 +99,95 @@ export async function GET(request: Request) {
   const movieMap = new Map(movies.map((m) => [m.id, m]));
   const tvMap = new Map(tvSeries.map((tv) => [tv.id, tv]));
 
+  // Resolve localized titles for all movies/TV
+  const [movieTranslations, tvTranslations] = await Promise.all([
+    movies.length > 0
+      ? prisma.translation.findMany({
+          where: {entityType: 'movie', entityId: {in: movies.map((m) => m.id)}},
+        })
+      : [],
+    tvSeries.length > 0
+      ? prisma.translation.findMany({
+          where: {entityType: 'tv', entityId: {in: tvSeries.map((t) => t.id)}},
+        })
+      : [],
+  ]);
+
+  // Group translations by entityId
+  const movieTransByEntity = new Map<number, typeof movieTranslations>();
+  for (const t of movieTranslations) {
+    const existing = movieTransByEntity.get(t.entityId) || [];
+    existing.push(t);
+    movieTransByEntity.set(t.entityId, existing);
+  }
+  const tvTransByEntity = new Map<number, typeof tvTranslations>();
+  for (const t of tvTranslations) {
+    const existing = tvTransByEntity.get(t.entityId) || [];
+    existing.push(t);
+    tvTransByEntity.set(t.entityId, existing);
+  }
+
   // Merge annotation + media data
-  const annotatedResults = annotations.map((a) => ({
-    ...a,
-    source: 'annotation' as const,
-    movie: a.entityType === 'MOVIE' ? movieMap.get(a.entityId) ?? null : null,
-    tvSeries: a.entityType === 'TV' ? tvMap.get(a.entityId) ?? null : null,
-  }));
+  const annotatedResults = annotations.map((a) => {
+    let localizedTitle = '';
+    if (a.entityType === 'MOVIE') {
+      const movie = movieMap.get(a.entityId);
+      if (movie) {
+        const trans = movieTransByEntity.get(movie.id) || [];
+        localizedTitle = getLocalizedField(trans, locale, 'name', movie.title) ?? movie.title;
+      }
+    } else if (a.entityType === 'TV') {
+      const tv = tvMap.get(a.entityId);
+      if (tv) {
+        const trans = tvTransByEntity.get(tv.id) || [];
+        localizedTitle = getLocalizedField(trans, locale, 'name', tv.name) ?? tv.name;
+      }
+    }
+    return {
+      ...a,
+      source: 'annotation' as const,
+      localizedTitle,
+      movie: a.entityType === 'MOVIE' ? movieMap.get(a.entityId) ?? null : null,
+      tvSeries: a.entityType === 'TV' ? tvMap.get(a.entityId) ?? null : null,
+    };
+  });
 
   // Merge watchlist items + media data (with WANT_TO_WATCH status)
-  const watchlistResults = unannotatedWatchlistItems.map((wi) => ({
-    id: -wi.id, // Negative ID to distinguish from annotations
-    userId: session.user!.id,
-    entityType: wi.entityType,
-    entityId: wi.entityId,
-    watchStatus: 'WANT_TO_WATCH' as const,
-    personalRating: null,
-    currentEpisode: null,
-    totalEpisodes: null,
-    notes: null,
-    watchDate: null,
-    createdAt: wi.createdAt,
-    updatedAt: wi.createdAt,
-    source: 'watchlist' as const,
-    watchlistName: wi.watchlist.name,
-    movie: wi.entityType === 'MOVIE' ? movieMap.get(wi.entityId) ?? null : null,
-    tvSeries: wi.entityType === 'TV' ? tvMap.get(wi.entityId) ?? null : null,
-  }));
+  const watchlistResults = unannotatedWatchlistItems.map((wi) => {
+    let localizedTitle = '';
+    if (wi.entityType === 'MOVIE') {
+      const movie = movieMap.get(wi.entityId);
+      if (movie) {
+        const trans = movieTransByEntity.get(movie.id) || [];
+        localizedTitle = getLocalizedField(trans, locale, 'name', movie.title) ?? movie.title;
+      }
+    } else if (wi.entityType === 'TV') {
+      const tv = tvMap.get(wi.entityId);
+      if (tv) {
+        const trans = tvTransByEntity.get(tv.id) || [];
+        localizedTitle = getLocalizedField(trans, locale, 'name', tv.name) ?? tv.name;
+      }
+    }
+    return {
+      id: -wi.id, // Negative ID to distinguish from annotations
+      userId: session.user!.id,
+      entityType: wi.entityType,
+      entityId: wi.entityId,
+      watchStatus: 'WANT_TO_WATCH' as const,
+      personalRating: null,
+      currentEpisode: null,
+      totalEpisodes: null,
+      notes: null,
+      watchDate: null,
+      createdAt: wi.createdAt,
+      updatedAt: wi.createdAt,
+      source: 'watchlist' as const,
+      localizedTitle,
+      watchlistName: wi.watchlist.name,
+      movie: wi.entityType === 'MOVIE' ? movieMap.get(wi.entityId) ?? null : null,
+      tvSeries: wi.entityType === 'TV' ? tvMap.get(wi.entityId) ?? null : null,
+    };
+  });
 
   const allResults = [...annotatedResults, ...watchlistResults];
 

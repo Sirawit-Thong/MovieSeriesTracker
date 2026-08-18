@@ -21,6 +21,7 @@ type LibraryItem = {
   watchDate: string | null;
   updatedAt: string;
   source?: 'annotation' | 'watchlist';
+  localizedTitle?: string;
   movie: {
     id: number;
     title: string;
@@ -111,6 +112,7 @@ export default function LibraryContent({locale}: {locale: string}) {
         if (filterStatus !== 'ALL') params.set('status', filterStatus);
         if (localSearch) params.set('search', localSearch);
         params.set('sortBy', sortBy);
+        params.set('locale', locale);
 
         const res = await fetch(`/api/library?${params.toString()}`);
         if (!res.ok) throw new Error('Failed to fetch library');
@@ -125,7 +127,7 @@ export default function LibraryContent({locale}: {locale: string}) {
 
     fetchLibrary();
     return () => { cancelled = true; };
-  }, [session, filterType, filterStatus, localSearch, sortBy]);
+  }, [session, filterType, filterStatus, localSearch, sortBy, locale]);
 
   // TMDB search with debounce
   const handleTmdbSearch = useCallback((query: string) => {
@@ -184,6 +186,7 @@ export default function LibraryContent({locale}: {locale: string}) {
   }
 
   const getTitle = (item: LibraryItem) => {
+    if (item.localizedTitle) return item.localizedTitle;
     if (item.entityType === 'MOVIE' && item.movie) return item.movie.title;
     if (item.entityType === 'TV' && item.tvSeries) return item.tvSeries.name;
     return 'Unknown';
