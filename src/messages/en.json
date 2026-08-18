@@ -349,7 +349,10 @@
       "rating": "Rating",
       "department": "Department",
       "lastFetched": "Last Fetched",
-      "noResults": "No results found."
+      "noResults": "No results found.",
+      "delete": "Delete",
+      "confirmDelete": "Delete this item?",
+      "deleteError": "Failed to delete item"
     },
     "syncPanel": {
       "title": "TMDB Sync",
@@ -365,7 +368,9 @@
       "processed": "Processed",
       "errorCount": "Errors",
       "duration": "Duration",
-      "networkError": "Network error — sync may still be running in the background"
+      "networkError": "Network error — sync may still be running in the background",
+      "all": "All",
+      "viewHistory": "View sync history"
     },
     "back": "Back",
     "delete": "Delete",
@@ -406,6 +411,17 @@
     },
     "loadError": "Failed to load data. Please try again.",
     "actionError": "Action failed. Please try again.",
-    "loadFailed": "Failed to load"
+    "loadFailed": "Failed to load",
+    "systemStatus": "System Status",
+    "lastSync": "Last Sync",
+    "neverSynced": "Never synced",
+    "runningNow": "Sync running now",
+    "bannedUsers": "Banned Users",
+    "staleContent": "Stale Content (7d+)",
+    "staleMovie": "movies",
+    "staleTv": "TV",
+    "stalePerson": "persons",
+    "failedLogins": "Failed Logins (7d)",
+    "viewHistory": "View history"
   }
 }

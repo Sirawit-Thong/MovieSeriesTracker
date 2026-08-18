@@ -349,7 +349,10 @@
       "rating": "คะแนน",
       "department": "แผนก",
       "lastFetched": "ดึงข้อมูลล่าสุด",
-      "noResults": "ไม่พบผลลัพธ์"
+      "noResults": "ไม่พบผลลัพธ์",
+      "delete": "ลบ",
+      "confirmDelete": "ยืนยันการลบรายการนี้?",
+      "deleteError": "ลบไม่สำเร็จ"
     },
     "syncPanel": {
       "title": "ซิงค์ TMDB",
@@ -365,7 +368,9 @@
       "processed": "ประมวลผล",
       "errorCount": "ข้อผิดพลาด",
       "duration": "ระยะเวลา",
-      "networkError": "เครือข่ายขัดข้อง — การซิงค์อาจยังทำงานอยู่ในพื้นหลัง"
+      "networkError": "เครือข่ายขัดข้อง — การซิงค์อาจยังทำงานอยู่ในพื้นหลัง",
+      "all": "ทั้งหมด",
+      "viewHistory": "ดูประวัติการซิงค์"
     },
     "back": "กลับ",
     "delete": "ลบ",
@@ -406,6 +411,17 @@
     },
     "loadError": "โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่",
     "actionError": "ดำเนินการไม่สำเร็จ กรุณาลองใหม่",
-    "loadFailed": "โหลดไม่สำเร็จ"
+    "loadFailed": "โหลดไม่สำเร็จ",
+    "systemStatus": "สถานะระบบ",
+    "lastSync": "ซิงค์ล่าสุด",
+    "neverSynced": "ยังไม่เคยซิงค์",
+    "runningNow": "กำลังซิงค์",
+    "bannedUsers": "ผู้ใช้ที่ถูกแบน",
+    "staleContent": "ข้อมูลเก่า (7 วันขึ้นไป)",
+    "staleMovie": "ภาพยนตร์",
+    "staleTv": "ซีรีส์",
+    "stalePerson": "บุคคล",
+    "failedLogins": "เข้าสู่ระบบล้มเหลว (7 วัน)",
+    "viewHistory": "ดูประวัติ"
   }
 }
