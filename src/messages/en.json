@@ -288,7 +288,10 @@
       "description": "Description",
       "items": "Items",
       "created": "Created",
-      "noWatchlists": "No watchlists found."
+      "noWatchlists": "No watchlists found.",
+      "delete": "Delete",
+      "confirmDelete": "Delete this watchlist?",
+      "deleteError": "Failed to delete watchlist"
     },
     "annotationsPage": {
       "title": "Annotations",
@@ -303,7 +306,17 @@
       "allStatuses": "All Statuses",
       "allTypes": "All Types",
       "noAnnotations": "No annotations found.",
-      "noNotes": "No notes"
+      "noNotes": "No notes",
+      "watched": "Watched",
+      "watching": "Watching",
+      "wantToWatch": "Want to Watch",
+      "dropped": "Dropped",
+      "movie": "Movie",
+      "tv": "TV",
+      "person": "Person",
+      "delete": "Delete",
+      "confirmDelete": "Delete this annotation?",
+      "deleteError": "Failed to delete annotation"
     },
     "syncHistoryPage": {
       "title": "Sync History",
@@ -390,6 +403,9 @@
       "allMethods": "All Methods",
       "loadingLogs": "Loading login logs...",
       "noLogs": "No login logs found."
-    }
+    },
+    "loadError": "Failed to load data. Please try again.",
+    "actionError": "Action failed. Please try again.",
+    "loadFailed": "Failed to load"
   }
 }

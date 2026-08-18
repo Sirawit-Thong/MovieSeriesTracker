@@ -288,7 +288,10 @@
       "description": "คำอธิบาย",
       "items": "รายการ",
       "created": "สร้างเมื่อ",
-      "noWatchlists": "ไม่พบ Watchlist"
+      "noWatchlists": "ไม่พบ Watchlist",
+      "delete": "ลบ",
+      "confirmDelete": "ยืนยันการลบรายการนี้?",
+      "deleteError": "ลบไม่สำเร็จ"
     },
     "annotationsPage": {
       "title": "ความคิดเห็น",
@@ -303,7 +306,17 @@
       "allStatuses": "ทุกสถานะ",
       "allTypes": "ทุกประเภท",
       "noAnnotations": "ไม่พบความคิดเห็น",
-      "noNotes": "ไม่มีบันทึก"
+      "noNotes": "ไม่มีบันทึก",
+      "watched": "ดูแล้ว",
+      "watching": "กำลังดู",
+      "wantToWatch": "อยากดู",
+      "dropped": "เลิกดู",
+      "movie": "ภาพยนตร์",
+      "tv": "ซีรีส์",
+      "person": "บุคคล",
+      "delete": "ลบ",
+      "confirmDelete": "ยืนยันการลบรายการนี้?",
+      "deleteError": "ลบไม่สำเร็จ"
     },
     "syncHistoryPage": {
       "title": "ประวัติการซิงค์",
@@ -390,6 +403,9 @@
       "allMethods": "ทุกวิธี",
       "loadingLogs": "กำลังโหลดประวัติการเข้าสู่ระบบ...",
       "noLogs": "ไม่พบประวัติการเข้าสู่ระบบ"
-    }
+    },
+    "loadError": "โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่",
+    "actionError": "ดำเนินการไม่สำเร็จ กรุณาลองใหม่",
+    "loadFailed": "โหลดไม่สำเร็จ"
   }
 }
