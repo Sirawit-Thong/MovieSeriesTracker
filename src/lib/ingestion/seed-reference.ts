@@ -138,8 +138,6 @@ export async function seedReferenceData(): Promise<{
   } catch (error) {
     console.error('[seed] Reference data seeding failed:', error);
     throw error;
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
