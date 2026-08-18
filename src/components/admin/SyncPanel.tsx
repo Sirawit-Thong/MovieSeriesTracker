@@ -1,15 +1,9 @@
 'use client';
 
 import {useState} from 'react';
+import {useTranslations} from 'next-intl';
 
 type EntityOption = 'all' | 'movies' | 'tv' | 'persons';
-
-const ENTITY_OPTIONS: {value: EntityOption; label: string}[] = [
-  {value: 'all', label: 'All'},
-  {value: 'movies', label: 'Movies'},
-  {value: 'tv', label: 'TV Series'},
-  {value: 'persons', label: 'Persons'},
-];
 
 type SyncResult = {
   success: boolean;
@@ -19,14 +13,23 @@ type SyncResult = {
 };
 
 export default function SyncPanel() {
+  const t = useTranslations('Admin');
   const [entity, setEntity] = useState<EntityOption>('all');
   const [limit, setLimit] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<SyncResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const entityOptions: {value: EntityOption; label: string}[] = [
+    {value: 'all', label: t('stats.movies').slice(0, 0) + 'All'},
+    {value: 'movies', label: t('stats.movies')},
+    {value: 'tv', label: t('stats.tvSeries')},
+    {value: 'persons', label: t('stats.persons')},
+  ];
+
   async function handleSync() {
-    if (!confirm(`Start syncing ${entity === 'all' ? 'all data' : entity}? This may take several minutes.`)) {
+    const entityLabel = entity === 'all' ? t('syncPanel.allData') : entity;
+    if (!confirm(t('syncPanel.confirmMessage', {entity: entityLabel}))) {
       return;
     }
 
@@ -54,7 +57,7 @@ export default function SyncPanel() {
         setError(data.error ?? `Sync failed (${res.status})`);
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Network error — sync may still be running in the background');
+      setError(e instanceof Error ? e.message : t('syncPanel.networkError'));
     } finally {
       setLoading(false);
     }
@@ -62,16 +65,16 @@ export default function SyncPanel() {
 
   return (
     <div className="bg-surface border border-border rounded-xl p-6">
-      <h2 className="text-lg font-semibold text-white">TMDB Sync</h2>
+      <h2 className="text-lg font-semibold text-white">{t('syncPanel.title')}</h2>
       <p className="mt-1 text-sm text-foreground/60">
-        Trigger a manual sync with The Movie Database.
+        {t('syncPanel.subtitle')}
       </p>
 
       {/* Controls */}
       <div className="mt-4 flex flex-wrap items-end gap-4">
         <div>
           <label htmlFor="entity-select" className="block text-xs font-medium text-foreground/50 mb-1">
-            Entity
+            {t('syncPanel.entity')}
           </label>
           <select
             id="entity-select"
@@ -80,7 +83,7 @@ export default function SyncPanel() {
             disabled={loading}
             className="px-3 py-2 text-sm bg-background border border-border rounded-lg text-foreground focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-50"
           >
-            {ENTITY_OPTIONS.map((opt) => (
+            {entityOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
               </option>
@@ -90,7 +93,7 @@ export default function SyncPanel() {
 
         <div>
           <label htmlFor="limit-input" className="block text-xs font-medium text-foreground/50 mb-1">
-            Limit (0 = all)
+            {t('syncPanel.limit')}
           </label>
           <input
             id="limit-input"
@@ -110,7 +113,7 @@ export default function SyncPanel() {
           disabled={loading}
           className="px-4 py-2 bg-primary hover:bg-primary-hover text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
         >
-          {loading ? 'Syncing...' : 'Sync Now'}
+          {loading ? t('syncPanel.syncing') : t('syncPanel.syncNow')}
         </button>
       </div>
 
@@ -122,7 +125,7 @@ export default function SyncPanel() {
       {result && (
         <div className="mt-4 space-y-2">
           <p className="text-sm text-green-400">
-            {result.message ?? 'Sync completed'} at {result.completedAt ? new Date(result.completedAt).toLocaleTimeString() : ''}
+            {result.message ?? t('syncPanel.completed')} {t('syncPanel.at')} {result.completedAt ? new Date(result.completedAt).toLocaleTimeString() : ''}
           </p>
           {result.results && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
@@ -133,7 +136,7 @@ export default function SyncPanel() {
                 >
                   <p className="font-medium text-foreground capitalize">{key}</p>
                   <p className="text-foreground/60 mt-1">
-                    Processed: {r.processed} | Errors: {r.errors} | Duration: {(r.duration / 1000).toFixed(1)}s
+                    {t('syncPanel.processed')}: {r.processed} | {t('syncPanel.errorCount')}: {r.errors} | {t('syncPanel.duration')}: {(r.duration / 1000).toFixed(1)}s
                   </p>
                 </div>
               ))}

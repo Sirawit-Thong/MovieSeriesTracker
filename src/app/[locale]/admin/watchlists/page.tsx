@@ -2,6 +2,7 @@
 
 import {useEffect, useState, useCallback} from 'react';
 import {Link} from '@/i18n/navigation';
+import {useTranslations} from 'next-intl';
 
 type Watchlist = {
   id: string;
@@ -24,6 +25,7 @@ type WatchlistsResponse = {
 };
 
 export default function AdminWatchlistsPage() {
+  const t = useTranslations('Admin');
   const [data, setData] = useState<WatchlistsResponse | null>(null);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -68,11 +70,11 @@ export default function AdminWatchlistsPage() {
             </svg>
           </Link>
           <h1 className="text-3xl font-bold text-white">
-            Watchlist Management
+            {t('watchlistsPage.title')}
           </h1>
         </div>
         <p className="mt-1 text-foreground/60">
-          Browse and manage user watchlists across the platform.
+          {t('watchlistsPage.subtitle')}
         </p>
       </div>
 
@@ -83,19 +85,19 @@ export default function AdminWatchlistsPage() {
             <thead>
               <tr className="border-b border-border">
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  User
+                  {t('watchlistsPage.user')}
                 </th>
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Name
+                  {t('watchlistsPage.watchlistName')}
                 </th>
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Description
+                  {t('watchlistsPage.description')}
                 </th>
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Items
+                  {t('watchlistsPage.items')}
                 </th>
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Created
+                  {t('watchlistsPage.created')}
                 </th>
               </tr>
             </thead>
@@ -126,7 +128,7 @@ export default function AdminWatchlistsPage() {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                         />
                       </svg>
-                      Loading watchlists...
+                      {t('loadingWatchlists')}
                     </div>
                   </td>
                 </tr>
@@ -170,7 +172,7 @@ export default function AdminWatchlistsPage() {
                     colSpan={5}
                     className="px-6 py-8 text-center text-foreground/40"
                   >
-                    No watchlists found.
+                    {t('watchlistsPage.noWatchlists')}
                   </td>
                 </tr>
               )}
@@ -182,7 +184,7 @@ export default function AdminWatchlistsPage() {
         {data && data.totalPages > 1 && (
           <div className="flex items-center justify-between px-6 py-4 border-t border-border">
             <p className="text-sm text-foreground/50">
-              Page {data.page} of {data.totalPages} ({data.total} watchlists)
+              {t('pagination', {page: data.page, totalPages: data.totalPages, count: data.total})}
             </p>
             <div className="flex gap-2">
               <button
@@ -191,7 +193,7 @@ export default function AdminWatchlistsPage() {
                 disabled={page <= 1}
                 className="px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground/70 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                Previous
+                {t('previous')}
               </button>
               <button
                 type="button"
@@ -201,7 +203,7 @@ export default function AdminWatchlistsPage() {
                 disabled={page >= data.totalPages}
                 className="px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground/70 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                Next
+                {t('next')}
               </button>
             </div>
           </div>

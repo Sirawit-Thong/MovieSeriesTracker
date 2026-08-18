@@ -2,6 +2,7 @@
 
 import {useEffect, useState, useCallback} from 'react';
 import {Link} from '@/i18n/navigation';
+import {useTranslations} from 'next-intl';
 
 type MediaItem = {
   id: string;
@@ -25,31 +26,31 @@ type MediaResponse = {
 
 type MediaType = 'movie' | 'tv' | 'person';
 
-const TYPE_TABS: {value: MediaType; label: string}[] = [
-  {value: 'movie', label: 'Movies'},
-  {value: 'tv', label: 'TV Series'},
-  {value: 'person', label: 'Persons'},
+const TYPE_TABS: {value: MediaType; labelKey: string}[] = [
+  {value: 'movie', labelKey: 'movies'},
+  {value: 'tv', labelKey: 'tvSeries'},
+  {value: 'person', labelKey: 'persons'},
 ];
 
-function MovieTable({items}: {items: MediaItem[]}) {
+function MovieTable({items, t}: {items: MediaItem[]; t: (key: string) => string}) {
   return (
     <table className="w-full text-sm">
       <thead>
         <tr className="border-b border-border">
           <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-            Title
+            {t('mediaPage.titleCol')}
           </th>
           <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-            TMDB ID
+            {t('mediaPage.tmdbId')}
           </th>
           <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-            Release Date
+            {t('mediaPage.releaseDate')}
           </th>
           <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-            Rating
+            {t('mediaPage.rating')}
           </th>
           <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-            Last Fetched
+            {t('mediaPage.lastFetched')}
           </th>
         </tr>
       </thead>
@@ -91,25 +92,25 @@ function MovieTable({items}: {items: MediaItem[]}) {
   );
 }
 
-function TvTable({items}: {items: MediaItem[]}) {
+function TvTable({items, t}: {items: MediaItem[]; t: (key: string) => string}) {
   return (
     <table className="w-full text-sm">
       <thead>
         <tr className="border-b border-border">
           <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-            Name
+            {t('mediaPage.nameCol')}
           </th>
           <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-            TMDB ID
+            {t('mediaPage.tmdbId')}
           </th>
           <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-            First Air Date
+            {t('mediaPage.firstAirDate')}
           </th>
           <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-            Rating
+            {t('mediaPage.rating')}
           </th>
           <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-            Last Fetched
+            {t('mediaPage.lastFetched')}
           </th>
         </tr>
       </thead>
@@ -151,22 +152,22 @@ function TvTable({items}: {items: MediaItem[]}) {
   );
 }
 
-function PersonTable({items}: {items: MediaItem[]}) {
+function PersonTable({items, t}: {items: MediaItem[]; t: (key: string) => string}) {
   return (
     <table className="w-full text-sm">
       <thead>
         <tr className="border-b border-border">
           <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-            Name
+            {t('mediaPage.nameCol')}
           </th>
           <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-            TMDB ID
+            {t('mediaPage.tmdbId')}
           </th>
           <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-            Department
+            {t('mediaPage.department')}
           </th>
           <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-            Last Fetched
+            {t('mediaPage.lastFetched')}
           </th>
         </tr>
       </thead>
@@ -200,6 +201,7 @@ function PersonTable({items}: {items: MediaItem[]}) {
 }
 
 export default function AdminMediaPage() {
+  const t = useTranslations('Admin');
   const [data, setData] = useState<MediaResponse | null>(null);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -241,13 +243,6 @@ export default function AdminMediaPage() {
     fetchMedia(1, mediaType, query);
   }
 
-  const totalLabel =
-    mediaType === 'movie'
-      ? 'movies'
-      : mediaType === 'tv'
-        ? 'series'
-        : 'persons';
-
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
       {/* Header */}
@@ -271,10 +266,10 @@ export default function AdminMediaPage() {
               />
             </svg>
           </Link>
-          <h1 className="text-3xl font-bold text-white">Media Browser</h1>
+          <h1 className="text-3xl font-bold text-white">{t('mediaPage.title')}</h1>
         </div>
         <p className="mt-1 text-foreground/60">
-          Browse movies, TV series, and persons in the database.
+          {t('mediaPage.subtitle')}
         </p>
       </div>
 
@@ -292,7 +287,7 @@ export default function AdminMediaPage() {
                   : 'text-foreground/60 hover:text-white'
               }`}
             >
-              {tab.label}
+              {t(`mediaPage.${tab.labelKey}`)}
             </button>
           ))}
         </div>
@@ -301,14 +296,14 @@ export default function AdminMediaPage() {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder={`Search ${totalLabel}...`}
+            placeholder={t('mediaPage.searchPlaceholder')}
             className="flex-1 px-4 py-2 text-sm rounded-lg bg-background border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:border-primary/50 transition-colors"
           />
           <button
             type="submit"
             className="px-4 py-2 text-sm font-medium rounded-lg bg-primary text-white hover:bg-primary/80 transition-colors"
           >
-            Search
+            {t('searchButton')}
           </button>
         </form>
       </div>
@@ -338,18 +333,18 @@ export default function AdminMediaPage() {
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                   />
                 </svg>
-                Loading media...
+                {t('loadingMedia')}
               </div>
             </div>
           ) : data && data.items.length === 0 ? (
             <div className="px-6 py-8 text-center text-foreground/40">
-              No {totalLabel} found.
+              {t('mediaPage.noResults')}
             </div>
           ) : data ? (
             <>
-              {mediaType === 'movie' && <MovieTable items={data.items} />}
-              {mediaType === 'tv' && <TvTable items={data.items} />}
-              {mediaType === 'person' && <PersonTable items={data.items} />}
+              {mediaType === 'movie' && <MovieTable items={data.items} t={t} />}
+              {mediaType === 'tv' && <TvTable items={data.items} t={t} />}
+              {mediaType === 'person' && <PersonTable items={data.items} t={t} />}
             </>
           ) : null}
         </div>
@@ -358,7 +353,7 @@ export default function AdminMediaPage() {
         {data && data.totalPages > 1 && (
           <div className="flex items-center justify-between px-6 py-4 border-t border-border">
             <p className="text-sm text-foreground/50">
-              Page {data.page} of {data.totalPages} ({data.total} {totalLabel})
+              {t('pagination', {page: data.page, totalPages: data.totalPages, count: data.total})}
             </p>
             <div className="flex gap-2">
               <button
@@ -367,7 +362,7 @@ export default function AdminMediaPage() {
                 disabled={page <= 1}
                 className="px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground/70 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                Previous
+                {t('previous')}
               </button>
               <button
                 type="button"
@@ -377,7 +372,7 @@ export default function AdminMediaPage() {
                 disabled={page >= data.totalPages}
                 className="px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground/70 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                Next
+                {t('next')}
               </button>
             </div>
           </div>

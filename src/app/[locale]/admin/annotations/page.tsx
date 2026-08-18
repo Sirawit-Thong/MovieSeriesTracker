@@ -2,6 +2,7 @@
 
 import {useEffect, useState, useCallback} from 'react';
 import {Link} from '@/i18n/navigation';
+import {useTranslations} from 'next-intl';
 
 type Annotation = {
   id: string;
@@ -26,7 +27,7 @@ type AnnotationsResponse = {
 };
 
 const STATUS_OPTIONS = [
-  {value: '', label: 'All Statuses'},
+  {value: '', labelKey: 'allStatuses'},
   {value: 'WATCHED', label: 'Watched'},
   {value: 'WATCHING', label: 'Watching'},
   {value: 'WANT_TO_WATCH', label: 'Want to Watch'},
@@ -34,13 +35,14 @@ const STATUS_OPTIONS = [
 ];
 
 const ENTITY_TYPE_OPTIONS = [
-  {value: '', label: 'All Types'},
+  {value: '', labelKey: 'allTypes'},
   {value: 'MOVIE', label: 'Movie'},
   {value: 'TV', label: 'TV'},
   {value: 'PERSON', label: 'Person'},
 ];
 
 export default function AdminAnnotationsPage() {
+  const t = useTranslations('Admin');
   const [data, setData] = useState<AnnotationsResponse | null>(null);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -102,10 +104,10 @@ export default function AdminAnnotationsPage() {
               />
             </svg>
           </Link>
-          <h1 className="text-3xl font-bold text-white">Annotations</h1>
+          <h1 className="text-3xl font-bold text-white">{t('annotationsPage.title')}</h1>
         </div>
         <p className="mt-1 text-foreground/60">
-          View and manage user annotations, ratings, and watch statuses.
+          {t('annotationsPage.subtitle')}
         </p>
       </div>
 
@@ -118,7 +120,7 @@ export default function AdminAnnotationsPage() {
         >
           {STATUS_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
-              {opt.label}
+              {opt.labelKey ? t(`annotationsPage.${opt.labelKey}`) : opt.label}
             </option>
           ))}
         </select>
@@ -129,7 +131,7 @@ export default function AdminAnnotationsPage() {
         >
           {ENTITY_TYPE_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
-              {opt.label}
+              {opt.labelKey ? t(`annotationsPage.${opt.labelKey}`) : opt.label}
             </option>
           ))}
         </select>
@@ -142,25 +144,25 @@ export default function AdminAnnotationsPage() {
             <thead>
               <tr className="border-b border-border">
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  User
+                  {t('annotationsPage.user')}
                 </th>
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Type
+                  {t('annotationsPage.type')}
                 </th>
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  ID
+                  {t('annotationsPage.entityId')}
                 </th>
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Status
+                  {t('annotationsPage.status')}
                 </th>
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Rating
+                  {t('annotationsPage.rating')}
                 </th>
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Notes
+                  {t('annotationsPage.notes')}
                 </th>
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Created
+                  {t('annotationsPage.created')}
                 </th>
               </tr>
             </thead>
@@ -191,7 +193,7 @@ export default function AdminAnnotationsPage() {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                         />
                       </svg>
-                      Loading annotations...
+                      {t('loadingAnnotations')}
                     </div>
                   </td>
                 </tr>
@@ -258,7 +260,7 @@ export default function AdminAnnotationsPage() {
                     colSpan={7}
                     className="px-6 py-8 text-center text-foreground/40"
                   >
-                    No annotations found.
+                    {t('annotationsPage.noAnnotations')}
                   </td>
                 </tr>
               )}
@@ -270,7 +272,7 @@ export default function AdminAnnotationsPage() {
         {data && data.totalPages > 1 && (
           <div className="flex items-center justify-between px-6 py-4 border-t border-border">
             <p className="text-sm text-foreground/50">
-              Page {data.page} of {data.totalPages} ({data.total} annotations)
+              {t('pagination', {page: data.page, totalPages: data.totalPages, count: data.total})}
             </p>
             <div className="flex gap-2">
               <button
@@ -279,7 +281,7 @@ export default function AdminAnnotationsPage() {
                 disabled={page <= 1}
                 className="px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground/70 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                Previous
+                {t('previous')}
               </button>
               <button
                 type="button"
@@ -289,7 +291,7 @@ export default function AdminAnnotationsPage() {
                 disabled={page >= data.totalPages}
                 className="px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground/70 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                Next
+                {t('next')}
               </button>
             </div>
           </div>

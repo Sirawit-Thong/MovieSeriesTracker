@@ -1,4 +1,4 @@
-import {setRequestLocale} from 'next-intl/server';
+import {setRequestLocale, getTranslations} from 'next-intl/server';
 import {Link} from '@/i18n/navigation';
 import prisma from '@/lib/db';
 import SyncPanel from '@/components/admin/SyncPanel';
@@ -12,6 +12,8 @@ type AdminPageProps = {
 export default async function AdminDashboardPage({params}: AdminPageProps) {
   const {locale} = await params;
   setRequestLocale(locale);
+
+  const t = await getTranslations('Admin');
 
   const [stats, recentUsers] = await Promise.all([
     Promise.all([
@@ -39,16 +41,16 @@ export default async function AdminDashboardPage({params}: AdminPageProps) {
   ]);
 
   const statCards = [
-    {label: 'Users', value: stats.users, href: '/admin/users'},
-    {label: 'Movies', value: stats.movies, href: '/admin/media?type=movies'},
-    {label: 'TV Series', value: stats.tvSeries, href: '/admin/media?type=tv'},
-    {label: 'Persons', value: stats.persons, href: '/admin/media?type=persons'},
+    {label: t('stats.users'), value: stats.users, href: '/admin/users'},
+    {label: t('stats.movies'), value: stats.movies, href: '/admin/media?type=movies'},
+    {label: t('stats.tvSeries'), value: stats.tvSeries, href: '/admin/media?type=tv'},
+    {label: t('stats.persons'), value: stats.persons, href: '/admin/media?type=persons'},
   ];
 
   const adminSections = [
     {
-      title: 'User Management',
-      description: 'View, search, and manage user accounts and roles.',
+      title: t('sections.users'),
+      description: t('sections.usersDesc'),
       href: '/admin/users',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -57,8 +59,8 @@ export default async function AdminDashboardPage({params}: AdminPageProps) {
       ),
     },
     {
-      title: 'Watchlists',
-      description: 'Browse and manage all user watchlists.',
+      title: t('sections.watchlists'),
+      description: t('sections.watchlistsDesc'),
       href: '/admin/watchlists',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -67,8 +69,8 @@ export default async function AdminDashboardPage({params}: AdminPageProps) {
       ),
     },
     {
-      title: 'Annotations',
-      description: 'View and moderate user reviews and watch status.',
+      title: t('sections.annotations'),
+      description: t('sections.annotationsDesc'),
       href: '/admin/annotations',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,8 +79,8 @@ export default async function AdminDashboardPage({params}: AdminPageProps) {
       ),
     },
     {
-      title: 'Media Browser',
-      description: 'Search and browse movies, TV series, and persons.',
+      title: t('sections.media'),
+      description: t('sections.mediaDesc'),
       href: '/admin/media',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -87,8 +89,8 @@ export default async function AdminDashboardPage({params}: AdminPageProps) {
       ),
     },
     {
-      title: 'Sync History',
-      description: 'View past sync operations and their results.',
+      title: t('sections.syncHistory'),
+      description: t('sections.syncHistoryDesc'),
       href: '/admin/sync-history',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -102,9 +104,9 @@ export default async function AdminDashboardPage({params}: AdminPageProps) {
     <div className="max-w-7xl mx-auto px-4 py-10">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white">Admin Dashboard</h1>
+        <h1 className="text-3xl font-bold text-white">{t('dashboard.title')}</h1>
         <p className="mt-1 text-foreground/60">
-          Manage users, content, and monitor system status.
+          {t('dashboard.subtitle')}
         </p>
       </div>
 
@@ -128,7 +130,7 @@ export default async function AdminDashboardPage({params}: AdminPageProps) {
 
       {/* Admin Sections */}
       <div className="mb-10">
-        <h2 className="text-lg font-semibold text-white mb-4">Management</h2>
+        <h2 className="text-lg font-semibold text-white mb-4">{t('dashboard.management')}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {adminSections.map((section) => (
             <Link
@@ -157,12 +159,12 @@ export default async function AdminDashboardPage({params}: AdminPageProps) {
       {/* Recent Users */}
       <div className="bg-surface border border-border rounded-xl overflow-hidden mb-10">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-          <h2 className="text-lg font-semibold text-white">Recent Users</h2>
+          <h2 className="text-lg font-semibold text-white">{t('recentUsers')}</h2>
           <Link
             href="/admin/users"
             className="text-sm text-primary hover:text-primary-hover transition-colors"
           >
-            View all
+            {t('viewAll')}
           </Link>
         </div>
         <div className="overflow-x-auto">
@@ -170,16 +172,16 @@ export default async function AdminDashboardPage({params}: AdminPageProps) {
             <thead>
               <tr className="border-b border-border">
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Name
+                  {t('name')}
                 </th>
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Email
+                  {t('email')}
                 </th>
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Role
+                  {t('role')}
                 </th>
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Joined
+                  {t('joined')}
                 </th>
               </tr>
             </thead>
@@ -221,7 +223,7 @@ export default async function AdminDashboardPage({params}: AdminPageProps) {
                     colSpan={4}
                     className="px-6 py-8 text-center text-foreground/40"
                   >
-                    No users found.
+                    {t('noUsers')}
                   </td>
                 </tr>
               )}

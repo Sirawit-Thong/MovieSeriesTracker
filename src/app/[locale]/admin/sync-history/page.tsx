@@ -2,6 +2,7 @@
 
 import {useEffect, useState, useCallback} from 'react';
 import {Link} from '@/i18n/navigation';
+import {useTranslations} from 'next-intl';
 
 type SyncLog = {
   id: string;
@@ -22,18 +23,20 @@ type SyncLogsResponse = {
   totalPages: number;
 };
 
-function StatusBadge({status}: {status: string}) {
+function StatusBadge({status, t}: {status: string; t: (key: string) => string}) {
   const styles: Record<string, string> = {
     running: 'bg-yellow-500/15 text-yellow-400',
     completed: 'bg-green-500/15 text-green-400',
     failed: 'bg-red-500/15 text-red-400',
   };
 
+  const labelKey = `syncHistoryPage.${status}` as const;
+
   return (
     <span
       className={`inline-block px-2.5 py-0.5 text-xs font-medium rounded-full ${styles[status] ?? 'bg-foreground/10 text-foreground/60'}`}
     >
-      {status}
+      {t(labelKey)}
     </span>
   );
 }
@@ -45,6 +48,7 @@ function formatDuration(ms: number | null): string {
 }
 
 export default function AdminSyncHistoryPage() {
+  const t = useTranslations('Admin');
   const [data, setData] = useState<SyncLogsResponse | null>(null);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -88,10 +92,10 @@ export default function AdminSyncHistoryPage() {
               />
             </svg>
           </Link>
-          <h1 className="text-3xl font-bold text-white">Sync History</h1>
+          <h1 className="text-3xl font-bold text-white">{t('syncHistoryPage.title')}</h1>
         </div>
         <p className="mt-1 text-foreground/60">
-          Track data synchronization jobs, their status, and performance.
+          {t('syncHistoryPage.subtitle')}
         </p>
       </div>
 
@@ -102,25 +106,25 @@ export default function AdminSyncHistoryPage() {
             <thead>
               <tr className="border-b border-border">
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Entity
+                  {t('syncHistoryPage.entity')}
                 </th>
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Status
+                  {t('syncHistoryPage.status')}
                 </th>
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Processed
+                  {t('syncHistoryPage.processed')}
                 </th>
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Errors
+                  {t('syncHistoryPage.errors')}
                 </th>
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Duration
+                  {t('syncHistoryPage.duration')}
                 </th>
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Started
+                  {t('syncHistoryPage.started')}
                 </th>
                 <th className="text-left px-6 py-3 text-foreground/50 font-medium">
-                  Ended
+                  {t('syncHistoryPage.ended')}
                 </th>
               </tr>
             </thead>
@@ -151,7 +155,7 @@ export default function AdminSyncHistoryPage() {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                         />
                       </svg>
-                      Loading sync logs...
+                      {t('loadingSyncLogs')}
                     </div>
                   </td>
                 </tr>
@@ -167,7 +171,7 @@ export default function AdminSyncHistoryPage() {
                     </span>
                   </td>
                   <td className="px-6 py-3">
-                    <StatusBadge status={log.status} />
+                    <StatusBadge status={log.status} t={t} />
                   </td>
                   <td className="px-6 py-3 text-foreground/70">
                     {log.processedCount.toLocaleString()}
@@ -210,7 +214,7 @@ export default function AdminSyncHistoryPage() {
                     colSpan={7}
                     className="px-6 py-8 text-center text-foreground/40"
                   >
-                    No sync logs found.
+                    {t('syncHistoryPage.noLogs')}
                   </td>
                 </tr>
               )}
@@ -222,7 +226,7 @@ export default function AdminSyncHistoryPage() {
         {data && data.totalPages > 1 && (
           <div className="flex items-center justify-between px-6 py-4 border-t border-border">
             <p className="text-sm text-foreground/50">
-              Page {data.page} of {data.totalPages} ({data.total} logs)
+              {t('pagination', {page: data.page, totalPages: data.totalPages, count: data.total})}
             </p>
             <div className="flex gap-2">
               <button
@@ -231,7 +235,7 @@ export default function AdminSyncHistoryPage() {
                 disabled={page <= 1}
                 className="px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground/70 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                Previous
+                {t('previous')}
               </button>
               <button
                 type="button"
@@ -241,7 +245,7 @@ export default function AdminSyncHistoryPage() {
                 disabled={page >= data.totalPages}
                 className="px-3 py-1.5 text-sm rounded-lg bg-background border border-border text-foreground/70 hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                Next
+                {t('next')}
               </button>
             </div>
           </div>

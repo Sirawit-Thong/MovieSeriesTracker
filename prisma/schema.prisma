@@ -1052,6 +1052,7 @@ model User {
   passwordHash  String?   @map("password_hash")
   image         String?
   role          String    @default("USER")
+  banned        Boolean   @default(false)
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 

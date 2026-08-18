@@ -1,6 +1,8 @@
 // Admin Users API Route
-// GET  /api/admin/users       — List all users with pagination (admin only)
-// PUT  /api/admin/users       — Update a user's role (admin only)
+// GET    /api/admin/users       — List all users with pagination (admin only)
+// PUT    /api/admin/users       — Update a user's role (admin only)
+// DELETE /api/admin/users       — Delete a user (admin only)
+// PATCH  /api/admin/users       — Ban/unban a user (admin only)
 
 import {NextResponse} from 'next/server';
 import {requireAdmin} from '@/lib/admin';
@@ -43,6 +45,7 @@ export async function GET(request: Request) {
           name: true,
           email: true,
           role: true,
+          banned: true,
           createdAt: true,
         },
         orderBy: {createdAt: 'desc'},
@@ -116,6 +119,7 @@ export async function PUT(request: Request) {
         name: true,
         email: true,
         role: true,
+        banned: true,
         createdAt: true,
       },
     });
@@ -123,6 +127,106 @@ export async function PUT(request: Request) {
     return NextResponse.json(updatedUser);
   } catch (error) {
     log.error('Failed to update user', error);
+    return NextResponse.json(
+      {error: 'Internal server error'},
+      {status: 500},
+    );
+  }
+}
+
+// ── DELETE ───────────────────────────────────────────────────
+
+export async function DELETE(request: Request) {
+  try {
+    const authResult = await requireAdmin();
+    if (authResult.response) return authResult.response;
+    const sessionUser = authResult.user;
+
+    const {searchParams} = new URL(request.url);
+    const userId = searchParams.get('userId');
+
+    if (!userId || typeof userId !== 'string') {
+      return NextResponse.json(
+        {error: 'userId is required'},
+        {status: 400},
+      );
+    }
+
+    // Prevent self-deletion
+    if (userId === sessionUser.id) {
+      return NextResponse.json(
+        {error: 'Cannot delete your own account'},
+        {status: 400},
+      );
+    }
+
+    await prisma.user.delete({where: {id: userId}});
+
+    return NextResponse.json({success: true});
+  } catch (error) {
+    log.error('Failed to delete user', error);
+    return NextResponse.json(
+      {error: 'Internal server error'},
+      {status: 500},
+    );
+  }
+}
+
+// ── PATCH ────────────────────────────────────────────────────
+
+export async function PATCH(request: Request) {
+  try {
+    const authResult = await requireAdmin();
+    if (authResult.response) return authResult.response;
+    const sessionUser = authResult.user;
+
+    let body: Record<string, unknown>;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({error: 'Invalid JSON body'}, {status: 400});
+    }
+
+    const {userId, banned} = body;
+
+    if (!userId || typeof userId !== 'string') {
+      return NextResponse.json(
+        {error: 'userId is required and must be a string'},
+        {status: 400},
+      );
+    }
+
+    if (typeof banned !== 'boolean') {
+      return NextResponse.json(
+        {error: 'banned must be a boolean'},
+        {status: 400},
+      );
+    }
+
+    // Prevent self-ban
+    if (userId === sessionUser.id) {
+      return NextResponse.json(
+        {error: 'Cannot ban your own account'},
+        {status: 400},
+      );
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: {id: userId},
+      data: {banned},
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        banned: true,
+        createdAt: true,
+      },
+    });
+
+    return NextResponse.json(updatedUser);
+  } catch (error) {
+    log.error('Failed to update user ban status', error);
     return NextResponse.json(
       {error: 'Internal server error'},
       {status: 500},
