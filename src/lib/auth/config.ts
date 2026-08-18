@@ -45,6 +45,19 @@ providers.push(
         return null;
       }
 
+      if (user.banned) {
+        await recordLogin({
+          userId: user.id,
+          email: user.email,
+          name: user.name,
+          method: 'credentials',
+          request,
+          success: false,
+          reason: 'Banned',
+        });
+        return null;
+      }
+
       const isValid = await verifyPassword(
         credentials.password as string,
         user.passwordHash,

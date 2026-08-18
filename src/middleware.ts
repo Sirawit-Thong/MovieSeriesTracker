@@ -2,6 +2,7 @@ import createMiddleware from 'next-intl/middleware';
 import {routing} from './i18n/routing';
 import {NextResponse} from 'next/server';
 import type {NextRequest} from 'next/server';
+import {auth} from './lib/auth/config';
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -59,18 +60,27 @@ function applyRateLimit(request: NextRequest): NextResponse | null {
   return null;
 }
 
-export function middleware(request: NextRequest) {
+export const middleware = auth((request) => {
   const rateLimitResponse = applyRateLimit(request);
   if (rateLimitResponse) return rateLimitResponse;
 
   if (request.nextUrl.pathname.startsWith('/api')) return NextResponse.next();
 
+  const user = request.auth?.user as
+    | (Record<string, unknown> & {banned?: boolean})
+    | undefined;
+  if (user?.banned) {
+    const locale = request.nextUrl.pathname.startsWith('/th') ? 'th' : 'en';
+    return NextResponse.redirect(new URL(`/${locale}/login?error=banned`, request.nextUrl));
+  }
+
   return intlMiddleware(request);
-}
+});
 
 export const config = {
   matcher: [
     '/((?!api|_next|_vercel|.*\\..*).*)',
     '/api/:path*',
   ],
+  runtime: 'nodejs',
 };
