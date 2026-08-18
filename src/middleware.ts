@@ -26,7 +26,7 @@ function getRateLimitConfig(pathname: string) {
 function applyRateLimit(request: NextRequest): NextResponse | null {
   const {pathname} = request.nextUrl;
 
-  if (!pathname.startsWith('/api/')) return null;
+  if (!pathname.startsWith('/api')) return null;
 
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0] || 'anonymous';
   const key = `${ip}:${pathname}`;
@@ -63,7 +63,7 @@ export function middleware(request: NextRequest) {
   const rateLimitResponse = applyRateLimit(request);
   if (rateLimitResponse) return rateLimitResponse;
 
-  if (request.nextUrl.pathname.startsWith('/api/')) return NextResponse.next();
+  if (request.nextUrl.pathname.startsWith('/api')) return NextResponse.next();
 
   return intlMiddleware(request);
 }
