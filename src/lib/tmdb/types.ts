@@ -627,6 +627,7 @@ export interface TmdbClientConfig {
   language?: string;
   region?: string;
   timeout?: number;
+  rateLimiter?: import('./rate-limiter').TmdbRateLimiter;
 }
 
 export interface TmdbRateLimitConfig {

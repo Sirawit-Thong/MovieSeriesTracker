@@ -89,4 +89,6 @@ export class TmdbRateLimiter {
   }
 }
 
+export const globalTmdbRateLimiter = new TmdbRateLimiter();
+
 export default TmdbRateLimiter;

@@ -1,7 +1,7 @@
 // TMDB API Client
 // Comprehensive client with rate limiting and retry logic
 
-import { TmdbRateLimiter } from './rate-limiter';
+import { TmdbRateLimiter, globalTmdbRateLimiter } from './rate-limiter';
 import type {
   TmdbClientConfig,
   TmdbRetryConfig,
@@ -53,7 +53,7 @@ export class TmdbClient {
     this.region = config.region || 'US';
     this.timeout = config.timeout || 30000;
 
-    this.rateLimiter = new TmdbRateLimiter();
+    this.rateLimiter = config.rateLimiter ?? globalTmdbRateLimiter;
 
     this.retryConfig = {
       maxRetries: retryConfig.maxRetries || 3,
