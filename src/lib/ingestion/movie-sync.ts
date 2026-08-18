@@ -53,62 +53,70 @@ function buildMovieCreateData(tmdbMovie: TmdbMovie) {
 // ============================================================
 
 async function ensureGenresExist(genres: TmdbMovie['genres']) {
-  for (const genre of genres) {
-    await prisma.genre.upsert({
-      where: { id: genre.id },
-      create: { id: genre.id, name: genre.name },
-      update: { name: genre.name },
-    });
-  }
+  await Promise.all(
+    genres.map((genre) =>
+      prisma.genre.upsert({
+        where: {id: genre.id},
+        create: {id: genre.id, name: genre.name},
+        update: {name: genre.name},
+      })
+    )
+  );
 }
 
 async function ensureProductionCompaniesExist(
   companies: TmdbMovie['production_companies'],
 ) {
-  for (const company of companies) {
-    await prisma.productionCompany.upsert({
-      where: { id: company.id },
-      create: {
-        id: company.id,
-        logoPath: company.logo_path ?? '',
-        name: company.name,
-        originCountry: company.origin_country,
-      },
-      update: {
-        logoPath: company.logo_path ?? '',
-        name: company.name,
-        originCountry: company.origin_country,
-      },
-    });
-  }
+  await Promise.all(
+    companies.map((company) =>
+      prisma.productionCompany.upsert({
+        where: { id: company.id },
+        create: {
+          id: company.id,
+          logoPath: company.logo_path ?? '',
+          name: company.name,
+          originCountry: company.origin_country,
+        },
+        update: {
+          logoPath: company.logo_path ?? '',
+          name: company.name,
+          originCountry: company.origin_country,
+        },
+      })
+    )
+  );
 }
 
 async function ensureProductionCountriesExist(
   countries: TmdbMovie['production_countries'],
 ) {
-  for (const country of countries) {
-    await prisma.productionCountry.upsert({
-      where: { iso31661: country.iso_3166_1 },
-      create: { iso31661: country.iso_3166_1, name: country.name },
-      update: { name: country.name },
-    });
-  }
+  await Promise.all(
+    countries.map((country) =>
+      prisma.productionCountry.upsert({
+        where: { iso31661: country.iso_3166_1 },
+        create: { iso31661: country.iso_3166_1, name: country.name },
+        update: { name: country.name },
+      })
+    )
+  );
 }
 
 async function ensureSpokenLanguagesExist(
   languages: TmdbMovie['spoken_languages'],
 ) {
-  for (const lang of languages) {
-    await prisma.spokenLanguage.upsert({
-      where: { englishName: lang.english_name },
-      create: {
-        englishName: lang.english_name,
-        iso6391: lang.iso_639_1,
-        name: lang.name,
-      },
-      update: { iso6391: lang.iso_639_1, name: lang.name },
-    });
-  }
+  await Promise.all(
+    languages.map((lang) =>
+      prisma.spokenLanguage.upsert({
+        where: { englishName: lang.english_name },
+        create: {
+          englishName: lang.english_name,
+          iso6391: lang.iso_639_1,
+          name: lang.name,
+        },
+        update: { iso6391: lang.iso_639_1, name: lang.name },
+      })
+    )
+  );
 }
 
 async function ensureCollectionExists(
