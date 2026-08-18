@@ -1,6 +1,7 @@
 import {setRequestLocale, getTranslations} from 'next-intl/server';
 import {Link} from '@/i18n/navigation';
 import prisma from '@/lib/db';
+import {formatDate} from '@/lib/format-date';
 import SyncPanel from '@/components/admin/SyncPanel';
 
 export const dynamic = 'force-dynamic';
@@ -9,13 +10,10 @@ type AdminPageProps = {
   params: Promise<{locale: string}>;
 };
 
-export default async function AdminDashboardPage({params}: AdminPageProps) {
-  const {locale} = await params;
-  setRequestLocale(locale);
+async function loadDashboardData() {
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
-  const t = await getTranslations('Admin');
-
-  const [stats, recentUsers] = await Promise.all([
+  const [stats, recentUsers, lastSync, runningSyncs, bannedUserCount, staleMovies, staleTv, stalePersons, failedLogins] = await Promise.all([
     Promise.all([
       prisma.user.count(),
       prisma.movie.count(),
@@ -38,7 +36,25 @@ export default async function AdminDashboardPage({params}: AdminPageProps) {
       orderBy: {createdAt: 'desc'},
       take: 10,
     }),
+    prisma.syncLog.findFirst({orderBy: {startedAt: 'desc'}}),
+    prisma.syncLog.count({where: {status: 'running'}}),
+    prisma.user.count({where: {banned: true}}),
+    prisma.movie.count({where: {OR: [{lastFetchedAt: null}, {lastFetchedAt: {lt: sevenDaysAgo}}]}}),
+    prisma.tvSeries.count({where: {OR: [{lastFetchedAt: null}, {lastFetchedAt: {lt: sevenDaysAgo}}]}}),
+    prisma.person.count({where: {OR: [{lastFetchedAt: null}, {lastFetchedAt: {lt: sevenDaysAgo}}]}}),
+    prisma.loginLog.count({where: {success: false, createdAt: {gte: sevenDaysAgo}}}),
   ]);
+
+  return {stats, recentUsers, lastSync, runningSyncs, bannedUserCount, staleMovies, staleTv, stalePersons, failedLogins};
+}
+
+export default async function AdminDashboardPage({params}: AdminPageProps) {
+  const {locale} = await params;
+  setRequestLocale(locale);
+
+  const t = await getTranslations('Admin');
+
+  const {stats, recentUsers, lastSync, runningSyncs, bannedUserCount, staleMovies, staleTv, stalePersons, failedLogins} = await loadDashboardData();
 
   const statCards = [
     {label: t('stats.users'), value: stats.users, href: '/admin/users'},
@@ -98,6 +114,16 @@ export default async function AdminDashboardPage({params}: AdminPageProps) {
         </svg>
       ),
     },
+    {
+      title: t('sections.watchlists'),
+      description: t('sections.watchlistsDesc'),
+      href: '/admin/watchlists',
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+        </svg>
+      ),
+    },
   ];
 
   return (
@@ -126,6 +152,84 @@ export default async function AdminDashboardPage({params}: AdminPageProps) {
             </p>
           </Link>
         ))}
+      </div>
+
+      <div className="mb-10">
+        <h2 className="text-lg font-semibold text-white mb-4">{t('systemStatus')}</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="bg-surface border border-border rounded-xl p-4">
+            <p className="text-sm font-medium text-foreground/60">{t('lastSync')}</p>
+            {lastSync ? (
+              <div className="mt-2 space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-foreground/10 text-foreground/60">
+                    {lastSync.entity}
+                  </span>
+                  <span
+                    className={`inline-block px-2.5 py-0.5 text-xs font-medium rounded-full ${
+                      lastSync.status === 'completed'
+                        ? 'bg-green-500/15 text-green-400'
+                        : lastSync.status === 'failed'
+                          ? 'bg-red-500/15 text-red-400'
+                          : 'bg-blue-500/15 text-blue-400'
+                    }`}
+                  >
+                    {t(`syncHistoryPage.${lastSync.status}`)}
+                  </span>
+                </div>
+                <p className="text-xs text-foreground/60">
+                  {t('syncHistoryPage.processed')}: {lastSync.processed} | {t('syncHistoryPage.errors')}: {lastSync.errors}
+                </p>
+                <p className="text-xs text-foreground/60">{formatDate(lastSync.startedAt, locale)}</p>
+              </div>
+            ) : (
+              <p className="mt-2 text-sm text-foreground/60">{t('neverSynced')}</p>
+            )}
+          </div>
+
+          <div className="bg-surface border border-border rounded-xl p-4">
+            <p className="text-sm font-medium text-foreground/60">{t('syncHistoryPage.running')}</p>
+            {runningSyncs > 0 ? (
+              <div className="mt-2 flex items-center gap-2 text-sm text-blue-400">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500" />
+                </span>
+                {t('runningNow')}
+              </div>
+            ) : (
+              <p className="mt-2 text-sm text-foreground/60">—</p>
+            )}
+          </div>
+
+          <Link
+            href="/admin/users"
+            className="bg-surface border border-border rounded-xl p-4 hover:border-primary/40 transition-colors"
+          >
+            <p className="text-sm font-medium text-foreground/60">{t('bannedUsers')}</p>
+            <p className="mt-2 text-2xl font-bold text-white">{bannedUserCount.toLocaleString()}</p>
+          </Link>
+
+          <div className="bg-surface border border-border rounded-xl p-4">
+            <p className="text-sm font-medium text-foreground/60">{t('staleContent')}</p>
+            <p className="mt-2 text-2xl font-bold text-white">
+              {(staleMovies + staleTv + stalePersons).toLocaleString()}
+            </p>
+            <p className="mt-1 text-xs text-foreground/60">
+              {staleMovies} {t('staleMovie')} · {staleTv} {t('staleTv')} · {stalePersons} {t('stalePerson')}
+            </p>
+          </div>
+
+          <Link
+            href="/admin/login-history"
+            className="bg-surface border border-border rounded-xl p-4 hover:border-primary/40 transition-colors"
+          >
+            <p className="text-sm font-medium text-foreground/60">{t('failedLogins')}</p>
+            <p className={`mt-2 text-2xl font-bold ${failedLogins > 0 ? 'text-red-400' : 'text-white'}`}>
+              {failedLogins.toLocaleString()}
+            </p>
+          </Link>
+        </div>
       </div>
 
       {/* Admin Sections */}

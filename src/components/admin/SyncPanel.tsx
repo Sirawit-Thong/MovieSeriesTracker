@@ -2,6 +2,7 @@
 
 import {useState} from 'react';
 import {useTranslations} from 'next-intl';
+import {Link} from '@/i18n/navigation';
 
 type EntityOption = 'all' | 'movies' | 'tv' | 'persons';
 
@@ -21,7 +22,7 @@ export default function SyncPanel() {
   const [error, setError] = useState<string | null>(null);
 
   const entityOptions: {value: EntityOption; label: string}[] = [
-    {value: 'all', label: t('stats.movies').slice(0, 0) + 'All'},
+    {value: 'all', label: t('syncPanel.all')},
     {value: 'movies', label: t('stats.movies')},
     {value: 'tv', label: t('stats.tvSeries')},
     {value: 'persons', label: t('stats.persons')},
@@ -143,6 +144,12 @@ export default function SyncPanel() {
             </div>
           )}
         </div>
+      )}
+
+      {result && (
+        <Link href="/admin/sync-history" className="mt-3 inline-block text-sm text-primary hover:underline">
+          {t('syncPanel.viewHistory')}
+        </Link>
       )}
     </div>
   );
