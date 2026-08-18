@@ -21,9 +21,11 @@ export async function GET(request: Request) {
   const locale = searchParams.get('locale') ?? 'en';
   const countryRaw = searchParams.getAll('country');
   const countryCodes = countryRaw.length > 0 ? countryRaw : null;
+  const limit = Math.min(Math.max(Number(searchParams.get('limit')) || 100, 1), 500);
 
   // Fetch annotations
   const annotations = await prisma.userAnnotation.findMany({
+    take: limit,
     where: {
       userId: session.user.id,
       ...(entityType ? {entityType} : {}),
@@ -38,6 +40,7 @@ export async function GET(request: Request) {
 
   // Fetch watchlist items (treated as WANT_TO_WATCH if not already annotated)
   const watchlistItems = await prisma.watchlistItem.findMany({
+    take: limit,
     where: {
       watchlist: {userId: session.user.id},
       ...(entityType ? {entityType: entityType === 'MOVIE' ? 'MOVIE' : 'TV'} : {}),
