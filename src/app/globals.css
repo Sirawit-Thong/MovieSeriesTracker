@@ -10,6 +10,7 @@
   --color-border: #2a2a3e;
   --color-surface: #141428;
   --color-surface-hover: #1e1e3a;
+  --spacing-safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 body {
@@ -20,6 +21,7 @@ body {
     Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
 /* Smooth scrolling */
@@ -53,4 +55,9 @@ html {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Safe area padding for bottom nav on notch phones */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }

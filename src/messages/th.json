@@ -5,7 +5,8 @@
     "tvSeries": "ซีรีส์",
     "people": "บุคคล",
     "search": "ค้นหา",
-    "library": "คลังของฉัน"
+    "library": "คลังของฉัน",
+    "profile": "โปรไฟล์"
   },
   "Common": {
     "loading": "กำลังโหลด...",

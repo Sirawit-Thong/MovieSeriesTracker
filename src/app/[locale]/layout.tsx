@@ -7,6 +7,7 @@ import {notFound} from 'next/navigation';
 import '../globals.css';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import BottomNav from '@/components/layout/BottomNav';
 import SessionProvider from '@/components/providers/SessionProvider';
 
 export function generateStaticParams() {
@@ -18,7 +19,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: '#3b82f6',
+  themeColor: '#0a0a0a',
+  viewportFit: 'cover',
 };
 
 export async function generateMetadata(
@@ -89,8 +91,9 @@ export default async function LocaleLayout({
         <SessionProvider>
           <NextIntlClientProvider messages={messages}>
             <Header />
-            <main className="flex-1 pt-16">{children}</main>
+            <main className="flex-1 pt-14 md:pt-16 pb-14 md:pb-0">{children}</main>
             <Footer />
+            <BottomNav />
           </NextIntlClientProvider>
         </SessionProvider>
       </body>

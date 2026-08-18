@@ -102,26 +102,26 @@ function HomePageContent({
   const tNav = useTranslations('Navigation');
 
   return (
-    <div className="min-h-[calc(100vh-4rem)]">
+    <div className="min-h-[calc(100vh-3.5rem)] md:min-h-[calc(100vh-4rem)]">
       {/* Hero Section */}
-      <section className="relative flex flex-col items-center justify-center py-24 px-4 text-center">
+      <section className="relative flex flex-col items-center justify-center py-14 md:py-24 px-4 text-center">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
-        <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-4 bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
+        <h1 className="text-3xl md:text-6xl font-bold tracking-tight mb-3 md:mb-4 bg-gradient-to-r from-white to-white/60 bg-clip-text text-transparent">
           {t('title')}
         </h1>
-        <p className="text-lg md:text-xl text-foreground/60 max-w-2xl mb-8">
+        <p className="text-base md:text-xl text-foreground/60 max-w-2xl mb-6 md:mb-8">
           {t('subtitle')}
         </p>
-        <div className="flex gap-4">
+        <div className="flex gap-3 md:gap-4">
           <Link
             href="/movies"
-            className="px-6 py-3 bg-primary hover:bg-primary-hover text-white font-medium rounded-lg transition-colors"
+            className="px-5 md:px-6 py-2.5 md:py-3 bg-primary hover:bg-primary-hover text-white text-sm md:text-base font-medium rounded-lg transition-colors"
           >
             {tNav('movies')}
           </Link>
           <Link
             href="/tv-series"
-            className="px-6 py-3 bg-surface hover:bg-surface-hover text-foreground font-medium rounded-lg border border-border transition-colors"
+            className="px-5 md:px-6 py-2.5 md:py-3 bg-surface hover:bg-surface-hover text-foreground text-sm md:text-base font-medium rounded-lg border border-border transition-colors"
           >
             {tNav('tvSeries')}
           </Link>

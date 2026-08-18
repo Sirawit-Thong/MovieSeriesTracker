@@ -25,13 +25,13 @@ export default function Header() {
   const t = useTranslations('Navigation');
   const pathname = usePathname();
   const {data: session} = useSession();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [headerSearch, setHeaderSearch] = useState('');
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const mobileSearchRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
-  // Close user menu on outside click
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
@@ -44,21 +44,28 @@ export default function Header() {
     }
   }, [userMenuOpen]);
 
+  useEffect(() => {
+    if (mobileSearchOpen && mobileSearchRef.current) {
+      mobileSearchRef.current.focus();
+    }
+  }, [mobileSearchOpen]);
+
   const handleHeaderSearch = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     const q = headerSearch.trim();
     if (q) {
+      setMobileSearchOpen(false);
       router.push(`/search?q=${encodeURIComponent(q)}`);
     }
   }, [headerSearch, router]);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
-      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-        {/* Logo / App Name */}
+      <div className="max-w-7xl mx-auto px-4 h-14 md:h-16 flex items-center justify-between">
+        {/* Logo */}
         <Link
           href="/"
-          className="text-xl font-bold text-white hover:text-primary transition-colors"
+          className="text-xl font-bold text-white hover:text-primary transition-colors shrink-0"
         >
           <span className="text-primary">M</span>ST
         </Link>
@@ -203,155 +210,53 @@ export default function Header() {
           )}
         </div>
 
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 text-foreground/70 hover:text-white transition-colors"
-          aria-label="Toggle menu"
-        >
-          {mobileMenuOpen ? (
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
+        {/* Mobile: Search + Language */}
+        <div className="flex md:hidden items-center gap-2">
+          <LanguageSwitcher />
+          <button
+            onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
+            className="p-2 text-foreground/70 hover:text-white transition-colors"
+            aria-label="Search"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-          ) : (
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          )}
-        </button>
+          </button>
+        </div>
       </div>
 
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
+      {/* Mobile Search Overlay */}
+      {mobileSearchOpen && (
         <div className="md:hidden bg-background border-t border-border">
-          <nav className="flex flex-col p-4 gap-1">
-            {/* Mobile Search */}
-            <form onSubmit={handleHeaderSearch} className="mb-2">
-              <div className="relative">
-                <input
-                  type="text"
-                  value={headerSearch}
-                  onChange={(e) => setHeaderSearch(e.target.value)}
-                  placeholder={t('search')}
-                  className="w-full pl-8 pr-3 py-2.5 text-sm bg-surface border border-border rounded-lg
-                    text-foreground placeholder:text-foreground/40 focus:outline-none focus:border-primary/50
-                    focus:ring-1 focus:ring-primary/20 transition-all"
-                />
-                <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-foreground/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-            </form>
-            {NAV_LINKS.map(({key, href}) => {
-              const isActive =
-                pathname === href || pathname.startsWith(href + '/');
-              return (
-                <Link
-                  key={key}
-                  href={href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-primary text-white'
-                      : 'text-foreground/70 hover:text-white hover:bg-surface-hover'
-                  }`}
-                >
-                  {t(key)}
-                </Link>
-              );
-            })}
-            {isAdmin(session) && (
-              <Link
-                href="/admin"
-                onClick={() => setMobileMenuOpen(false)}
-                className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                  pathname === '/admin' || pathname.startsWith('/admin/')
-                    ? 'bg-primary text-white'
-                    : 'text-foreground/70 hover:text-white hover:bg-surface-hover'
-                }`}
+          <form onSubmit={handleHeaderSearch} className="p-3">
+            <div className="relative">
+              <input
+                ref={mobileSearchRef}
+                type="text"
+                value={headerSearch}
+                onChange={(e) => setHeaderSearch(e.target.value)}
+                placeholder={t('search')}
+                className="w-full pl-8 pr-10 py-2.5 text-sm bg-surface border border-border rounded-lg
+                  text-foreground placeholder:text-foreground/40 focus:outline-none focus:border-primary/50
+                  focus:ring-1 focus:ring-primary/20 transition-all"
+              />
+              <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-foreground/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileSearchOpen(false);
+                  setHeaderSearch('');
+                }}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-foreground/40 hover:text-foreground"
               >
-                Admin
-              </Link>
-            )}
-            {session?.user && AUTH_NAV_LINKS.map(({key, href}) => {
-              const isActive = pathname === href || pathname.startsWith(href + '/');
-              return (
-                <Link
-                  key={key}
-                  href={href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-primary text-white'
-                      : 'text-foreground/70 hover:text-white hover:bg-surface-hover'
-                  }`}
-                >
-                  {t(key)}
-                </Link>
-              );
-            })}
-            <div className="mt-2 pt-2 border-t border-border">
-              <LanguageSwitcher />
-              {session?.user ? (
-                <>
-                  <Link
-                    href="/profile"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block px-4 py-3 rounded-lg text-sm font-medium text-foreground/70 hover:text-white hover:bg-surface-hover transition-colors"
-                  >
-                    Profile
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      signOut({callbackUrl: '/'});
-                    }}
-                    className="w-full text-left px-4 py-3 rounded-lg text-sm font-medium text-foreground/70 hover:text-white hover:bg-surface-hover transition-colors"
-                  >
-                    Sign out
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link
-                    href="/login"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block px-4 py-3 rounded-lg text-sm font-medium text-foreground/70 hover:text-white hover:bg-surface-hover transition-colors"
-                  >
-                    Sign in
-                  </Link>
-                  <Link
-                    href="/register"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block px-4 py-3 rounded-lg text-sm font-medium bg-primary text-white hover:bg-primary-hover transition-colors"
-                  >
-                    Sign up
-                  </Link>
-                </>
-              )}
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
-          </nav>
+          </form>
         </div>
       )}
     </header>

@@ -5,7 +5,8 @@
     "tvSeries": "TV Series",
     "people": "People",
     "search": "Search",
-    "library": "My Library"
+    "library": "My Library",
+    "profile": "Profile"
   },
   "Common": {
     "loading": "Loading...",

@@ -125,7 +125,8 @@ function HorizontalScroll({
 
 /**
  * Section wrapper that displays a title and a grid of MediaCards.
- * Supports both responsive grid and horizontal-scroll modes.
+ * On mobile: vertical 2-column grid (top-to-bottom scroll).
+ * On desktop (md+): horizontal scroll if `horizontal` is true, otherwise grid.
  */
 export default function MediaSection({
   title,
@@ -137,42 +138,60 @@ export default function MediaSection({
   if (!items || items.length === 0) return null;
 
   return (
-    <section className="w-full py-8">
+    <section className="w-full py-6 md:py-8">
       {/* Section header */}
-      <div className="max-w-7xl mx-auto px-4 mb-4">
-        <h2 className="text-xl md:text-2xl font-bold text-foreground">
+      <div className="max-w-7xl mx-auto px-4 mb-3 md:mb-4">
+        <h2 className="text-lg md:text-2xl font-bold text-foreground">
           {title}
-          <span className="block mt-1 h-0.5 w-12 bg-primary rounded" />
+          <span className="block mt-1 h-0.5 w-10 md:w-12 bg-primary rounded" />
         </h2>
       </div>
 
-      {/* Content container */}
-      {horizontal ? (
-        <div className="max-w-7xl mx-auto">
-          <HorizontalScroll
-            items={items}
-            type={type}
-            localizedTitles={localizedTitles}
-          />
+      {/* Mobile: always vertical grid */}
+      <div className="md:hidden px-4">
+        <div className="grid grid-cols-2 gap-3">
+          {items.map((item) => (
+            <MediaCard
+              key={item.id}
+              tmdbId={item.tmdbId}
+              title={localizedTitles[item.tmdbId] || item.title || item.name || ''}
+              posterPath={item.posterPath}
+              voteAverage={item.voteAverage}
+              type={type}
+              releaseDate={item.releaseDate ?? item.firstAirDate}
+            />
+          ))}
         </div>
-      ) : (
-        /* Responsive grid */
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
-            {items.map((item) => (
-              <MediaCard
-                key={item.id}
-                tmdbId={item.tmdbId}
-                title={localizedTitles[item.tmdbId] || item.title || item.name || ''}
-                posterPath={item.posterPath}
-                voteAverage={item.voteAverage}
-                type={type}
-                releaseDate={item.releaseDate ?? item.firstAirDate}
-              />
-            ))}
+      </div>
+
+      {/* Desktop: horizontal scroll or grid */}
+      <div className="hidden md:block">
+        {horizontal ? (
+          <div className="max-w-7xl mx-auto">
+            <HorizontalScroll
+              items={items}
+              type={type}
+              localizedTitles={localizedTitles}
+            />
           </div>
-        </div>
-      )}
+        ) : (
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
+              {items.map((item) => (
+                <MediaCard
+                  key={item.id}
+                  tmdbId={item.tmdbId}
+                  title={localizedTitles[item.tmdbId] || item.title || item.name || ''}
+                  posterPath={item.posterPath}
+                  voteAverage={item.voteAverage}
+                  type={type}
+                  releaseDate={item.releaseDate ?? item.firstAirDate}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </section>
   );
 }
