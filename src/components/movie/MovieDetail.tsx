@@ -1,5 +1,6 @@
 'use client';
 
+import {useState} from 'react';
 import TmdbImage from '@/components/ui/TmdbImage';
 import {useTranslations} from 'next-intl';
 import {Link} from '@/i18n/navigation';
@@ -220,6 +221,10 @@ export default function MovieDetail({movie, locale}: MovieDetailProps) {
   const languages = movie.spokenLanguages.map((sl) => sl.language);
   const cast = deduplicateByPersonId(movie.castCredits);
   const crew = deduplicateByPersonId(movie.crewCredits);
+
+  const [showAllCrew, setShowAllCrew] = useState(false);
+  const CREW_COLLAPSE_LIMIT = 20;
+  const visibleCrew = showAllCrew ? crew : crew.slice(0, CREW_COLLAPSE_LIMIT);
 
   // Group release dates by country
   const releaseDatesByCountry = movie.releaseDates.reduce<Record<string, typeof movie.releaseDates>>(
@@ -669,7 +674,7 @@ export default function MovieDetail({movie, locale}: MovieDetailProps) {
                   {t('crew')}
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                  {crew.map((credit) => (
+                  {visibleCrew.map((credit) => (
                     <Link
                       key={credit.id}
                       href={`/person/${credit.person.tmdbId}`}
@@ -702,6 +707,15 @@ export default function MovieDetail({movie, locale}: MovieDetailProps) {
                     </Link>
                   ))}
                 </div>
+                {crew.length > CREW_COLLAPSE_LIMIT && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAllCrew((v) => !v)}
+                    className="mt-4 px-4 py-2 bg-surface border border-border rounded-lg text-sm text-foreground/70 hover:text-white hover:bg-surface-hover transition-colors"
+                  >
+                    {showAllCrew ? t('showLess') : t('showMore')}
+                  </button>
+                )}
               </div>
             )}
 

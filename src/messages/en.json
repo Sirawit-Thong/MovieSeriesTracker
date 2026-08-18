@@ -102,6 +102,8 @@
     "collection": "Belongs to Collection",
     "cast": "Cast",
     "crew": "Crew",
+    "showMore": "Show more",
+    "showLess": "Show less",
     "originalLanguage": "Original Language",
     "originCountry": "Origin Country",
     "externalLinks": "External Links",
