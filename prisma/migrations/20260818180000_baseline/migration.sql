@@ -1,3 +1,6 @@
+-- CreateSchema
+CREATE SCHEMA IF NOT EXISTS "public";
+
 -- CreateEnum
 CREATE TYPE "WatchStatus" AS ENUM ('WATCHED', 'WATCHING', 'WANT_TO_WATCH', 'DROPPED');
 
@@ -149,6 +152,7 @@ CREATE TABLE "movies" (
     "video" BOOLEAN NOT NULL DEFAULT false,
     "vote_average" DOUBLE PRECISION,
     "vote_count" INTEGER,
+    "last_fetched_at" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "collectionId" INTEGER,
@@ -176,6 +180,7 @@ CREATE TABLE "movie_keywords" (
 CREATE TABLE "movie_watch_providers" (
     "movieId" INTEGER NOT NULL,
     "providerId" INTEGER NOT NULL,
+    "provider_type" TEXT DEFAULT 'flatrate',
 
     CONSTRAINT "movie_watch_providers_pkey" PRIMARY KEY ("movieId","providerId")
 );
@@ -298,6 +303,7 @@ CREATE TABLE "tv_series" (
     "type" TEXT,
     "vote_average" DOUBLE PRECISION,
     "vote_count" INTEGER,
+    "last_fetched_at" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "last_episode_to_air_id" INTEGER,
@@ -444,6 +450,7 @@ CREATE TABLE "persons" (
     "place_of_birth" TEXT,
     "popularity" DOUBLE PRECISION,
     "profile_path" TEXT,
+    "last_fetched_at" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -459,6 +466,10 @@ CREATE TABLE "cast_credits" (
     "character" TEXT,
     "credit_id" TEXT,
     "order" INTEGER,
+    "gender" INTEGER,
+    "popularity" DOUBLE PRECISION,
+    "profile_path" TEXT,
+    "original_name" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -474,6 +485,10 @@ CREATE TABLE "crew_credits" (
     "department" TEXT,
     "job" TEXT,
     "credit_id" TEXT,
+    "gender" INTEGER,
+    "popularity" DOUBLE PRECISION,
+    "profile_path" TEXT,
+    "original_name" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -490,6 +505,17 @@ CREATE TABLE "person_combined_credits" (
     "department" TEXT,
     "job" TEXT,
     "credit_id" TEXT,
+    "title" TEXT,
+    "overview" TEXT,
+    "popularity" DOUBLE PRECISION,
+    "release_date" TEXT,
+    "vote_average" DOUBLE PRECISION,
+    "vote_count" INTEGER,
+    "poster_path" TEXT,
+    "backdrop_path" TEXT,
+    "genre_ids" TEXT,
+    "adult" BOOLEAN DEFAULT false,
+    "video" BOOLEAN DEFAULT false,
 
     CONSTRAINT "person_combined_credits_pkey" PRIMARY KEY ("id")
 );
@@ -597,11 +623,13 @@ CREATE TABLE "reviews" (
 -- CreateTable
 CREATE TABLE "user_annotations" (
     "id" SERIAL NOT NULL,
-    "userId" TEXT NOT NULL DEFAULT 'local',
+    "userId" TEXT NOT NULL,
     "entityType" TEXT NOT NULL,
     "entityId" INTEGER NOT NULL,
     "watchStatus" "WatchStatus",
     "personalRating" INTEGER,
+    "current_episode" INTEGER,
+    "total_episodes" INTEGER,
     "notes" TEXT,
     "watchDate" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -615,7 +643,7 @@ CREATE TABLE "watchlists" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
-    "userId" TEXT NOT NULL DEFAULT 'local',
+    "userId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -634,7 +662,7 @@ CREATE TABLE "watchlist_items" (
 );
 
 -- CreateTable
-CREATE TABLE "accounts" (
+CREATE TABLE "tmdb_accounts" (
     "id" SERIAL NOT NULL,
     "tmdbId" INTEGER NOT NULL,
     "username" TEXT NOT NULL,
@@ -647,7 +675,7 @@ CREATE TABLE "accounts" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "accounts_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "tmdb_accounts_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -710,6 +738,97 @@ CREATE TABLE "trending_items" (
     "fetchedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "trending_items_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "tv_series_watch_providers" (
+    "tvSeriesId" INTEGER NOT NULL,
+    "providerId" INTEGER NOT NULL,
+    "provider_type" TEXT DEFAULT 'flatrate',
+
+    CONSTRAINT "tv_series_watch_providers_pkey" PRIMARY KEY ("tvSeriesId","providerId")
+);
+
+-- CreateTable
+CREATE TABLE "sync_logs" (
+    "id" SERIAL NOT NULL,
+    "entity" TEXT NOT NULL,
+    "status" TEXT NOT NULL,
+    "processed" INTEGER NOT NULL DEFAULT 0,
+    "errors" INTEGER NOT NULL DEFAULT 0,
+    "duration" INTEGER,
+    "details" TEXT,
+    "started_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "ended_at" TIMESTAMP(3),
+
+    CONSTRAINT "sync_logs_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "login_logs" (
+    "id" TEXT NOT NULL,
+    "user_id" TEXT,
+    "email" TEXT NOT NULL,
+    "name" TEXT,
+    "method" TEXT NOT NULL,
+    "ip" VARCHAR(45),
+    "user_agent" TEXT,
+    "success" BOOLEAN NOT NULL DEFAULT true,
+    "reason" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "login_logs_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "users" (
+    "id" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "email_verified" TIMESTAMP(3),
+    "name" TEXT,
+    "password_hash" TEXT,
+    "image" TEXT,
+    "role" TEXT NOT NULL DEFAULT 'USER',
+    "banned" BOOLEAN NOT NULL DEFAULT false,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "accounts" (
+    "id" TEXT NOT NULL,
+    "user_id" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "provider" TEXT NOT NULL,
+    "provider_account_id" TEXT NOT NULL,
+    "refresh_token" TEXT,
+    "access_token" TEXT,
+    "expires_at" INTEGER,
+    "token_type" TEXT,
+    "scope" TEXT,
+    "id_token" TEXT,
+    "session_state" TEXT,
+
+    CONSTRAINT "accounts_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "sessions" (
+    "id" TEXT NOT NULL,
+    "session_token" TEXT NOT NULL,
+    "user_id" TEXT NOT NULL,
+    "expires" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "sessions_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "verification_tokens" (
+    "identifier" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
+    "expires" TIMESTAMP(3) NOT NULL
 );
 
 -- CreateIndex
@@ -881,7 +1000,7 @@ CREATE INDEX "watchlist_items_watchlistId_idx" ON "watchlist_items"("watchlistId
 CREATE UNIQUE INDEX "watchlist_items_watchlistId_entityType_entityId_key" ON "watchlist_items"("watchlistId", "entityType", "entityId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "accounts_tmdbId_key" ON "accounts"("tmdbId");
+CREATE UNIQUE INDEX "tmdb_accounts_tmdbId_key" ON "tmdb_accounts"("tmdbId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "tmdb_favorites_accountId_entityType_mediaId_key" ON "tmdb_favorites"("accountId", "entityType", "mediaId");
@@ -900,6 +1019,33 @@ CREATE INDEX "trending_items_timeWindow_position_idx" ON "trending_items"("timeW
 
 -- CreateIndex
 CREATE UNIQUE INDEX "trending_items_mediaType_mediaId_timeWindow_key" ON "trending_items"("mediaType", "mediaId", "timeWindow");
+
+-- CreateIndex
+CREATE INDEX "sync_logs_started_at_idx" ON "sync_logs"("started_at");
+
+-- CreateIndex
+CREATE INDEX "login_logs_user_id_idx" ON "login_logs"("user_id");
+
+-- CreateIndex
+CREATE INDEX "login_logs_created_at_idx" ON "login_logs"("created_at");
+
+-- CreateIndex
+CREATE INDEX "login_logs_email_idx" ON "login_logs"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "accounts_provider_provider_account_id_key" ON "accounts"("provider", "provider_account_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "sessions_session_token_key" ON "sessions"("session_token");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "verification_tokens_token_key" ON "verification_tokens"("token");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "verification_tokens_identifier_token_key" ON "verification_tokens"("identifier", "token");
 
 -- AddForeignKey
 ALTER TABLE "production_companies" ADD CONSTRAINT "production_companies_parent_company_id_fkey" FOREIGN KEY ("parent_company_id") REFERENCES "production_companies"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -1040,16 +1186,37 @@ ALTER TABLE "crew_credits" ADD CONSTRAINT "crew_credits_tvSeriesId_fkey" FOREIGN
 ALTER TABLE "person_combined_credits" ADD CONSTRAINT "person_combined_credits_personId_fkey" FOREIGN KEY ("personId") REFERENCES "persons"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "user_annotations" ADD CONSTRAINT "user_annotations_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "watchlists" ADD CONSTRAINT "watchlists_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "watchlist_items" ADD CONSTRAINT "watchlist_items_watchlistId_fkey" FOREIGN KEY ("watchlistId") REFERENCES "watchlists"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "tmdb_favorites" ADD CONSTRAINT "tmdb_favorites_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "accounts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "tmdb_favorites" ADD CONSTRAINT "tmdb_favorites_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "tmdb_accounts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "tmdb_ratings" ADD CONSTRAINT "tmdb_ratings_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "accounts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "tmdb_ratings" ADD CONSTRAINT "tmdb_ratings_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "tmdb_accounts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "tmdb_watchlists" ADD CONSTRAINT "tmdb_watchlists_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "accounts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "tmdb_watchlists" ADD CONSTRAINT "tmdb_watchlists_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "tmdb_accounts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "tmdb_lists" ADD CONSTRAINT "tmdb_lists_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "accounts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "tmdb_lists" ADD CONSTRAINT "tmdb_lists_accountId_fkey" FOREIGN KEY ("accountId") REFERENCES "tmdb_accounts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "tv_series_watch_providers" ADD CONSTRAINT "tv_series_watch_providers_tvSeriesId_fkey" FOREIGN KEY ("tvSeriesId") REFERENCES "tv_series"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "tv_series_watch_providers" ADD CONSTRAINT "tv_series_watch_providers_providerId_fkey" FOREIGN KEY ("providerId") REFERENCES "watch_providers"("provider_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "login_logs" ADD CONSTRAINT "login_logs_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "accounts" ADD CONSTRAINT "accounts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "sessions" ADD CONSTRAINT "sessions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
