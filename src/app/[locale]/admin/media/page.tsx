@@ -8,6 +8,7 @@ import {formatDate} from '@/lib/format-date';
 import AdminPagination from '@/components/admin/AdminPagination';
 import AdminSpinner from '@/components/admin/AdminSpinner';
 import AdminEmptyState from '@/components/admin/AdminEmptyState';
+import ConfirmButton from '@/components/admin/ConfirmButton';
 
 type MediaItem = {
   id: string;
@@ -37,7 +38,7 @@ const TYPE_TABS: {value: MediaType; labelKey: string}[] = [
   {value: 'person', labelKey: 'persons'},
 ];
 
-function MovieTable({items, t, locale}: {items: MediaItem[]; t: (key: string) => string; locale: string}) {
+function MovieTable({items, t, locale, onDelete}: {items: MediaItem[]; t: (key: string) => string; locale: string; onDelete: (item: MediaItem) => void}) {
   return (
     <table className="w-full text-sm">
       <thead>
@@ -56,6 +57,9 @@ function MovieTable({items, t, locale}: {items: MediaItem[]; t: (key: string) =>
           </th>
           <th className="text-left px-6 py-3 text-foreground/50 font-medium">
             {t('mediaPage.lastFetched')}
+          </th>
+          <th className="text-left px-6 py-3 text-foreground/50 font-medium">
+            {t('actions')}
           </th>
         </tr>
       </thead>
@@ -87,6 +91,14 @@ function MovieTable({items, t, locale}: {items: MediaItem[]; t: (key: string) =>
             <td className="px-6 py-3 text-foreground/60">
               {formatDate(item.lastFetchedAt, locale)}
             </td>
+            <td className="px-6 py-3">
+              <ConfirmButton
+                onConfirm={() => onDelete(item)}
+                confirmLabel={t('mediaPage.confirmDelete')}
+              >
+                {t('mediaPage.delete')}
+              </ConfirmButton>
+            </td>
           </tr>
         ))}
       </tbody>
@@ -94,7 +106,7 @@ function MovieTable({items, t, locale}: {items: MediaItem[]; t: (key: string) =>
   );
 }
 
-function TvTable({items, t, locale}: {items: MediaItem[]; t: (key: string) => string; locale: string}) {
+function TvTable({items, t, locale, onDelete}: {items: MediaItem[]; t: (key: string) => string; locale: string; onDelete: (item: MediaItem) => void}) {
   return (
     <table className="w-full text-sm">
       <thead>
@@ -113,6 +125,9 @@ function TvTable({items, t, locale}: {items: MediaItem[]; t: (key: string) => st
           </th>
           <th className="text-left px-6 py-3 text-foreground/50 font-medium">
             {t('mediaPage.lastFetched')}
+          </th>
+          <th className="text-left px-6 py-3 text-foreground/50 font-medium">
+            {t('actions')}
           </th>
         </tr>
       </thead>
@@ -144,6 +159,14 @@ function TvTable({items, t, locale}: {items: MediaItem[]; t: (key: string) => st
             <td className="px-6 py-3 text-foreground/60">
               {formatDate(item.lastFetchedAt, locale)}
             </td>
+            <td className="px-6 py-3">
+              <ConfirmButton
+                onConfirm={() => onDelete(item)}
+                confirmLabel={t('mediaPage.confirmDelete')}
+              >
+                {t('mediaPage.delete')}
+              </ConfirmButton>
+            </td>
           </tr>
         ))}
       </tbody>
@@ -151,7 +174,7 @@ function TvTable({items, t, locale}: {items: MediaItem[]; t: (key: string) => st
   );
 }
 
-function PersonTable({items, t, locale}: {items: MediaItem[]; t: (key: string) => string; locale: string}) {
+function PersonTable({items, t, locale, onDelete}: {items: MediaItem[]; t: (key: string) => string; locale: string; onDelete: (item: MediaItem) => void}) {
   return (
     <table className="w-full text-sm">
       <thead>
@@ -167,6 +190,9 @@ function PersonTable({items, t, locale}: {items: MediaItem[]; t: (key: string) =
           </th>
           <th className="text-left px-6 py-3 text-foreground/50 font-medium">
             {t('mediaPage.lastFetched')}
+          </th>
+          <th className="text-left px-6 py-3 text-foreground/50 font-medium">
+            {t('actions')}
           </th>
         </tr>
       </thead>
@@ -193,6 +219,14 @@ function PersonTable({items, t, locale}: {items: MediaItem[]; t: (key: string) =
             <td className="px-6 py-3 text-foreground/60">
               {formatDate(item.lastFetchedAt, locale)}
             </td>
+            <td className="px-6 py-3">
+              <ConfirmButton
+                onConfirm={() => onDelete(item)}
+                confirmLabel={t('mediaPage.confirmDelete')}
+              >
+                {t('mediaPage.delete')}
+              </ConfirmButton>
+            </td>
           </tr>
         ))}
       </tbody>
@@ -213,6 +247,7 @@ export default function AdminMediaPage() {
   const [mediaType, setMediaType] = useState<MediaType>(initialType);
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const fetchMedia = useCallback(
     async (p: number, type: MediaType, q: string) => {
@@ -225,8 +260,13 @@ export default function AdminMediaPage() {
         if (q) params.set('q', q);
         const res = await fetch(`/api/admin/media?${params.toString()}`);
         if (res.ok) {
-          setData(await res.json());
+          const nextData: MediaResponse = await res.json();
+          setData(nextData);
+          return nextData;
         }
+        return null;
+      } catch {
+        return null;
       } finally {
         setLoading(false);
       }
@@ -253,6 +293,22 @@ export default function AdminMediaPage() {
 
   function handleSearch(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+  }
+
+  async function handleDelete(item: MediaItem) {
+    try {
+      const typeParam = mediaType === 'movie' ? 'movies' : mediaType === 'tv' ? 'tv' : 'persons';
+      const res = await fetch(`/api/admin/media?type=${typeParam}&id=${item.id}`, {method: 'DELETE'});
+      if (res.ok) {
+        setError(null);
+        const next = await fetchMedia(page, mediaType, debouncedQuery);
+        if (next && page > next.totalPages) setPage(Math.max(1, next.totalPages));
+      } else {
+        setError(t('mediaPage.deleteError'));
+      }
+    } catch {
+      setError(t('mediaPage.deleteError'));
+    }
   }
 
   return (
@@ -320,6 +376,12 @@ export default function AdminMediaPage() {
         </form>
       </div>
 
+      {error && (
+        <div className="mb-4 px-4 py-3 text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg">
+          {error}
+        </div>
+      )}
+
       {/* Media Table */}
       <div className="bg-surface border border-border rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
@@ -329,9 +391,9 @@ export default function AdminMediaPage() {
             <AdminEmptyState message={t('mediaPage.noResults')} />
           ) : data ? (
             <>
-              {mediaType === 'movie' && <MovieTable items={data.items} t={t} locale={locale} />}
-              {mediaType === 'tv' && <TvTable items={data.items} t={t} locale={locale} />}
-              {mediaType === 'person' && <PersonTable items={data.items} t={t} locale={locale} />}
+              {mediaType === 'movie' && <MovieTable items={data.items} t={t} locale={locale} onDelete={handleDelete} />}
+              {mediaType === 'tv' && <TvTable items={data.items} t={t} locale={locale} onDelete={handleDelete} />}
+              {mediaType === 'person' && <PersonTable items={data.items} t={t} locale={locale} onDelete={handleDelete} />}
             </>
           ) : null}
         </div>

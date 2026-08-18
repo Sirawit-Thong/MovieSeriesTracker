@@ -107,3 +107,46 @@ export async function GET(request: Request) {
     return NextResponse.json({error: 'Internal server error'}, {status: 500});
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    const auth = await requireAdmin();
+    if (auth.response) return auth.response;
+
+    const {searchParams} = new URL(request.url);
+    const type = searchParams.get('type');
+    const rawId = searchParams.get('id');
+    if (!['movies', 'tv', 'persons'].includes(type ?? '')) {
+      return NextResponse.json({error: 'Invalid type'}, {status: 400});
+    }
+    if (!rawId || !Number.isInteger(Number(rawId))) {
+      return NextResponse.json({error: 'id is required and must be an integer'}, {status: 400});
+    }
+    const id = Number(rawId);
+
+    if (type === 'movies') {
+      const existing = await prisma.movie.findUnique({where: {id}, select: {id: true}});
+      if (!existing) {
+        return NextResponse.json({error: 'Media not found'}, {status: 404});
+      }
+      await prisma.movie.delete({where: {id}});
+    } else if (type === 'tv') {
+      const existing = await prisma.tvSeries.findUnique({where: {id}, select: {id: true}});
+      if (!existing) {
+        return NextResponse.json({error: 'Media not found'}, {status: 404});
+      }
+      await prisma.tvSeries.delete({where: {id}});
+    } else {
+      const existing = await prisma.person.findUnique({where: {id}, select: {id: true}});
+      if (!existing) {
+        return NextResponse.json({error: 'Media not found'}, {status: 404});
+      }
+      await prisma.person.delete({where: {id}});
+    }
+
+    return NextResponse.json({success: true});
+  } catch (error) {
+    console.error('[admin:media:delete]', error);
+    return NextResponse.json({error: 'Internal server error'}, {status: 500});
+  }
+}
