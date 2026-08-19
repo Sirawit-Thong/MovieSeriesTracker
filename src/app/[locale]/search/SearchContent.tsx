@@ -74,11 +74,6 @@ export default function SearchContent() {
           setResults(data);
         }
       })
-      .catch(() => {
-        if (!cancelled) {
-          setResults(null);
-        }
-      })
       .finally(() => {
         if (!cancelled) {
           setIsLoading(false);
