@@ -69,7 +69,8 @@ const withNextIntl = createNextIntlPlugin();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
+  // Vercel handles its own tracing; standalone is for the Docker deployment.
+  output: process.env.VERCEL ? undefined : 'standalone',
   images: {
     remotePatterns: [
       {
