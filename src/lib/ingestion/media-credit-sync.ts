@@ -5,7 +5,6 @@
 
 import { prisma } from '../db';
 import { TmdbClient } from '../tmdb/client';
-import type { TmdbCastMember, TmdbCrewMember } from '../tmdb/types';
 
 const LOG_PREFIX = '[media-credit-sync]';
 

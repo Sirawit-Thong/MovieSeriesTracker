@@ -2,6 +2,7 @@
 
 import {useState, useEffect, type FormEvent} from 'react';
 import {useSession} from 'next-auth/react';
+import Image from 'next/image';
 import {useRouter} from '@/i18n/navigation';
 import {Link} from '@/i18n/navigation';
 
@@ -15,7 +16,7 @@ type UserProfile = {
 };
 
 export default function ProfilePage() {
-  const {data: session, status} = useSession();
+  const {status} = useSession();
   const router = useRouter();
 
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -185,9 +186,13 @@ export default function ProfilePage() {
         <div className="bg-surface border border-border rounded-xl p-6">
           <div className="flex items-center gap-4">
             {profile.image ? (
-              <img
+              <Image
                 src={profile.image}
                 alt={profile.name ?? 'User'}
+                width={64}
+                height={64}
+                unoptimized
+                loading="eager"
                 className="w-16 h-16 rounded-full border-2 border-border"
               />
             ) : (

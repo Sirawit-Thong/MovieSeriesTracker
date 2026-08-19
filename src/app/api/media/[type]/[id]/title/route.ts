@@ -6,6 +6,13 @@ type RouteParams = {
   params: Promise<{ type: string; id: string }>;
 };
 
+// Shape of the media row we use: movie rows expose `title`, tv rows expose `name`.
+type MediaTitleRow = {
+  id: number;
+  title?: string;
+  name?: string;
+};
+
 export async function GET(
   request: Request,
   { params }: RouteParams
@@ -38,7 +45,8 @@ export async function GET(
       where: { entityType: type, entityId: media.id },
     });
 
-    const baseTitle = type === 'movie' ? (media as any).title : (media as any).name;
+    const mediaTitle = media as MediaTitleRow;
+    const baseTitle = type === 'movie' ? mediaTitle.title ?? null : mediaTitle.name ?? null;
     const title = getLocalizedField(translations, locale, 'name', baseTitle);
 
     return NextResponse.json({ title });

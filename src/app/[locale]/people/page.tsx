@@ -2,6 +2,7 @@ import {setRequestLocale} from 'next-intl/server';
 import {getTranslations} from 'next-intl/server';
 import {getPeopleList} from '@/lib/db/media-queries';
 import {Link} from '@/i18n/navigation';
+import TmdbImage from '@/components/ui/TmdbImage';
 
 export const dynamic = 'force-dynamic';
 
@@ -50,10 +51,12 @@ export default async function PeoplePage({
               >
                 <div className="relative aspect-[2/3] w-full overflow-hidden">
                   {person.profilePath ? (
-                    <img
+                    <TmdbImage
                       src={`${TMDB_IMG}${person.profilePath}`}
                       alt={person.name}
-                      className="w-full h-full object-cover"
+                      fill
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                      className="object-cover"
                       loading="lazy"
                     />
                   ) : (

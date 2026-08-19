@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function OfflinePage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-8rem)] px-4 text-center">
@@ -23,7 +25,7 @@ export default function OfflinePage() {
         Please check your connection and try again.
       </p>
 
-      <a
+      <Link
         href="/"
         className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-hover transition-colors"
       >
@@ -41,7 +43,7 @@ export default function OfflinePage() {
           />
         </svg>
         Back to Home
-      </a>
+      </Link>
     </div>
   );
 }

@@ -91,7 +91,6 @@ export default async function WatchlistDetailPage({
   }
 
   const t = await getTranslations({locale, namespace: 'Watchlist'});
-  const tAnnotation = await getTranslations({locale, namespace: 'annotation'});
 
   return (
     <WatchlistDetailContent
