@@ -421,7 +421,6 @@
     "staleMovie": "movies",
     "staleTv": "TV",
     "stalePerson": "persons",
-    "failedLogins": "Failed Logins (7d)",
-    "viewHistory": "View history"
+    "failedLogins": "Failed Logins (7d)"
   }
 }

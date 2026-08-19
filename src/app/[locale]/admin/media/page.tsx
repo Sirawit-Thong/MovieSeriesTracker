@@ -11,7 +11,7 @@ import AdminEmptyState from '@/components/admin/AdminEmptyState';
 import ConfirmButton from '@/components/admin/ConfirmButton';
 
 type MediaItem = {
-  id: string;
+  id: number;
   tmdbId: number;
   title?: string;
   name?: string;
@@ -251,7 +251,6 @@ export default function AdminMediaPage() {
 
   const fetchMedia = useCallback(
     async (p: number, type: MediaType, q: string) => {
-      setLoading(true);
       try {
         const params = new URLSearchParams({
           page: String(p),
@@ -260,15 +259,11 @@ export default function AdminMediaPage() {
         if (q) params.set('q', q);
         const res = await fetch(`/api/admin/media?${params.toString()}`);
         if (res.ok) {
-          const nextData: MediaResponse = await res.json();
-          setData(nextData);
-          return nextData;
+          return (await res.json()) as MediaResponse;
         }
         return null;
       } catch {
         return null;
-      } finally {
-        setLoading(false);
       }
     },
     [],
@@ -283,7 +278,23 @@ export default function AdminMediaPage() {
   }, [query]);
 
   useEffect(() => {
-    fetchMedia(page, mediaType, debouncedQuery);
+    let cancelled = false;
+    fetchMedia(page, mediaType, debouncedQuery)
+      .then((nextData) => {
+        if (!cancelled) {
+          setData(nextData);
+          setError(null);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setError('loadError');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [page, fetchMedia, mediaType, debouncedQuery]);
 
   function handleTypeChange(type: MediaType) {
@@ -300,9 +311,14 @@ export default function AdminMediaPage() {
       const typeParam = mediaType === 'movie' ? 'movies' : mediaType === 'tv' ? 'tv' : 'persons';
       const res = await fetch(`/api/admin/media?type=${typeParam}&id=${item.id}`, {method: 'DELETE'});
       if (res.ok) {
-        setError(null);
         const next = await fetchMedia(page, mediaType, debouncedQuery);
-        if (next && page > next.totalPages) setPage(Math.max(1, next.totalPages));
+        if (next) {
+          setData(next);
+          setError(null);
+          if (page > next.totalPages) setPage(Math.max(1, next.totalPages));
+        } else {
+          setError(t('loadError'));
+        }
       } else {
         setError(t('mediaPage.deleteError'));
       }
