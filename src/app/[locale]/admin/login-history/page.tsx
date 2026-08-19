@@ -15,7 +15,6 @@ type LoginLog = {
   name: string | null;
   method: string;
   ip: string | null;
-  userAgent: string | null;
   success: boolean;
   reason: string | null;
   createdAt: string;
@@ -55,7 +54,6 @@ export default function AdminLoginHistoryPage() {
 
   const fetchLogs = useCallback(
     async (p: number, q: string, m: string, s: string) => {
-      setLoading(true);
       try {
         const params = new URLSearchParams({page: String(p)});
         if (q) params.set('search', q);
@@ -63,23 +61,35 @@ export default function AdminLoginHistoryPage() {
         if (s) params.set('success', s);
         const res = await fetch(`/api/admin/login-logs?${params.toString()}`);
         if (res.ok) {
-          setData(await res.json());
-          setError(null);
-        } else {
-          setError(t('loadError'));
+          return (await res.json()) as LoginLogsResponse;
         }
+        return null;
       } catch {
-        setError(t('loadError'));
-      } finally {
-        setLoading(false);
+        return null;
       }
     },
-    [t],
+    [],
   );
 
   useEffect(() => {
-    fetchLogs(page, debouncedSearch, method, success);
-  }, [page, fetchLogs, debouncedSearch, method, success]);
+    let cancelled = false;
+    fetchLogs(page, debouncedSearch, method, success)
+      .then((nextData) => {
+        if (!cancelled) {
+          setData(nextData);
+          setError(null);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setError(t('loadError'));
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [page, fetchLogs, debouncedSearch, method, success, t]);
 
   useEffect(() => {
     const timer = setTimeout(() => {

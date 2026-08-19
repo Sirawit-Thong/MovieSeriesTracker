@@ -10,7 +10,7 @@ import ConfirmButton from '@/components/admin/ConfirmButton';
 import {formatDate} from '@/lib/format-date';
 
 type Annotation = {
-  id: string;
+  id: number;
   entityType: string;
   entityId: number;
   watchStatus: string | null;
@@ -58,33 +58,41 @@ export default function AdminAnnotationsPage() {
 
   const fetchAnnotations = useCallback(
     async (p: number, statusFilter: string, typeFilter: string) => {
-      setLoading(true);
       try {
         const params = new URLSearchParams({page: String(p)});
         if (statusFilter) params.set('status', statusFilter);
         if (typeFilter) params.set('entityType', typeFilter);
         const res = await fetch(`/api/admin/annotations?${params.toString()}`);
         if (res.ok) {
-          const nextData: AnnotationsResponse = await res.json();
-          setData(nextData);
-          setError(null);
-          return nextData;
+          return (await res.json()) as AnnotationsResponse;
         }
-        setError(t('loadError'));
         return null;
       } catch {
-        setError(t('loadError'));
         return null;
-      } finally {
-        setLoading(false);
       }
     },
-    [t],
+    [],
   );
 
   useEffect(() => {
-    fetchAnnotations(page, status, entityType);
-  }, [page, fetchAnnotations, status, entityType]);
+    let cancelled = false;
+    fetchAnnotations(page, status, entityType)
+      .then((nextData) => {
+        if (!cancelled) {
+          setData(nextData);
+          setError(null);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setError(t('loadError'));
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [page, fetchAnnotations, status, entityType, t]);
 
   function handleStatusFilter(e: React.ChangeEvent<HTMLSelectElement>) {
     setStatus(e.target.value);
@@ -269,6 +277,12 @@ export default function AdminAnnotationsPage() {
                           const res = await fetch(`/api/admin/annotations?id=${annotation.id}`, {method: 'DELETE'});
                           if (res.ok) {
                             const next = await fetchAnnotations(page, status, entityType);
+                            if (next) {
+                              setData(next);
+                              setError(null);
+                            } else {
+                              setError(t('loadError'));
+                            }
                             if (next && page > next.totalPages) setPage(Math.max(1, next.totalPages));
                           } else {
                             setError(t('annotationsPage.deleteError'));
