@@ -11,7 +11,15 @@ const eslintConfig = [
     },
   },
   {
-    ignores: ['node_modules/', '.next/', 'generated/', 'public/', '*.config.*'],
+    ignores: [
+      'node_modules/',
+      '.next/',
+      'generated/',
+      'public/',
+      '*.config.*',
+      '.superpowers/',
+      '.playwright-mcp/',
+    ],
   },
 ];
 
