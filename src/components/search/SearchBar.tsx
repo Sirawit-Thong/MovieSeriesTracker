@@ -24,11 +24,16 @@ export default function SearchBar({
   const t = useTranslations('Search');
   const inputRef = useRef<HTMLInputElement>(null);
   const [localValue, setLocalValue] = useState(value);
+  const [prevValue, setPrevValue] = useState(value);
 
-  // Sync local value when external value changes (e.g., URL navigation)
-  useEffect(() => {
+  // Sync local value when external value changes (e.g., URL navigation).
+  // Render-time adjustment — React-sanctioned alternative to setState in effect
+  // (setState during render is re-run before commit; guarded so it only fires
+  // when the external value actually differs from the previous one).
+  if (prevValue !== value) {
+    setPrevValue(value);
     setLocalValue(value);
-  }, [value]);
+  }
 
   // Debounce the search callback (300ms)
   useEffect(() => {

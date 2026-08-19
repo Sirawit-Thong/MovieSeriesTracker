@@ -1,12 +1,13 @@
 'use client';
 
-import {useState, useEffect, useCallback, useRef, useMemo} from 'react';
-import {useTranslations, useLocale} from 'next-intl';
+import {useState, useEffect, useCallback, useRef} from 'react';
+import {useTranslations} from 'next-intl';
 import {useRouter} from '@/i18n/navigation';
 import {Link} from '@/i18n/navigation';
 import {useSession} from 'next-auth/react';
 import CountryFilter from '@/components/media/CountryFilter';
 import {getDisplayName} from '@/lib/i18n/country-names';
+import TmdbImage from '@/components/ui/TmdbImage';
 
 const TMDB_IMG = 'https://image.tmdb.org/t/p';
 const TMDB_IMG_W300 = `${TMDB_IMG}/w300`;
@@ -62,13 +63,6 @@ const STATUS_COLORS: Record<string, string> = {
   WATCHING: 'bg-blue-400/20 text-blue-400',
   WANT_TO_WATCH: 'bg-yellow-400/20 text-yellow-400',
   DROPPED: 'bg-red-400/20 text-red-400',
-};
-
-const STATUS_LABELS: Record<string, 'watched' | 'watching' | 'wantToWatch' | 'dropped'> = {
-  WATCHED: 'watched',
-  WATCHING: 'watching',
-  WANT_TO_WATCH: 'wantToWatch',
-  DROPPED: 'dropped',
 };
 
 export default function LibraryContent({locale}: {locale: string}) {
@@ -389,7 +383,14 @@ export default function LibraryContent({locale}: {locale: string}) {
                     >
                       <div className="relative aspect-[2/3] w-full overflow-hidden">
                         {movie.posterPath ? (
-                          <img src={`${TMDB_IMG}/w300${movie.posterPath}`} alt={movie.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" loading="lazy" />
+                          <TmdbImage
+                            src={`${TMDB_IMG}/w300${movie.posterPath}`}
+                            alt={movie.title}
+                            fill
+                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                            className="object-cover group-hover:scale-105 transition-transform duration-200"
+                            loading="lazy"
+                          />
                         ) : (
                           <div className="w-full h-full bg-muted flex items-center justify-center text-sm text-foreground/40">No Image</div>
                         )}
@@ -426,7 +427,14 @@ export default function LibraryContent({locale}: {locale: string}) {
                     >
                       <div className="relative aspect-[2/3] w-full overflow-hidden">
                         {series.posterPath ? (
-                          <img src={`${TMDB_IMG}/w300${series.posterPath}`} alt={series.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" loading="lazy" />
+                          <TmdbImage
+                            src={`${TMDB_IMG}/w300${series.posterPath}`}
+                            alt={series.name}
+                            fill
+                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                            className="object-cover group-hover:scale-105 transition-transform duration-200"
+                            loading="lazy"
+                          />
                         ) : (
                           <div className="w-full h-full bg-muted flex items-center justify-center text-sm text-foreground/40">No Image</div>
                         )}
@@ -632,7 +640,14 @@ export default function LibraryContent({locale}: {locale: string}) {
                 <Link href={link} className="block relative">
                   <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-surface mb-2">
                     {poster ? (
-                      <img src={poster} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" loading="lazy" />
+                      <TmdbImage
+                        src={poster}
+                        alt={title}
+                        fill
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-200"
+                        loading="lazy"
+                      />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-foreground/30 text-sm">No Image</div>
                     )}
@@ -735,7 +750,7 @@ export default function LibraryContent({locale}: {locale: string}) {
 
                 {/* Notes preview */}
                 {item.notes && (
-                  <p className="text-[10px] text-foreground/40 mt-1 line-clamp-1 italic">"{item.notes}"</p>
+                  <p className="text-[10px] text-foreground/40 mt-1 line-clamp-1 italic">&quot;{item.notes}&quot;</p>
                 )}
               </div>
             );
@@ -763,7 +778,14 @@ export default function LibraryContent({locale}: {locale: string}) {
                 <Link href={link} className="flex-shrink-0">
                   <div className="relative w-[80px] aspect-[2/3] rounded-lg overflow-hidden bg-background">
                     {poster ? (
-                      <img src={poster} alt={title} className="w-full h-full object-cover" loading="lazy" />
+                      <TmdbImage
+                        src={poster}
+                        alt={title}
+                        fill
+                        sizes="80px"
+                        className="object-cover"
+                        loading="lazy"
+                      />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-foreground/30 text-xs">No Image</div>
                     )}
@@ -811,7 +833,7 @@ export default function LibraryContent({locale}: {locale: string}) {
 
                   {/* Notes preview */}
                   {item.notes && (
-                    <p className="text-[11px] text-foreground/40 mt-1 line-clamp-1 italic">"{item.notes}"</p>
+                    <p className="text-[11px] text-foreground/40 mt-1 line-clamp-1 italic">&quot;{item.notes}&quot;</p>
                   )}
 
                   {/* Overview preview */}

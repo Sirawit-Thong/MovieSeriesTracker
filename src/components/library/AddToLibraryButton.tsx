@@ -31,36 +31,56 @@ export default function AddToLibraryButton({entityType, entityId}: AddToLibraryB
   const {data: session} = useSession();
 
   const [annotation, setAnnotation] = useState<Annotation | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
 
+  // Render-time adjustment (React-sanctioned — no setState in effects):
+  // when the session resolves/changes, loading follows the login state.
+  // Logged-out → done loading; logged-in → initial library check starts.
+  const hasUser = !!session?.user;
+  const [prevHasUser, setPrevHasUser] = useState(false);
+  if (prevHasUser !== hasUser) {
+    setPrevHasUser(hasUser);
+    setIsLoading(hasUser);
+  }
+
+  // Pure fetch — no setState; returns the annotation or null (not found/error)
+  const checkAnnotation = useCallback(async (): Promise<Annotation | null> => {
+    try {
+      const res = await fetch(
+        `/api/annotations?entityType=${entityType}&entityId=${entityId}`
+      );
+      if (!res.ok) return null;
+      return (await res.json()) as Annotation;
+    } catch {
+      return null;
+    }
+  }, [entityType, entityId]);
+
   // Check if already in library
   useEffect(() => {
-    if (!session?.user) {
-      setIsLoading(false);
-      return;
-    }
+    if (!session?.user) return;
 
-    async function checkAnnotation() {
-      try {
-        const res = await fetch(
-          `/api/annotations?entityType=${entityType}&entityId=${entityId}`
-        );
-        if (res.ok) {
-          const data = await res.json();
+    let cancelled = false;
+
+    checkAnnotation()
+      .then((data) => {
+        if (!cancelled && data !== null) {
           setAnnotation(data);
         }
-      } catch {
-        // Ignore errors
-      } finally {
-        setIsLoading(false);
-      }
-    }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      });
 
-    checkAnnotation();
-  }, [session, entityType, entityId]);
+    return () => {
+      cancelled = true;
+    };
+  }, [session, checkAnnotation]);
 
   const addToLibrary = useCallback(async (status: string = 'WANT_TO_WATCH') => {
     if (!session?.user) return;

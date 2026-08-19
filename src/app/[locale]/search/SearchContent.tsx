@@ -21,7 +21,20 @@ export default function SearchContent() {
   const initialQuery = searchParams.get('q') ?? '';
   const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState<SearchResultsData | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  // Start loading when arriving with a query in the URL (initial fetch in flight)
+  const [isLoading, setIsLoading] = useState(initialQuery !== '');
+  const [prevQuery, setPrevQuery] = useState(initialQuery);
+
+  // Render-time adjustments (React-sanctioned — no setState in effects):
+  // - when the query changes, reflect the new loading state immediately
+  // - when the query is cleared, drop stale results
+  if (prevQuery !== query) {
+    setPrevQuery(query);
+    setIsLoading(query !== '');
+  }
+  if (!query && results !== null) {
+    setResults(null);
+  }
 
   // Sync URL when query changes
   useEffect(() => {
@@ -35,43 +48,47 @@ export default function SearchContent() {
     window.history.replaceState(null, '', newUrl);
   }, [query]);
 
+  // Pure fetch — no setState, no hooks; returns data or null on failure
+  const fetchResults = useCallback(
+    async (q: string): Promise<SearchResultsData | null> => {
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+        if (!res.ok) return null;
+        return (await res.json()) as SearchResultsData;
+      } catch {
+        return null;
+      }
+    },
+    []
+  );
+
   // Fetch results when query changes
   useEffect(() => {
-    if (!query) {
-      setResults(null);
-      return;
-    }
+    if (!query) return;
 
     let cancelled = false;
 
-    async function fetchResults() {
-      setIsLoading(true);
-      try {
-        const res = await fetch(
-          `/api/search?q=${encodeURIComponent(query)}`
-        );
-        if (!res.ok) throw new Error('Search failed');
-        const data = await res.json();
+    fetchResults(query)
+      .then((data) => {
         if (!cancelled) {
           setResults(data);
         }
-      } catch {
+      })
+      .catch(() => {
         if (!cancelled) {
           setResults(null);
         }
-      } finally {
+      })
+      .finally(() => {
         if (!cancelled) {
           setIsLoading(false);
         }
-      }
-    }
-
-    fetchResults();
+      });
 
     return () => {
       cancelled = true;
     };
-  }, [query]);
+  }, [query, fetchResults]);
 
   // SearchBar already debounces (300ms) before calling onSearch
   const handleSearch = useCallback((value: string) => {
