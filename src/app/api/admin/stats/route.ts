@@ -5,25 +5,26 @@ import {NextResponse} from 'next/server';
 import {requireAdmin} from '@/lib/admin';
 import prisma from '@/lib/db';
 
+let statsCache: {data: unknown; at: number} | null = null;
+const STATS_TTL_MS = 60 * 1000;
+
 export async function GET() {
   try {
     const auth = await requireAdmin();
     if (auth.response) return auth.response;
 
-    const [userCount, movieCount, tvSeriesCount, personCount] =
-      await Promise.all([
+    const now = Date.now();
+    if (!statsCache || now - statsCache.at > STATS_TTL_MS) {
+      const [users, movies, tvSeries, persons] = await Promise.all([
         prisma.user.count(),
         prisma.movie.count(),
         prisma.tvSeries.count(),
         prisma.person.count(),
       ]);
+      statsCache = {data: {users, movies, tvSeries, persons}, at: now};
+    }
 
-    return NextResponse.json({
-      users: userCount,
-      movies: movieCount,
-      tvSeries: tvSeriesCount,
-      persons: personCount,
-    });
+    return NextResponse.json(statsCache.data);
   } catch (error) {
     console.error('[admin:stats]', error);
     return NextResponse.json(

@@ -19,11 +19,10 @@ export default async function MoviesPage({
   const {page, genre, country} = await searchParams;
   setRequestLocale(locale);
 
-  const t = await getTranslations({locale, namespace: 'Movie'});
   const tNav = await getTranslations({locale, namespace: 'Navigation'});
 
   const pageSize = 24;
-  const currentPage = Math.max(1, Number(page) || 1);
+  const currentPage = Math.min(Math.max(1, Number(page) || 1), 500);
   const offset = (currentPage - 1) * pageSize;
   const genreId = genre ? Number(genre) : undefined;
   const countryCodes = country

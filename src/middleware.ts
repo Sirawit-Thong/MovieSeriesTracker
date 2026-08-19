@@ -37,6 +37,11 @@ function applyRateLimit(request: NextRequest): NextResponse | null {
   const entry = rateLimitMap.get(key);
 
   if (!entry || now > entry.resetAt) {
+    if (rateLimitMap.size > 10000) {
+      for (const [k, v] of rateLimitMap) {
+        if (now > v.resetAt) rateLimitMap.delete(k);
+      }
+    }
     rateLimitMap.set(key, {count: 1, resetAt: now + config.windowMs});
     return null;
   }
