@@ -20,14 +20,13 @@ type MediaFilterBarProps = {
   basePath: string;
 };
 
-export default function MediaFilterBar({countries, basePath}: MediaFilterBarProps) {
+export default function MediaFilterBar({countries, basePath: _basePath}: MediaFilterBarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const locale = useLocale();
 
   const selectedCountries = searchParams.getAll('country');
-  const currentGenre = searchParams.get('genre');
 
   // Top 5 countries by count (excluding already-selected ones from the quick list)
   const topCountries = useMemo(() => {

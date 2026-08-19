@@ -236,15 +236,6 @@ export default function MovieDetail({movie, locale}: MovieDetailProps) {
     {}
   );
 
-  // Group content ratings by country
-  const contentRatingsByCountry = movie.contentRatings.reduce<Record<string, string>>(
-    (acc, cr) => {
-      acc[cr.countryCode] = cr.rating;
-      return acc;
-    },
-    {}
-  );
-
   return (
     <div className="min-h-screen">
       {/* ─── Hero Section ─────────────────────────────────── */}

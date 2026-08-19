@@ -1,6 +1,7 @@
 'use client';
 
 import {useRef, useState, useEffect, useCallback} from 'react';
+import TmdbImage from '@/components/ui/TmdbImage';
 
 type VideoEntry = {
   id: number;
@@ -110,10 +111,12 @@ export default function VideoList({videos}: VideoListProps) {
             className="group flex-shrink-0 w-[280px] md:w-[320px] snap-start"
           >
             <div className="relative aspect-video rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all bg-muted">
-              <img
+              <TmdbImage
                 src={`https://img.youtube.com/vi/${video.key}/hqdefault.jpg`}
                 alt={video.name}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                fill
+                sizes="(max-width: 768px) 280px, 320px"
+                className="object-cover group-hover:scale-105 transition-transform duration-300"
                 loading="lazy"
               />
               {/* Play button overlay */}

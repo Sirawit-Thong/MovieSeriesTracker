@@ -1,6 +1,6 @@
 'use client';
 
-import {useRef, useState, useCallback, useEffect} from 'react';
+import {useRef, useCallback} from 'react';
 import TmdbImage from '@/components/ui/TmdbImage';
 import {useTranslations} from 'next-intl';
 import {Link} from '@/i18n/navigation';
@@ -136,7 +136,7 @@ function getKnownFor(credits: PersonWithRelations['combinedCredits']) {
  * personal details, full filmography, known for, external links, and profile gallery.
  * Follows the project dark theme (#0a0a0a background, Netflix-red primary).
  */
-export default function PersonDetail({person, locale}: PersonDetailProps) {
+export default function PersonDetail({person, locale: _locale}: PersonDetailProps) {
   const t = useTranslations('Person');
 
   const displayName = person.localized?.name ?? person.name;
@@ -158,24 +158,6 @@ export default function PersonDetail({person, locale}: PersonDetailProps) {
 
   // Known For horizontal scroll
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
-
-  const updateScrollState = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    setCanScrollLeft(el.scrollLeft > 2);
-    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 2);
-  }, []);
-
-  useEffect(() => {
-    updateScrollState();
-    const el = scrollRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver(updateScrollState);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [updateScrollState, knownFor.length]);
 
   const scrollBy = useCallback((direction: number) => {
     const el = scrollRef.current;
@@ -301,7 +283,6 @@ export default function PersonDetail({person, locale}: PersonDetailProps) {
                   </button>
                   <div
                     ref={scrollRef}
-                    onScroll={updateScrollState}
                     className="overflow-x-auto scrollbar-hide"
                   >
                     <div className="flex gap-3 min-w-max pb-2">

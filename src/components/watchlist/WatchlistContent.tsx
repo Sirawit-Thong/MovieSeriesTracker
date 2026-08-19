@@ -12,12 +12,6 @@ type Watchlist = {
   updatedAt: string;
 };
 
-type WatchlistItem = {
-  id: number;
-  entityType: string;
-  entityId: number;
-};
-
 type Translations = {
   title: string;
   subtitle: string;
@@ -42,7 +36,7 @@ type Props = {
   translations: Translations;
 };
 
-export default function WatchlistContent({locale, translations: t}: Props) {
+export default function WatchlistContent({locale: _locale, translations: t}: Props) {
   const {data: session} = useSession();
   const [watchlists, setWatchlists] = useState<Watchlist[]>([]);
   const [isLoading, setIsLoading] = useState(true);

@@ -1,6 +1,7 @@
 'use client';
 
 import {useState, useCallback, useEffect} from 'react';
+import TmdbImage from '@/components/ui/TmdbImage';
 
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
 
@@ -108,10 +109,12 @@ export default function MediaGallery({images}: MediaGalleryProps) {
             onClick={() => setSelectedImage(img)}
             className="relative aspect-video rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all group cursor-pointer bg-muted"
           >
-            <img
+            <TmdbImage
               src={`${TMDB_IMAGE_BASE}/w500${img.filePath}`}
               alt={`Image ${img.id}`}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
               loading="lazy"
             />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
@@ -160,9 +163,11 @@ export default function MediaGallery({images}: MediaGalleryProps) {
             </svg>
           </button>
           {/* Full-size image */}
-          <img
+          <TmdbImage
             src={`${TMDB_IMAGE_BASE}/original${selectedImage.filePath}`}
             alt="Full size"
+            width={selectedImage.width ?? 1280}
+            height={selectedImage.height ?? 720}
             className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg"
             onClick={(e) => e.stopPropagation()}
           />

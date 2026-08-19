@@ -1,5 +1,7 @@
 'use client';
 
+import TmdbImage from '@/components/ui/TmdbImage';
+
 const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p';
 
 type Provider = {
@@ -70,9 +72,11 @@ export default function WatchProviders({providers}: WatchProvidersProps) {
                   className="flex items-center gap-2 bg-surface/50 rounded-lg px-3 py-2 border border-border hover:bg-surface-hover transition-colors"
                   title={entry.provider.providerName}
                 >
-                  <img
+                  <TmdbImage
                     src={`${TMDB_IMAGE_BASE}/w45${entry.provider.logoPath}`}
                     alt={entry.provider.providerName}
+                    width={32}
+                    height={32}
                     className="w-8 h-8 rounded object-contain"
                     loading="lazy"
                   />

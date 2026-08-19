@@ -2,6 +2,7 @@
 
 import {useState} from 'react';
 import Link from 'next/link';
+import TmdbImage from '@/components/ui/TmdbImage';
 
 type WatchlistItemData = {
   id: number;
@@ -115,12 +116,14 @@ export default function WatchlistDetailContent({locale, watchlist, initialMedia,
             return (
               <div key={item.id} className="group relative">
                 <Link href={link}>
-                  <div className="aspect-[2/3] rounded-lg overflow-hidden bg-surface mb-2">
+                  <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-surface mb-2">
                     {media.posterPath ? (
-                      <img
+                      <TmdbImage
                         src={`${TMDB_IMG}${media.posterPath}`}
                         alt={media.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                        fill
+                        sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-200"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-foreground/30 text-sm">

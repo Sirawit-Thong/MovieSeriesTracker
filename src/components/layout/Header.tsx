@@ -5,6 +5,7 @@ import {useTranslations} from 'next-intl';
 import {Link, usePathname, useRouter} from '@/i18n/navigation';
 import {useSession, signOut} from 'next-auth/react';
 import LanguageSwitcher from './LanguageSwitcher';
+import TmdbImage from '@/components/ui/TmdbImage';
 
 const NAV_LINKS = [
   {key: 'movies' as const, href: '/movies'},
@@ -148,9 +149,11 @@ export default function Header() {
                   text-foreground/70 hover:text-white hover:bg-surface-hover transition-colors"
               >
                 {session.user.image ? (
-                  <img
+                  <TmdbImage
                     src={session.user.image}
                     alt=""
+                    width={24}
+                    height={24}
                     className="w-6 h-6 rounded-full"
                   />
                 ) : (
