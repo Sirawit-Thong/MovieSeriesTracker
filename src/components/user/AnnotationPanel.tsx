@@ -1,6 +1,7 @@
 'use client';
 
 import {useState, useEffect, useCallback} from 'react';
+import {useSession} from 'next-auth/react';
 import PersonalRating from './PersonalRating';
 import UserNotes from './UserNotes';
 
@@ -25,10 +26,11 @@ type AnnotationPanelProps = {
 
 export default function AnnotationPanel({entityType, entityId}: AnnotationPanelProps) {
   const [annotation, setAnnotation] = useState<AnnotationData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const {status} = useSession();
 
   useEffect(() => {
+    if (status !== 'authenticated') return;
     let cancelled = false;
 
     async function fetchAnnotation() {
@@ -46,16 +48,12 @@ export default function AnnotationPanel({entityType, entityId}: AnnotationPanelP
         if (!cancelled) {
           setError('Failed to load annotations');
         }
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
       }
     }
 
     fetchAnnotation();
     return () => { cancelled = true; };
-  }, [entityType, entityId]);
+  }, [status, entityType, entityId]);
 
   const handleRatingChange = useCallback((rating: number | null) => {
     setAnnotation((prev) =>
@@ -69,7 +67,7 @@ export default function AnnotationPanel({entityType, entityId}: AnnotationPanelP
     );
   }, []);
 
-  if (isLoading) {
+  if (status === 'loading') {
     return (
       <div className="bg-surface rounded-lg border border-border p-6 space-y-4">
         <div className="animate-pulse space-y-4">
@@ -79,6 +77,10 @@ export default function AnnotationPanel({entityType, entityId}: AnnotationPanelP
         </div>
       </div>
     );
+  }
+
+  if (status !== 'authenticated') {
+    return null;
   }
 
   if (error) {

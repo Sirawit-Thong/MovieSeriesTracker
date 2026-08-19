@@ -186,7 +186,11 @@ export async function generateMetadata({
   params,
 }: PersonPageProps): Promise<Metadata> {
   const {locale, id} = await params;
-  const person = await getPersonById(Number(id), locale);
+  const personId = Number(id);
+  if (!Number.isInteger(personId)) {
+    notFound();
+  }
+  const person = await getPersonById(personId, locale);
 
   if (!person) {
     return {title: 'Person Not Found'};
@@ -212,7 +216,12 @@ export default async function PersonPage({params}: PersonPageProps) {
   const {locale, id} = await params;
   setRequestLocale(locale);
 
-  const person = await getPersonById(Number(id), locale);
+  const personId = Number(id);
+  if (!Number.isInteger(personId)) {
+    notFound();
+  }
+
+  const person = await getPersonById(personId, locale);
 
   if (!person) {
     notFound();

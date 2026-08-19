@@ -174,7 +174,11 @@ export async function generateMetadata({
   params,
 }: TvPageProps): Promise<Metadata> {
   const {locale, id} = await params;
-  const series = await getTvSeriesById(Number(id), locale);
+  const seriesId = Number(id);
+  if (!Number.isInteger(seriesId)) {
+    notFound();
+  }
+  const series = await getTvSeriesById(seriesId, locale);
 
   if (!series) {
     return {title: 'TV Series Not Found'};
@@ -200,7 +204,12 @@ export default async function TvPage({params}: TvPageProps) {
   const {locale, id} = await params;
   setRequestLocale(locale);
 
-  const series = await getTvSeriesById(Number(id), locale);
+  const seriesId = Number(id);
+  if (!Number.isInteger(seriesId)) {
+    notFound();
+  }
+
+  const series = await getTvSeriesById(seriesId, locale);
 
   if (!series) {
     notFound();

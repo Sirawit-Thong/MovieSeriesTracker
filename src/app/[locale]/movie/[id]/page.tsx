@@ -164,7 +164,11 @@ export async function generateMetadata({
   params,
 }: MoviePageProps): Promise<Metadata> {
   const {locale, id} = await params;
-  const movie = await getMovieById(Number(id), locale);
+  const movieId = Number(id);
+  if (!Number.isInteger(movieId)) {
+    notFound();
+  }
+  const movie = await getMovieById(movieId, locale);
 
   if (!movie) {
     return {title: 'Movie Not Found'};
@@ -190,7 +194,12 @@ export default async function MoviePage({params}: MoviePageProps) {
   const {locale, id} = await params;
   setRequestLocale(locale);
 
-  const movie = await getMovieById(Number(id), locale);
+  const movieId = Number(id);
+  if (!Number.isInteger(movieId)) {
+    notFound();
+  }
+
+  const movie = await getMovieById(movieId, locale);
 
   if (!movie) {
     notFound();
