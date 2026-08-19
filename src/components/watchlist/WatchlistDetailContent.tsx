@@ -27,6 +27,9 @@ type Translations = {
   emptyDescription: string;
   movies: string;
   tvSeries: string;
+  person: string;
+  backToWatchlists: string;
+  noImage: string;
 };
 
 type Props = {
@@ -46,7 +49,6 @@ const TMDB_IMG = 'https://image.tmdb.org/t/p/w200';
 export default function WatchlistDetailContent({locale, watchlist, initialMedia, translations: t}: Props) {
   const [items, setItems] = useState<WatchlistItemData[]>(watchlist.items);
   const [mediaCache] = useState<Record<string, MediaData>>(initialMedia);
-  const [isLoading] = useState(false);
 
   async function handleRemove(item: WatchlistItemData) {
     try {
@@ -75,7 +77,7 @@ export default function WatchlistDetailContent({locale, watchlist, initialMedia,
       {/* Header */}
       <div className="mb-8">
         <Link href="/watchlists" className="text-sm text-primary hover:text-primary-hover transition-colors mb-4 inline-block">
-          ← Back to Watchlists
+          ← {t.backToWatchlists}
         </Link>
         <h1 className="text-3xl font-bold text-white mb-2">{watchlist.name}</h1>
         {watchlist.description && (
@@ -87,16 +89,7 @@ export default function WatchlistDetailContent({locale, watchlist, initialMedia,
       </div>
 
       {/* Content */}
-      {isLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {Array.from({length: Math.min(items.length || 4, 8)}).map((_, i) => (
-            <div key={i} className="animate-pulse">
-              <div className="aspect-[2/3] bg-surface rounded-lg mb-2" />
-              <div className="h-4 bg-surface rounded w-3/4" />
-            </div>
-          ))}
-        </div>
-      ) : items.length === 0 ? (
+      {items.length === 0 ? (
         <div className="text-center py-20">
           <p className="text-xl text-foreground/70 mb-2">{t.empty}</p>
           <p className="text-sm text-foreground/40">{t.emptyDescription}</p>
@@ -127,7 +120,7 @@ export default function WatchlistDetailContent({locale, watchlist, initialMedia,
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-foreground/30 text-sm">
-                        No Image
+                        {t.noImage}
                       </div>
                     )}
                   </div>
@@ -135,7 +128,7 @@ export default function WatchlistDetailContent({locale, watchlist, initialMedia,
                     {media.title}
                   </h3>
                   <p className="text-xs text-foreground/40">
-                    {item.entityType === 'MOVIE' ? 'Movie' : item.entityType === 'TV' ? 'TV' : 'Person'}
+                    {item.entityType === 'MOVIE' ? t.movies : item.entityType === 'TV' ? t.tvSeries : t.person}
                     {media.voteAverage ? ` · ★ ${media.voteAverage.toFixed(1)}` : ''}
                   </p>
                 </Link>

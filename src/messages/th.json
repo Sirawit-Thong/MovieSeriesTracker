@@ -207,7 +207,10 @@
     "cancel": "ยกเลิก",
     "save": "บันทึก",
     "addToWatchlist": "เพิ่มใน Watchlist",
-    "removeFromWatchlist": "ลบจาก Watchlist"
+    "removeFromWatchlist": "ลบจาก Watchlist",
+    "backToWatchlists": "กลับไปยัง Watchlists",
+    "noImage": "ไม่มีรูปภาพ",
+    "person": "บุคคล"
   },
   "Person": {
     "biography": "ประวัติ",
@@ -321,7 +324,7 @@
     "syncHistoryPage": {
       "title": "ประวัติการซิงค์",
       "subtitle": "ดูประวัติการซิงค์และผลลัพธ์",
-      "entity": " Entity",
+      "entity": "Entity",
       "status": "สถานะ",
       "processed": "ประมวลผลแล้ว",
       "errors": "ข้อผิดพลาด",

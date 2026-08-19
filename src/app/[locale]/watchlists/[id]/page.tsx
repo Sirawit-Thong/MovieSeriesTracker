@@ -114,6 +114,9 @@ export default async function WatchlistDetailPage({
         emptyDescription: t('emptyDescription'),
         movies: 'Movies',
         tvSeries: 'TV Series',
+        person: t('person'),
+        backToWatchlists: t('backToWatchlists'),
+        noImage: t('noImage'),
       }}
     />
   );

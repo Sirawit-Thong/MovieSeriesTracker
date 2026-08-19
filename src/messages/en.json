@@ -207,7 +207,10 @@
     "cancel": "Cancel",
     "save": "Save",
     "addToWatchlist": "Add to Watchlist",
-    "removeFromWatchlist": "Remove from Watchlist"
+    "removeFromWatchlist": "Remove from Watchlist",
+    "backToWatchlists": "Back to Watchlists",
+    "noImage": "No Image",
+    "person": "Person"
   },
   "Person": {
     "biography": "Biography",

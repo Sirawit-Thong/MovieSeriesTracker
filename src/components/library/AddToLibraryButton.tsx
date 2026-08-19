@@ -1,6 +1,6 @@
 'use client';
 
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {useSession} from 'next-auth/react';
 import {useTranslations} from 'next-intl';
 
@@ -35,6 +35,12 @@ export default function AddToLibraryButton({entityType, entityId}: AddToLibraryB
   const [isSaving, setIsSaving] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [justAdded, setJustAdded] = useState(false);
+  const justAddedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Cleanup on unmount — no setState in this effect (rule-safe)
+  useEffect(() => () => {
+    if (justAddedTimer.current) clearTimeout(justAddedTimer.current);
+  }, []);
 
   // Render-time adjustment (React-sanctioned — no setState in effects):
   // when the session resolves/changes, loading follows the login state.
@@ -99,7 +105,8 @@ export default function AddToLibraryButton({entityType, entityId}: AddToLibraryB
         const data = await res.json();
         setAnnotation(data);
         setJustAdded(true);
-        setTimeout(() => setJustAdded(false), 2000);
+        if (justAddedTimer.current) clearTimeout(justAddedTimer.current);
+        justAddedTimer.current = setTimeout(() => setJustAdded(false), 2000);
       }
     } catch {
       // Ignore errors
