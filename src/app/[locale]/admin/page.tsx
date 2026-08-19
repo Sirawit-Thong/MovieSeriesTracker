@@ -190,7 +190,7 @@ export default async function AdminDashboardPage({params}: AdminPageProps) {
           <div className="bg-surface border border-border rounded-xl p-4">
             <p className="text-sm font-medium text-foreground/60">{t('syncHistoryPage.running')}</p>
             {runningSyncs > 0 ? (
-              <div className="mt-2 flex items-center gap-2 text-sm text-blue-400">
+              <div className="mt-2 flex items-center gap-2 text-sm text-yellow-400">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-yellow-500" />

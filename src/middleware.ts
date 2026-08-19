@@ -84,7 +84,7 @@ export const middleware = auth((request) => {
 
 export const config = {
   matcher: [
-    '/((?!api|_next|_vercel|.*\\..*).*)',
+    '/((?!api|_next|_vercel|offline|.*\\..*).*)',
     '/api/:path*',
   ],
   runtime: 'nodejs',
