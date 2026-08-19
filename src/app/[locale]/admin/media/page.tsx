@@ -282,12 +282,16 @@ export default function AdminMediaPage() {
     fetchMedia(page, mediaType, debouncedQuery)
       .then((nextData) => {
         if (!cancelled) {
-          setData(nextData);
-          setError(null);
+          if (nextData) {
+            setData(nextData);
+            setError(null);
+          } else {
+            setError(t('loadError'));
+          }
         }
       })
       .catch(() => {
-        if (!cancelled) setError('loadError');
+        if (!cancelled) setError(t('loadError'));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -295,7 +299,7 @@ export default function AdminMediaPage() {
     return () => {
       cancelled = true;
     };
-  }, [page, fetchMedia, mediaType, debouncedQuery]);
+  }, [page, fetchMedia, mediaType, debouncedQuery, t]);
 
   function handleTypeChange(type: MediaType) {
     setMediaType(type);
