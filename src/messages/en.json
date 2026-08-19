@@ -336,6 +336,7 @@
       "running": "Running",
       "completed": "Completed",
       "failed": "Failed",
+      "cancelled": "Cancelled",
       "noLogs": "No sync logs found.",
       "unknown": "Unknown"
     },
@@ -375,7 +376,10 @@
       "duration": "Duration",
       "networkError": "Network error — sync may still be running in the background",
       "all": "All",
-      "viewHistory": "View sync history"
+      "viewHistory": "View sync history",
+      "stop": "Stop",
+      "stopping": "Stopping...",
+      "stopError": "Failed to stop the sync"
     },
     "back": "Back",
     "delete": "Delete",

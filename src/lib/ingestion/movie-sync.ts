@@ -5,12 +5,7 @@
 import { TmdbClient } from '../tmdb/client';
 import prisma from '../db';
 import type { TmdbMovie } from '../tmdb/types';
-import type {
-  SyncProgress,
-  SyncResult,
-  SyncError,
-  SyncOptions,
-} from './types';
+import type { SyncProgress, SyncResult, SyncError, SyncOptions } from './types';
 import { DEFAULT_SYNC_OPTIONS } from './types';
 
 const LOG_PREFIX = '[movie-sync]';
@@ -33,9 +28,7 @@ function buildMovieCreateData(tmdbMovie: TmdbMovie) {
     overview: tmdbMovie.overview,
     popularity: tmdbMovie.popularity,
     posterPath: tmdbMovie.poster_path,
-    releaseDate: tmdbMovie.release_date
-      ? new Date(tmdbMovie.release_date)
-      : null,
+    releaseDate: tmdbMovie.release_date ? new Date(tmdbMovie.release_date) : null,
     revenue: tmdbMovie.revenue,
     runtime: tmdbMovie.runtime,
     status: tmdbMovie.status,
@@ -56,17 +49,15 @@ async function ensureGenresExist(genres: TmdbMovie['genres']) {
   await Promise.all(
     genres.map((genre) =>
       prisma.genre.upsert({
-        where: {id: genre.id},
-        create: {id: genre.id, name: genre.name},
-        update: {name: genre.name},
-      })
-    )
+        where: { id: genre.id },
+        create: { id: genre.id, name: genre.name },
+        update: { name: genre.name },
+      }),
+    ),
   );
 }
 
-async function ensureProductionCompaniesExist(
-  companies: TmdbMovie['production_companies'],
-) {
+async function ensureProductionCompaniesExist(companies: TmdbMovie['production_companies']) {
   await Promise.all(
     companies.map((company) =>
       prisma.productionCompany.upsert({
@@ -82,28 +73,24 @@ async function ensureProductionCompaniesExist(
           name: company.name,
           originCountry: company.origin_country,
         },
-      })
-    )
+      }),
+    ),
   );
 }
 
-async function ensureProductionCountriesExist(
-  countries: TmdbMovie['production_countries'],
-) {
+async function ensureProductionCountriesExist(countries: TmdbMovie['production_countries']) {
   await Promise.all(
     countries.map((country) =>
       prisma.productionCountry.upsert({
         where: { iso31661: country.iso_3166_1 },
         create: { iso31661: country.iso_3166_1, name: country.name },
         update: { name: country.name },
-      })
-    )
+      }),
+    ),
   );
 }
 
-async function ensureSpokenLanguagesExist(
-  languages: TmdbMovie['spoken_languages'],
-) {
+async function ensureSpokenLanguagesExist(languages: TmdbMovie['spoken_languages']) {
   await Promise.all(
     languages.map((lang) =>
       prisma.spokenLanguage.upsert({
@@ -114,14 +101,12 @@ async function ensureSpokenLanguagesExist(
           name: lang.name,
         },
         update: { iso6391: lang.iso_639_1, name: lang.name },
-      })
-    )
+      }),
+    ),
   );
 }
 
-async function ensureCollectionExists(
-  collection: TmdbMovie['belongs_to_collection'],
-) {
+async function ensureCollectionExists(collection: TmdbMovie['belongs_to_collection']) {
   if (!collection) return null;
 
   await prisma.collection.upsert({
@@ -157,10 +142,7 @@ function getValue<T>(result: PromiseSettledResult<T>): T | null {
  * Fetch all movie sub-resources in parallel and store them.
  * Each sub-resource is stored independently — one failure doesn't block others.
  */
-async function syncMovieSubResources(
-  tmdbMovie: TmdbMovie,
-  client: TmdbClient,
-): Promise<void> {
+async function syncMovieSubResources(tmdbMovie: TmdbMovie, client: TmdbClient): Promise<void> {
   // Fetch all sub-resources in parallel
   const [
     altTitlesResult,
@@ -437,7 +419,9 @@ async function syncMovieSubResources(
     // --- Similar Movies (stored as recommendations with source 'movie_similar') ---
     const similar = getValue(similarResult);
     if (similar?.results) {
-      await tx.recommendation.deleteMany({ where: { sourceType: 'movie_similar', sourceId: movie.id } });
+      await tx.recommendation.deleteMany({
+        where: { sourceType: 'movie_similar', sourceId: movie.id },
+      });
       const simData = similar.results.slice(0, 20).map((rec, idx) => ({
         sourceType: 'movie_similar' as const,
         sourceId: movie.id,
@@ -465,9 +449,7 @@ async function upsertMovie(tmdbMovie: TmdbMovie, client: TmdbClient): Promise<vo
     ensureSpokenLanguagesExist(tmdbMovie.spoken_languages),
   ]);
 
-  const collectionId = await ensureCollectionExists(
-    tmdbMovie.belongs_to_collection,
-  );
+  const collectionId = await ensureCollectionExists(tmdbMovie.belongs_to_collection);
 
   // Use a transaction to upsert the movie + rebuild all junction tables
   await prisma.$transaction(async (tx) => {
@@ -545,6 +527,7 @@ async function fetchMovieIds(
   client: TmdbClient,
   listType: 'popular' | 'top_rated',
   pages: number,
+  shouldStop?: () => Promise<boolean>,
 ): Promise<number[]> {
   const ids: number[] = [];
   const fetcher =
@@ -553,6 +536,7 @@ async function fetchMovieIds(
       : (p: number) => client.getTopRatedMovies(p);
 
   for (let page = 1; page <= pages; page++) {
+    if (shouldStop && (await shouldStop())) break;
     const response = await fetcher(page);
     for (const movie of response.results) {
       ids.push(movie.id);
@@ -571,16 +555,19 @@ async function syncBatch(
   client: TmdbClient,
   onProgress: (processed: number) => void,
   errors: SyncError[],
-): Promise<number> {
+  shouldStop?: () => Promise<boolean>,
+): Promise<{ processed: number; stopped: boolean }> {
   // Process in sub-batches to avoid overwhelming the API
   const subBatches = chunk(movieIds, BATCH_SIZE);
   let processed = 0;
 
   for (const subBatch of subBatches) {
+    if (shouldStop && (await shouldStop())) {
+      return { processed, stopped: true };
+    }
+
     // Fetch full details in parallel within a sub-batch
-    const details = await Promise.allSettled(
-      subBatch.map((id) => client.getMovieDetails(id)),
-    );
+    const details = await Promise.allSettled(subBatch.map((id) => client.getMovieDetails(id)));
 
     // Collect successfully fetched movies
     const validMovies: TmdbMovie[] = [];
@@ -592,10 +579,7 @@ async function syncBatch(
         errors.push({
           tmdbId: subBatch[i],
           entity: 'movie',
-          message:
-            result.reason instanceof Error
-              ? result.reason.message
-              : String(result.reason),
+          message: result.reason instanceof Error ? result.reason.message : String(result.reason),
           timestamp: new Date(),
         });
       }
@@ -609,8 +593,7 @@ async function syncBatch(
         errors.push({
           tmdbId: movie.id,
           entity: 'movie',
-          message:
-            err instanceof Error ? err.message : String(err),
+          message: err instanceof Error ? err.message : String(err),
           timestamp: new Date(),
         });
       }
@@ -620,7 +603,7 @@ async function syncBatch(
     onProgress(processed);
   }
 
-  return processed;
+  return { processed, stopped: false };
 }
 
 // ============================================================
@@ -639,9 +622,7 @@ function chunk<T>(arr: T[], size: number): T[][] {
 // Public API: Full Movie Sync
 // ============================================================
 
-export async function syncMovies(
-  options: Partial<SyncOptions> = {},
-): Promise<SyncResult> {
+export async function syncMovies(options: Partial<SyncOptions> = {}): Promise<SyncResult> {
   const opts: SyncOptions = { ...DEFAULT_SYNC_OPTIONS, ...options };
   const client = new TmdbClient({ language: opts.language });
   const errors: SyncError[] = [];
@@ -651,10 +632,10 @@ export async function syncMovies(
 
   // ---- Phase 1: Collect unique movie IDs from popular + top-rated ----
   console.log(`${LOG_PREFIX} Fetching popular movies (pages 1-5)...`);
-  const popularIds = await fetchMovieIds(client, 'popular', 5);
+  const popularIds = await fetchMovieIds(client, 'popular', 5, opts.shouldStop);
 
   console.log(`${LOG_PREFIX} Fetching top-rated movies (pages 1-5)...`);
-  const topRatedIds = await fetchMovieIds(client, 'top_rated', 5);
+  const topRatedIds = await fetchMovieIds(client, 'top_rated', 5, opts.shouldStop);
 
   // Deduplicate
   const allIds = [...new Set([...popularIds, ...topRatedIds])];
@@ -684,21 +665,22 @@ export async function syncMovies(
   };
 
   try {
-    await syncBatch(movieIds, client, onProgress, errors);
-    progress.status = 'completed';
+    const result = await syncBatch(movieIds, client, onProgress, errors, opts.shouldStop);
+    progress.status = result.stopped ? 'cancelled' : 'completed';
   } catch (err) {
     progress.status = 'failed';
     console.error(`${LOG_PREFIX} Sync failed:`, err);
   }
 
   const duration = Date.now() - startTime;
-  const success = errors.length === 0 && progress.status === 'completed';
+  const cancelled = progress.status === 'cancelled';
+  const success = !cancelled && errors.length === 0 && progress.status === 'completed';
 
   console.log(
-    `${LOG_PREFIX} Sync complete: ${movieIds.length} movies in ${duration}ms (${errors.length} errors)`,
+    `${LOG_PREFIX} Sync ${cancelled ? 'cancelled' : 'complete'}: ${progress.current}/${movieIds.length} movies in ${duration}ms (${errors.length} errors)`,
   );
 
-  return { success, errors, duration, moviesProcessed: movieIds.length };
+  return { success, cancelled, errors, duration, moviesProcessed: progress.current };
 }
 
 // ============================================================

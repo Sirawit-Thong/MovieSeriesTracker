@@ -113,7 +113,9 @@ async function upsertPerson(person: TmdbPerson, client: TmdbClient): Promise<voi
     // --- Images (profiles, up to 20) ---
     const images = imagesResult.status === 'fulfilled' ? imagesResult.value : null;
     if (images?.profiles) {
-      await tx.mediaImage.deleteMany({ where: { entityType: 'person', entityId: personRecord.id } });
+      await tx.mediaImage.deleteMany({
+        where: { entityType: 'person', entityId: personRecord.id },
+      });
       const imgData = images.profiles.slice(0, 20).map((img) => ({
         entityType: 'person' as const,
         entityId: personRecord.id,
@@ -133,9 +135,12 @@ async function upsertPerson(person: TmdbPerson, client: TmdbClient): Promise<voi
     }
 
     // --- Translations ---
-    const translations = translationsResult.status === 'fulfilled' ? translationsResult.value : null;
+    const translations =
+      translationsResult.status === 'fulfilled' ? translationsResult.value : null;
     if (translations?.translations) {
-      await tx.translation.deleteMany({ where: { entityType: 'person', entityId: personRecord.id } });
+      await tx.translation.deleteMany({
+        where: { entityType: 'person', entityId: personRecord.id },
+      });
       const trData = translations.translations.map((t) => ({
         entityType: 'person' as const,
         entityId: personRecord.id,
@@ -159,10 +164,12 @@ async function upsertPerson(person: TmdbPerson, client: TmdbClient): Promise<voi
 async function collectPopularPersonIds(
   client: TmdbClient,
   pages: number,
+  shouldStop?: () => Promise<boolean>,
 ): Promise<number[]> {
   const ids = new Set<number>();
 
   for (let page = 1; page <= pages; page++) {
+    if (shouldStop && (await shouldStop())) break;
     try {
       const response = await client.getPopularPersons(page);
       for (const person of response.results) {
@@ -172,10 +179,7 @@ async function collectPopularPersonIds(
         `${LOG_PREFIX} Fetched popular persons page ${page}/${pages} (${response.results.length} results)`,
       );
     } catch (err) {
-      console.error(
-        `${LOG_PREFIX} Error fetching popular persons page ${page}:`,
-        err,
-      );
+      console.error(`${LOG_PREFIX} Error fetching popular persons page ${page}:`, err);
     }
   }
 
@@ -191,15 +195,18 @@ async function syncBatch(
   client: TmdbClient,
   onProgress: (processed: number) => void,
   errors: SyncError[],
-): Promise<number> {
+  shouldStop?: () => Promise<boolean>,
+): Promise<{ processed: number; stopped: boolean }> {
   const batches = chunk(personIds, BATCH_SIZE);
   let processed = 0;
 
   for (const batch of batches) {
+    if (shouldStop && (await shouldStop())) {
+      return { processed, stopped: true };
+    }
+
     // Fetch full details in parallel within sub-batch
-    const details = await Promise.allSettled(
-      batch.map((id) => client.getPersonDetails(id)),
-    );
+    const details = await Promise.allSettled(batch.map((id) => client.getPersonDetails(id)));
 
     // Process each result
     for (let i = 0; i < details.length; i++) {
@@ -211,8 +218,7 @@ async function syncBatch(
           errors.push({
             tmdbId: batch[i],
             entity: 'person',
-            message:
-              err instanceof Error ? err.message : String(err),
+            message: err instanceof Error ? err.message : String(err),
             timestamp: new Date(),
           });
         }
@@ -220,10 +226,7 @@ async function syncBatch(
         errors.push({
           tmdbId: batch[i],
           entity: 'person',
-          message:
-            result.reason instanceof Error
-              ? result.reason.message
-              : String(result.reason),
+          message: result.reason instanceof Error ? result.reason.message : String(result.reason),
           timestamp: new Date(),
         });
       }
@@ -233,16 +236,14 @@ async function syncBatch(
     onProgress(processed);
   }
 
-  return processed;
+  return { processed, stopped: false };
 }
 
 // ============================================================
 // Public API: Full Person Sync
 // ============================================================
 
-export async function syncPersons(
-  options: Partial<SyncOptions> = {},
-): Promise<SyncResult> {
+export async function syncPersons(options: Partial<SyncOptions> = {}): Promise<SyncResult> {
   const opts: SyncOptions = { ...DEFAULT_SYNC_OPTIONS, ...options };
   const client = new TmdbClient({ language: opts.language });
   const errors: SyncError[] = [];
@@ -252,7 +253,7 @@ export async function syncPersons(
 
   // ---- Phase 1: Collect unique person IDs from popular persons (pages 1-5) ----
   console.log(`${LOG_PREFIX} Fetching popular persons (pages 1-${PAGES_TO_FETCH})...`);
-  const allIds = await collectPopularPersonIds(client, PAGES_TO_FETCH);
+  const allIds = await collectPopularPersonIds(client, PAGES_TO_FETCH, opts.shouldStop);
 
   // Apply limit if set
   const personIds = opts.limit > 0 ? allIds.slice(0, opts.limit) : allIds;
@@ -266,9 +267,10 @@ export async function syncPersons(
 
   // ---- Phase 2: Fetch details + upsert in batches ----
   let processed = 0;
+  let cancelled = false;
 
   try {
-    processed = await syncBatch(
+    const result = await syncBatch(
       personIds,
       client,
       (count) => {
@@ -277,19 +279,22 @@ export async function syncPersons(
         );
       },
       errors,
+      opts.shouldStop,
     );
+    processed = result.processed;
+    cancelled = result.stopped;
   } catch (err) {
     console.error(`${LOG_PREFIX} Sync failed:`, err);
   }
 
   const duration = Date.now() - startTime;
-  const success = errors.length === 0 && processed === total;
+  const success = !cancelled && errors.length === 0 && processed === total;
 
   console.log(
-    `${LOG_PREFIX} Sync complete: ${processed}/${total} persons in ${duration}ms (${errors.length} errors)`,
+    `${LOG_PREFIX} Sync ${cancelled ? 'cancelled' : 'complete'}: ${processed}/${total} persons in ${duration}ms (${errors.length} errors)`,
   );
 
-  return { success, errors, duration, moviesProcessed: processed };
+  return { success, cancelled, errors, duration, moviesProcessed: processed };
 }
 
 // ============================================================

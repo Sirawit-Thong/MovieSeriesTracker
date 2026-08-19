@@ -1,8 +1,8 @@
 'use client';
 
-import {useEffect, useState, useCallback} from 'react';
-import {Link} from '@/i18n/navigation';
-import {useTranslations} from 'next-intl';
+import { useEffect, useState, useCallback } from 'react';
+import { Link } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
 
 type SyncLog = {
   id: number;
@@ -23,11 +23,12 @@ type SyncLogsResponse = {
   totalPages: number;
 };
 
-function StatusBadge({status, t}: {status: string; t: (key: string) => string}) {
+function StatusBadge({ status, t }: { status: string; t: (key: string) => string }) {
   const styles: Record<string, string> = {
     running: 'bg-yellow-500/15 text-yellow-400',
     completed: 'bg-green-500/15 text-green-400',
     failed: 'bg-red-500/15 text-red-400',
+    cancelled: 'bg-orange-500/15 text-orange-400',
   };
 
   const labelKey = `syncHistoryPage.${status}` as const;
@@ -68,11 +69,13 @@ export default function AdminSyncHistoryPage() {
 
   useEffect(() => {
     let cancelled = false;
-    fetchLogs(page).then((nextData) => {
-      if (!cancelled && nextData) setData(nextData);
-    }).finally(() => {
-      if (!cancelled) setLoading(false);
-    });
+    fetchLogs(page)
+      .then((nextData) => {
+        if (!cancelled && nextData) setData(nextData);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
     return () => {
       cancelled = true;
     };
@@ -82,19 +85,19 @@ export default function AdminSyncHistoryPage() {
     <div className="max-w-7xl mx-auto px-4 py-10">
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <Link
-            href="/admin"
-            className="text-foreground/60 hover:text-white transition-colors"
-          >
+          <Link href="/admin" className="text-foreground/60 hover:text-white transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </Link>
           <h1 className="text-3xl font-bold text-white">{t('syncHistoryPage.title')}</h1>
         </div>
-        <p className="mt-1 text-foreground/60">
-          {t('syncHistoryPage.subtitle')}
-        </p>
+        <p className="mt-1 text-foreground/60">{t('syncHistoryPage.subtitle')}</p>
       </div>
 
       <div className="bg-surface border border-border rounded-xl overflow-hidden">
@@ -130,9 +133,24 @@ export default function AdminSyncHistoryPage() {
                 <tr>
                   <td colSpan={7} className="px-6 py-8 text-center text-foreground/40">
                     <div className="flex items-center justify-center gap-2">
-                      <svg className="animate-spin h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      <svg
+                        className="animate-spin h-5 w-5 text-primary"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                        />
                       </svg>
                       {t('loadingSyncLogs')}
                     </div>
@@ -198,7 +216,7 @@ export default function AdminSyncHistoryPage() {
         {data && data.totalPages > 1 && (
           <div className="flex items-center justify-between px-6 py-4 border-t border-border">
             <p className="text-sm text-foreground/50">
-              {t('pagination', {page: data.page, totalPages: data.totalPages, count: data.total})}
+              {t('pagination', { page: data.page, totalPages: data.totalPages, count: data.total })}
             </p>
             <div className="flex gap-2">
               <button

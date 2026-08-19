@@ -885,6 +885,7 @@ export const SyncLogScalarFieldEnum = {
   errors: 'errors',
   duration: 'duration',
   details: 'details',
+  cancelRequested: 'cancelRequested',
   startedAt: 'startedAt',
   endedAt: 'endedAt'
 } as const

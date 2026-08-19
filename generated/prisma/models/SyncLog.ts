@@ -48,6 +48,7 @@ export type SyncLogMinAggregateOutputType = {
   errors: number | null
   duration: number | null
   details: string | null
+  cancelRequested: boolean | null
   startedAt: Date | null
   endedAt: Date | null
 }
@@ -60,6 +61,7 @@ export type SyncLogMaxAggregateOutputType = {
   errors: number | null
   duration: number | null
   details: string | null
+  cancelRequested: boolean | null
   startedAt: Date | null
   endedAt: Date | null
 }
@@ -72,6 +74,7 @@ export type SyncLogCountAggregateOutputType = {
   errors: number
   duration: number
   details: number
+  cancelRequested: number
   startedAt: number
   endedAt: number
   _all: number
@@ -100,6 +103,7 @@ export type SyncLogMinAggregateInputType = {
   errors?: true
   duration?: true
   details?: true
+  cancelRequested?: true
   startedAt?: true
   endedAt?: true
 }
@@ -112,6 +116,7 @@ export type SyncLogMaxAggregateInputType = {
   errors?: true
   duration?: true
   details?: true
+  cancelRequested?: true
   startedAt?: true
   endedAt?: true
 }
@@ -124,6 +129,7 @@ export type SyncLogCountAggregateInputType = {
   errors?: true
   duration?: true
   details?: true
+  cancelRequested?: true
   startedAt?: true
   endedAt?: true
   _all?: true
@@ -223,6 +229,7 @@ export type SyncLogGroupByOutputType = {
   errors: number
   duration: number | null
   details: string | null
+  cancelRequested: boolean
   startedAt: Date
   endedAt: Date | null
   _count: SyncLogCountAggregateOutputType | null
@@ -258,6 +265,7 @@ export type SyncLogWhereInput = {
   errors?: Prisma.IntFilter<"SyncLog"> | number
   duration?: Prisma.IntNullableFilter<"SyncLog"> | number | null
   details?: Prisma.StringNullableFilter<"SyncLog"> | string | null
+  cancelRequested?: Prisma.BoolFilter<"SyncLog"> | boolean
   startedAt?: Prisma.DateTimeFilter<"SyncLog"> | Date | string
   endedAt?: Prisma.DateTimeNullableFilter<"SyncLog"> | Date | string | null
 }
@@ -270,6 +278,7 @@ export type SyncLogOrderByWithRelationInput = {
   errors?: Prisma.SortOrder
   duration?: Prisma.SortOrderInput | Prisma.SortOrder
   details?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancelRequested?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   endedAt?: Prisma.SortOrderInput | Prisma.SortOrder
 }
@@ -285,6 +294,7 @@ export type SyncLogWhereUniqueInput = Prisma.AtLeast<{
   errors?: Prisma.IntFilter<"SyncLog"> | number
   duration?: Prisma.IntNullableFilter<"SyncLog"> | number | null
   details?: Prisma.StringNullableFilter<"SyncLog"> | string | null
+  cancelRequested?: Prisma.BoolFilter<"SyncLog"> | boolean
   startedAt?: Prisma.DateTimeFilter<"SyncLog"> | Date | string
   endedAt?: Prisma.DateTimeNullableFilter<"SyncLog"> | Date | string | null
 }, "id">
@@ -297,6 +307,7 @@ export type SyncLogOrderByWithAggregationInput = {
   errors?: Prisma.SortOrder
   duration?: Prisma.SortOrderInput | Prisma.SortOrder
   details?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancelRequested?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   endedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.SyncLogCountOrderByAggregateInput
@@ -317,6 +328,7 @@ export type SyncLogScalarWhereWithAggregatesInput = {
   errors?: Prisma.IntWithAggregatesFilter<"SyncLog"> | number
   duration?: Prisma.IntNullableWithAggregatesFilter<"SyncLog"> | number | null
   details?: Prisma.StringNullableWithAggregatesFilter<"SyncLog"> | string | null
+  cancelRequested?: Prisma.BoolWithAggregatesFilter<"SyncLog"> | boolean
   startedAt?: Prisma.DateTimeWithAggregatesFilter<"SyncLog"> | Date | string
   endedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"SyncLog"> | Date | string | null
 }
@@ -328,6 +340,7 @@ export type SyncLogCreateInput = {
   errors?: number
   duration?: number | null
   details?: string | null
+  cancelRequested?: boolean
   startedAt?: Date | string
   endedAt?: Date | string | null
 }
@@ -340,6 +353,7 @@ export type SyncLogUncheckedCreateInput = {
   errors?: number
   duration?: number | null
   details?: string | null
+  cancelRequested?: boolean
   startedAt?: Date | string
   endedAt?: Date | string | null
 }
@@ -351,6 +365,7 @@ export type SyncLogUpdateInput = {
   errors?: Prisma.IntFieldUpdateOperationsInput | number
   duration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   details?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelRequested?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -363,6 +378,7 @@ export type SyncLogUncheckedUpdateInput = {
   errors?: Prisma.IntFieldUpdateOperationsInput | number
   duration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   details?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelRequested?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -375,6 +391,7 @@ export type SyncLogCreateManyInput = {
   errors?: number
   duration?: number | null
   details?: string | null
+  cancelRequested?: boolean
   startedAt?: Date | string
   endedAt?: Date | string | null
 }
@@ -386,6 +403,7 @@ export type SyncLogUpdateManyMutationInput = {
   errors?: Prisma.IntFieldUpdateOperationsInput | number
   duration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   details?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelRequested?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -398,6 +416,7 @@ export type SyncLogUncheckedUpdateManyInput = {
   errors?: Prisma.IntFieldUpdateOperationsInput | number
   duration?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   details?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelRequested?: Prisma.BoolFieldUpdateOperationsInput | boolean
   startedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   endedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
@@ -410,6 +429,7 @@ export type SyncLogCountOrderByAggregateInput = {
   errors?: Prisma.SortOrder
   duration?: Prisma.SortOrder
   details?: Prisma.SortOrder
+  cancelRequested?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   endedAt?: Prisma.SortOrder
 }
@@ -429,6 +449,7 @@ export type SyncLogMaxOrderByAggregateInput = {
   errors?: Prisma.SortOrder
   duration?: Prisma.SortOrder
   details?: Prisma.SortOrder
+  cancelRequested?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   endedAt?: Prisma.SortOrder
 }
@@ -441,6 +462,7 @@ export type SyncLogMinOrderByAggregateInput = {
   errors?: Prisma.SortOrder
   duration?: Prisma.SortOrder
   details?: Prisma.SortOrder
+  cancelRequested?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   endedAt?: Prisma.SortOrder
 }
@@ -462,6 +484,7 @@ export type SyncLogSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   errors?: boolean
   duration?: boolean
   details?: boolean
+  cancelRequested?: boolean
   startedAt?: boolean
   endedAt?: boolean
 }, ExtArgs["result"]["syncLog"]>
@@ -474,6 +497,7 @@ export type SyncLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   errors?: boolean
   duration?: boolean
   details?: boolean
+  cancelRequested?: boolean
   startedAt?: boolean
   endedAt?: boolean
 }, ExtArgs["result"]["syncLog"]>
@@ -486,6 +510,7 @@ export type SyncLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   errors?: boolean
   duration?: boolean
   details?: boolean
+  cancelRequested?: boolean
   startedAt?: boolean
   endedAt?: boolean
 }, ExtArgs["result"]["syncLog"]>
@@ -498,11 +523,12 @@ export type SyncLogSelectScalar = {
   errors?: boolean
   duration?: boolean
   details?: boolean
+  cancelRequested?: boolean
   startedAt?: boolean
   endedAt?: boolean
 }
 
-export type SyncLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "entity" | "status" | "processed" | "errors" | "duration" | "details" | "startedAt" | "endedAt", ExtArgs["result"]["syncLog"]>
+export type SyncLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "entity" | "status" | "processed" | "errors" | "duration" | "details" | "cancelRequested" | "startedAt" | "endedAt", ExtArgs["result"]["syncLog"]>
 
 export type $SyncLogPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "SyncLog"
@@ -515,6 +541,7 @@ export type $SyncLogPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     errors: number
     duration: number | null
     details: string | null
+    cancelRequested: boolean
     startedAt: Date
     endedAt: Date | null
   }, ExtArgs["result"]["syncLog"]>
@@ -947,6 +974,7 @@ export interface SyncLogFieldRefs {
   readonly errors: Prisma.FieldRef<"SyncLog", 'Int'>
   readonly duration: Prisma.FieldRef<"SyncLog", 'Int'>
   readonly details: Prisma.FieldRef<"SyncLog", 'String'>
+  readonly cancelRequested: Prisma.FieldRef<"SyncLog", 'Boolean'>
   readonly startedAt: Prisma.FieldRef<"SyncLog", 'DateTime'>
   readonly endedAt: Prisma.FieldRef<"SyncLog", 'DateTime'>
 }

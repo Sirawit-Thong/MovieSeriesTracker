@@ -5,7 +5,7 @@
 // Sync Progress
 // ============================================================
 
-export type SyncStatus = 'pending' | 'running' | 'completed' | 'failed';
+export type SyncStatus = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
 
 export interface SyncProgress {
   /** Number of items processed so far */
@@ -35,6 +35,8 @@ export interface SyncResult {
   duration: number;
   /** Number of items processed (movies or TV series) */
   moviesProcessed?: number;
+  /** True when the sync was stopped by a cancellation request */
+  cancelled?: boolean;
 }
 
 export interface SyncError {
@@ -63,6 +65,8 @@ export interface SyncOptions {
   fullSync: boolean;
   /** Maximum pages to fetch from TMDB (for list endpoints) */
   maxPages?: number;
+  /** Called between batches; return true to stop the sync early */
+  shouldStop?: () => Promise<boolean>;
 }
 
 export const DEFAULT_SYNC_OPTIONS: SyncOptions = {

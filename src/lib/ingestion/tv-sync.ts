@@ -76,7 +76,7 @@ function chunk<T>(arr: T[], size: number): T[][] {
 /** Ensure all genres exist in the database */
 async function ensureGenresExist(
   genres: TmdbGenre[],
-  tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0]
+  tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0],
 ): Promise<void> {
   if (genres.length === 0) return;
 
@@ -86,15 +86,15 @@ async function ensureGenresExist(
         where: { id: genre.id },
         update: { name: genre.name },
         create: { id: genre.id, name: genre.name },
-      })
-    )
+      }),
+    ),
   );
 }
 
 /** Ensure all networks exist in the database */
 async function ensureNetworksExist(
   networks: TmdbTvNetwork[],
-  tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0]
+  tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0],
 ): Promise<void> {
   if (networks.length === 0) return;
 
@@ -113,15 +113,15 @@ async function ensureNetworksExist(
           logoPath: network.logo_path,
           originCountry: network.origin_country,
         },
-      })
-    )
+      }),
+    ),
   );
 }
 
 /** Ensure all production companies exist in the database */
 async function ensureProductionCompaniesExist(
   companies: TmdbProductionCompany[],
-  tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0]
+  tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0],
 ): Promise<void> {
   if (companies.length === 0) return;
 
@@ -140,15 +140,15 @@ async function ensureProductionCompaniesExist(
           logoPath: company.logo_path ?? '',
           originCountry: company.origin_country,
         },
-      })
-    )
+      }),
+    ),
   );
 }
 
 /** Ensure all production countries exist in the database */
 async function ensureProductionCountriesExist(
   countries: TmdbProductionCountry[],
-  tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0]
+  tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0],
 ): Promise<void> {
   if (countries.length === 0) return;
 
@@ -161,15 +161,15 @@ async function ensureProductionCountriesExist(
           iso31661: country.iso_3166_1,
           name: country.name,
         },
-      })
-    )
+      }),
+    ),
   );
 }
 
 /** Ensure all spoken languages exist in the database */
 async function ensureSpokenLanguagesExist(
   languages: TmdbSpokenLanguage[],
-  tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0]
+  tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0],
 ): Promise<void> {
   if (languages.length === 0) return;
 
@@ -183,8 +183,8 @@ async function ensureSpokenLanguagesExist(
           iso6391: lang.iso_639_1,
           name: lang.name,
         },
-      })
-    )
+      }),
+    ),
   );
 }
 
@@ -244,7 +244,7 @@ function buildEpisodeScalarData(episode: TmdbTvEpisodeDetail) {
 /** Upsert a TV series with all nested data in a transaction */
 async function upsertTvSeriesWithNestedData(
   tmdbSeries: TmdbTvSeries,
-  tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0]
+  tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0],
 ): Promise<void> {
   // 1. Ensure all reference entities exist
   await Promise.all([
@@ -437,10 +437,7 @@ function getValue<T>(result: PromiseSettledResult<T>): T | null {
  * Fetch all TV sub-resources in parallel and store them.
  * Each sub-resource is stored independently — one failure doesn't block others.
  */
-async function syncTvSubResources(
-  tmdbSeries: TmdbTvSeries,
-  client: TmdbClient,
-): Promise<void> {
+async function syncTvSubResources(tmdbSeries: TmdbTvSeries, client: TmdbClient): Promise<void> {
   // Fetch all sub-resources in parallel
   const [
     contentRatingsResult,
@@ -500,13 +497,13 @@ async function syncTvSubResources(
       await tx.tvAlternativeTitle.deleteMany({ where: { tvSeriesId: series.id } });
       if (altTitles.titles.length > 0) {
         const seenTvAlt = new Set<string>();
-        const uniqueTvAlt = altTitles.titles.filter((t: {iso_3166_1: string}) => {
+        const uniqueTvAlt = altTitles.titles.filter((t: { iso_3166_1: string }) => {
           if (!t.iso_3166_1 || seenTvAlt.has(t.iso_3166_1)) return false;
           seenTvAlt.add(t.iso_3166_1);
           return true;
         });
         await tx.tvAlternativeTitle.createMany({
-          data: uniqueTvAlt.map((t: {iso_3166_1: string; title: string}) => ({
+          data: uniqueTvAlt.map((t: { iso_3166_1: string; title: string }) => ({
             tvSeriesId: series.id,
             countryCode: t.iso_3166_1,
             title: t.title,
@@ -698,13 +695,15 @@ async function syncTvSubResources(
 async function collectTvSeriesIds(
   client: TmdbClient,
   options: SyncOptions,
-  onProgress?: (progress: SyncProgress) => void
+  onProgress?: (progress: SyncProgress) => void,
 ): Promise<number[]> {
   const pages = options.maxPages || 5;
   const seriesIds = new Set<number>();
+  const shouldStop = options.shouldStop;
 
   // Fetch popular TV series
   for (let page = 1; page <= pages; page++) {
+    if (shouldStop && (await shouldStop())) break;
     try {
       const response = await client.getPopularTv(page);
       for (const series of response.results) {
@@ -725,6 +724,7 @@ async function collectTvSeriesIds(
 
   // Fetch top-rated TV series
   for (let page = 1; page <= pages; page++) {
+    if (shouldStop && (await shouldStop())) break;
     try {
       const response = await client.getTopRatedTv(page);
       for (const series of response.results) {
@@ -755,7 +755,8 @@ async function processBatch(
   seriesIds: number[],
   client: TmdbClient,
   onProgress?: (progress: SyncProgress) => void,
-  errors: SyncError[] = []
+  errors: SyncError[] = [],
+  shouldStop?: () => Promise<boolean>,
 ): Promise<number> {
   let successCount = 0;
 
@@ -763,6 +764,7 @@ async function processBatch(
   const batches = chunk(seriesIds, DETAIL_BATCH_SIZE);
 
   for (const batch of batches) {
+    if (shouldStop && (await shouldStop())) break;
     // Fetch all details in parallel
     const detailPromises = batch.map((id) =>
       client.getTvDetails(id, 'keywords,external_ids').catch((error) => {
@@ -773,7 +775,7 @@ async function processBatch(
           timestamp: new Date(),
         });
         return null;
-      })
+      }),
     );
 
     const details = await Promise.all(detailPromises);
@@ -787,7 +789,7 @@ async function processBatch(
           async (tx) => {
             await upsertTvSeriesWithNestedData(tmdbSeries as TmdbTvSeries, tx);
           },
-          { timeout: 30000 }
+          { timeout: 30000 },
         );
         // Fetch and store sub-resources after the main upsert succeeds
         await syncTvSubResources(tmdbSeries as TmdbTvSeries, client);
@@ -825,7 +827,7 @@ async function processBatch(
 export async function syncTvSeries(
   client: TmdbClient,
   options: Partial<SyncOptions> = {},
-  onProgress?: (progress: SyncProgress) => void
+  onProgress?: (progress: SyncProgress) => void,
 ): Promise<SyncResult> {
   const syncOptions = { ...DEFAULT_SYNC_OPTIONS, ...options };
   const startTime = Date.now();
@@ -838,17 +840,35 @@ export async function syncTvSeries(
     const allSeriesIds = await collectTvSeriesIds(client, syncOptions, onProgress);
     console.log(`${LOG_PREFIX} Collected ${allSeriesIds.length} unique TV series`);
 
+    if (syncOptions.shouldStop && (await syncOptions.shouldStop())) {
+      const duration = Date.now() - startTime;
+      console.log(`${LOG_PREFIX} Sync cancelled during collection`);
+      return {
+        success: false,
+        cancelled: true,
+        moviesProcessed: 0,
+        errors,
+        duration,
+      };
+    }
+
     // Apply limit if set
-    const seriesIds = syncOptions.limit > 0 ? allSeriesIds.slice(0, syncOptions.limit) : allSeriesIds;
+    const seriesIds =
+      syncOptions.limit > 0 ? allSeriesIds.slice(0, syncOptions.limit) : allSeriesIds;
     console.log(`${LOG_PREFIX} Will process ${seriesIds.length} series`);
 
     // Phase 2: Sync in batches
     let totalSynced = 0;
+    let cancelled = false;
     const batches = chunk(seriesIds, BATCH_SIZE);
 
     for (let i = 0; i < batches.length; i++) {
+      if (syncOptions.shouldStop && (await syncOptions.shouldStop())) {
+        cancelled = true;
+        break;
+      }
       const batch = batches[i];
-      const synced = await processBatch(batch, client, onProgress, errors);
+      const synced = await processBatch(batch, client, onProgress, errors, syncOptions.shouldStop);
       totalSynced += synced;
 
       onProgress?.({
@@ -863,11 +883,12 @@ export async function syncTvSeries(
 
     const duration = Date.now() - startTime;
     console.log(
-      `${LOG_PREFIX} Sync complete: ${totalSynced} series in ${duration}ms (${errors.length} errors)`
+      `${LOG_PREFIX} Sync ${cancelled ? 'cancelled' : 'complete'}: ${totalSynced} series in ${duration}ms (${errors.length} errors)`,
     );
 
     return {
-      success: errors.length === 0,
+      success: !cancelled && errors.length === 0,
+      cancelled,
       moviesProcessed: totalSynced,
       errors,
       duration,
@@ -899,7 +920,7 @@ export async function syncTvSeasonDetails(
   client: TmdbClient,
   tvId: number,
   seasonNumber: number,
-  onProgress?: (progress: SyncProgress) => void
+  onProgress?: (progress: SyncProgress) => void,
 ): Promise<SyncResult> {
   const startTime = Date.now();
   const errors: SyncError[] = [];
@@ -916,7 +937,7 @@ export async function syncTvSeasonDetails(
     // Fetch season details
     const seasonDetail = (await client.getTvSeasonDetails(
       tvId,
-      seasonNumber
+      seasonNumber,
     )) as unknown as TmdbTvSeasonDetail;
 
     onProgress?.({
@@ -972,13 +993,11 @@ export async function syncTvSeasonDetails(
           });
         }
       },
-      { timeout: 60000 }
+      { timeout: 60000 },
     );
 
     const duration = Date.now() - startTime;
-    console.log(
-      `${LOG_PREFIX} Season ${seasonNumber} sync complete in ${duration}ms`
-    );
+    console.log(`${LOG_PREFIX} Season ${seasonNumber} sync complete in ${duration}ms`);
 
     return {
       success: true,
@@ -1026,7 +1045,7 @@ export async function fetchAndUpsertTvSeries(tmdbId: number): Promise<number | n
       async (tx) => {
         await upsertTvSeriesWithNestedData(tmdbSeries, tx);
       },
-      { timeout: 30000 }
+      { timeout: 30000 },
     );
 
     await syncTvSubResources(tmdbSeries, client);
