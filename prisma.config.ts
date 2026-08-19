@@ -1,9 +1,10 @@
+import 'dotenv/config';
 import { defineConfig } from "prisma/config";
 
-// Use DATABASE_URL env var when set (production: PostgreSQL),
-// fall back to local SQLite file for development.
+// Migrations use the direct/session connection (DIRECT_URL) when set,
+// falling back to DATABASE_URL (transaction pooler) otherwise.
 const databaseUrl =
-  process.env.DATABASE_URL ?? "file:./dev.db";
+  process.env.DIRECT_URL ?? process.env.DATABASE_URL ?? "file:./dev.db";
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
