@@ -210,7 +210,9 @@
     "removeFromWatchlist": "Remove from Watchlist",
     "backToWatchlists": "Back to Watchlists",
     "noImage": "No Image",
-    "person": "Person"
+    "person": "Person",
+    "movies": "Movies",
+    "tvSeries": "TV Series"
   },
   "Person": {
     "biography": "Biography",

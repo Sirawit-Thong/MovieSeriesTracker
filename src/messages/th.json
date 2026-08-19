@@ -210,7 +210,9 @@
     "removeFromWatchlist": "ลบจาก Watchlist",
     "backToWatchlists": "กลับไปยัง Watchlists",
     "noImage": "ไม่มีรูปภาพ",
-    "person": "บุคคล"
+    "person": "บุคคล",
+    "movies": "ภาพยนตร์",
+    "tvSeries": "ซีรีส์"
   },
   "Person": {
     "biography": "ประวัติ",
