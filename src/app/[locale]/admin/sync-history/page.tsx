@@ -54,19 +54,28 @@ export default function AdminSyncHistoryPage() {
   const [loading, setLoading] = useState(true);
 
   const fetchLogs = useCallback(async (p: number) => {
-    setLoading(true);
     try {
       const res = await fetch(`/api/admin/sync-logs?page=${p}`);
       if (res.ok) {
-        setData(await res.json());
+        const nextData: SyncLogsResponse = await res.json();
+        return nextData;
       }
-    } finally {
-      setLoading(false);
+      return null;
+    } catch {
+      return null;
     }
   }, []);
 
   useEffect(() => {
-    fetchLogs(page);
+    let cancelled = false;
+    fetchLogs(page).then((nextData) => {
+      if (!cancelled && nextData) setData(nextData);
+    }).finally(() => {
+      if (!cancelled) setLoading(false);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [page, fetchLogs]);
 
   return (

@@ -35,26 +35,46 @@ export default function AdminWatchlistsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchWatchlists = useCallback(async (p: number) => {
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/admin/watchlists?page=${p}`);
-      if (res.ok) {
-        setData(await res.json());
-        setError(null);
-      } else {
-        setError(t('loadError'));
+  const fetchWatchlists = useCallback(
+    async (p: number) => {
+      try {
+        const params = new URLSearchParams({page: String(p)});
+        const res = await fetch(`/api/admin/watchlists?${params.toString()}`);
+        if (res.ok) {
+          const nextData: WatchlistsResponse = await res.json();
+          return nextData;
+        }
+        return null;
+      } catch {
+        return null;
       }
-    } catch {
-      setError(t('loadError'));
-    } finally {
-      setLoading(false);
-    }
-  }, [t]);
+    },
+    [],
+  );
 
   useEffect(() => {
-    fetchWatchlists(page);
-  }, [page, fetchWatchlists]);
+    let cancelled = false;
+    fetchWatchlists(page)
+      .then((nextData) => {
+        if (!cancelled) {
+          if (nextData) {
+            setData(nextData);
+            setError(null);
+          } else {
+            setError(t('loadError'));
+          }
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setError(t('loadError'));
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [page, fetchWatchlists, t]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
@@ -166,8 +186,14 @@ export default function AdminWatchlistsPage() {
                           try {
                             const res = await fetch(`/api/admin/watchlists?id=${watchlist.id}`, {method: 'DELETE'});
                             if (res.ok) {
-                              await fetchWatchlists(page);
-                              if (data && page > data.totalPages) setPage(data.totalPages);
+                              const nextData = await fetchWatchlists(page);
+                              if (nextData) {
+                                setData(nextData);
+                                setError(null);
+                              } else {
+                                setError(t('loadError'));
+                              }
+                              if (nextData && page > nextData.totalPages) setPage(Math.max(1, nextData.totalPages));
                             } else {
                               setError(t('watchlistsPage.deleteError'));
                             }

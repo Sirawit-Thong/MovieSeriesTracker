@@ -41,7 +41,6 @@ export default function AdminUsersPage() {
 
   const fetchUsers = useCallback(
     async (p: number, searchQuery: string, roleFilter: string) => {
-      setLoading(true);
       try {
         const params = new URLSearchParams({page: String(p)});
         if (searchQuery) params.set('search', searchQuery);
@@ -49,25 +48,39 @@ export default function AdminUsersPage() {
         const res = await fetch(`/api/admin/users?${params.toString()}`);
         if (res.ok) {
           const nextData: UsersResponse = await res.json();
-          setData(nextData);
-          setError(null);
           return nextData;
         }
-        setError(t('loadError'));
         return null;
       } catch {
-        setError(t('loadError'));
         return null;
-      } finally {
-        setLoading(false);
       }
     },
-    [t],
+    [],
   );
 
   useEffect(() => {
-    fetchUsers(page, debouncedSearch, role);
-  }, [page, fetchUsers, debouncedSearch, role]);
+    let cancelled = false;
+    fetchUsers(page, debouncedSearch, role)
+      .then((nextData) => {
+        if (!cancelled) {
+          if (nextData) {
+            setData(nextData);
+            setError(null);
+          } else {
+            setError(t('loadError'));
+          }
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setError(t('loadError'));
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [page, fetchUsers, debouncedSearch, role, t]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -98,7 +111,13 @@ export default function AdminUsersPage() {
 
       if (res.ok) {
         setActionError(null);
-        await fetchUsers(page, debouncedSearch, role);
+        const nextData = await fetchUsers(page, debouncedSearch, role);
+        if (nextData) {
+          setData(nextData);
+          setError(null);
+        } else {
+          setError(t('loadError'));
+        }
       } else {
         setActionError(t('actionError'));
       }
@@ -120,7 +139,13 @@ export default function AdminUsersPage() {
 
       if (res.ok) {
         setActionError(null);
-        await fetchUsers(page, debouncedSearch, role);
+        const nextData = await fetchUsers(page, debouncedSearch, role);
+        if (nextData) {
+          setData(nextData);
+          setError(null);
+        } else {
+          setError(t('loadError'));
+        }
       } else {
         setActionError(t('actionError'));
       }
@@ -142,6 +167,12 @@ export default function AdminUsersPage() {
         setDeleteConfirmId(null);
         setActionError(null);
         const nextData = await fetchUsers(page, debouncedSearch, role);
+        if (nextData) {
+          setData(nextData);
+          setError(null);
+        } else {
+          setError(t('loadError'));
+        }
         if (nextData && nextData.page > nextData.totalPages) {
           setPage(Math.max(1, nextData.totalPages));
         }
