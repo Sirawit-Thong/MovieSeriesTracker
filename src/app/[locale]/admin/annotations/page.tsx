@@ -79,8 +79,12 @@ export default function AdminAnnotationsPage() {
     fetchAnnotations(page, status, entityType)
       .then((nextData) => {
         if (!cancelled) {
-          setData(nextData);
-          setError(null);
+          if (nextData) {
+            setData(nextData);
+            setError(null);
+          } else {
+            setError(t('loadError'));
+          }
         }
       })
       .catch(() => {

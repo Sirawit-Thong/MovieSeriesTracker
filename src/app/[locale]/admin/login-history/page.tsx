@@ -76,8 +76,12 @@ export default function AdminLoginHistoryPage() {
     fetchLogs(page, debouncedSearch, method, success)
       .then((nextData) => {
         if (!cancelled) {
-          setData(nextData);
-          setError(null);
+          if (nextData) {
+            setData(nextData);
+            setError(null);
+          } else {
+            setError(t('loadError'));
+          }
         }
       })
       .catch(() => {
