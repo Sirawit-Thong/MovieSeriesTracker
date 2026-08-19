@@ -1038,6 +1038,7 @@ model SyncLog {
   duration       Int?     // milliseconds
   details        String?  @db.Text // JSON string with per-entity results
   cancelRequested Boolean @default(false) // admin requested cancellation of this sync
+  lastHeartbeatAt DateTime? @map("last_heartbeat_at") // periodic ping so stale running rows can be detected
   startedAt      DateTime @default(now()) @map("started_at")
   endedAt        DateTime? @map("ended_at")
 

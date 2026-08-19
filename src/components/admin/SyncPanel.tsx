@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 
@@ -23,8 +23,31 @@ export default function SyncPanel() {
   const [limit, setLimit] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [stopping, setStopping] = useState(false);
+  const [syncRunning, setSyncRunning] = useState(false);
   const [result, setResult] = useState<SyncResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const check = async () => {
+      try {
+        const res = await fetch('/api/admin/sync/status');
+        if (!res.ok) return;
+        const data: { running: boolean } = await res.json();
+        if (cancelled) return;
+        setSyncRunning(!!data.running);
+        if (!data.running) setStopping(false);
+      } catch {
+        // silent — keep the last known state
+      }
+    };
+    check();
+    const interval = setInterval(check, 5000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, []);
 
   const entityOptions: { value: EntityOption; label: string }[] = [
     { value: 'all', label: t('syncPanel.all') },
@@ -77,10 +100,10 @@ export default function SyncPanel() {
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         setError(data.error ?? t('syncPanel.stopError'));
+        setStopping(false);
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : t('syncPanel.networkError'));
-    } finally {
       setStopping(false);
     }
   }
@@ -103,7 +126,7 @@ export default function SyncPanel() {
             id="entity-select"
             value={entity}
             onChange={(e) => setEntity(e.target.value as EntityOption)}
-            disabled={loading}
+            disabled={loading || syncRunning}
             className="px-3 py-2 text-sm bg-background border border-border rounded-lg text-foreground focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-50"
           >
             {entityOptions.map((opt) => (
@@ -127,7 +150,7 @@ export default function SyncPanel() {
             min="0"
             value={limit}
             onChange={(e) => setLimit(e.target.value)}
-            disabled={loading}
+            disabled={loading || syncRunning}
             placeholder="0"
             className="w-24 px-3 py-2 text-sm bg-background border border-border rounded-lg text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-primary/50 transition-colors disabled:opacity-50"
           />
@@ -136,13 +159,13 @@ export default function SyncPanel() {
         <button
           type="button"
           onClick={handleSync}
-          disabled={loading}
+          disabled={loading || syncRunning}
           className="px-4 py-2 bg-primary hover:bg-primary-hover text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
         >
-          {loading ? t('syncPanel.syncing') : t('syncPanel.syncNow')}
+          {loading || syncRunning ? t('syncPanel.syncing') : t('syncPanel.syncNow')}
         </button>
 
-        {loading && (
+        {(loading || syncRunning) && (
           <button
             type="button"
             onClick={handleStop}

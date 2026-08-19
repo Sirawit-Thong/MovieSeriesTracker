@@ -10,6 +10,7 @@ import {
   acquireSyncLock,
   finishSyncLog,
   isSyncCancellationRequested,
+  touchSyncHeartbeat,
 } from '@/lib/ingestion/sync-lock';
 import { TmdbClient } from '@/lib/tmdb/client';
 
@@ -40,6 +41,7 @@ export async function POST(request: Request) {
     }
 
     const syncLog = lock;
+    await touchSyncHeartbeat(syncLog.id).catch(() => {});
 
     const results: Record<string, unknown> = {};
     let totalProcessed = 0;
@@ -47,7 +49,15 @@ export async function POST(request: Request) {
     let cancelled = false;
     const startTime = Date.now();
 
-    const shouldStop = () => isSyncCancellationRequested(syncLog.id);
+    let lastHeartbeat = Date.now();
+    const shouldStop = async () => {
+      const now = Date.now();
+      if (now - lastHeartbeat > 15_000) {
+        lastHeartbeat = now;
+        await touchSyncHeartbeat(syncLog.id).catch(() => {});
+      }
+      return isSyncCancellationRequested(syncLog.id);
+    };
 
     try {
       if (entity === 'all' || entity === 'movies') {

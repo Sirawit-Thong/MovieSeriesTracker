@@ -9,6 +9,8 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import BottomNav from '@/components/layout/BottomNav';
 import SessionProvider from '@/components/providers/SessionProvider';
+import {Analytics} from '@vercel/analytics/next';
+import {SpeedInsights} from '@vercel/speed-insights/next';
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({locale}));
@@ -98,6 +100,8 @@ export default async function LocaleLayout({
             <BottomNav />
           </NextIntlClientProvider>
         </SessionProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

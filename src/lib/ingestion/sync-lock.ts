@@ -1,6 +1,7 @@
 import prisma from '../db';
 
 const LOCK_TIMEOUT_MS = 30 * 60 * 1000;
+const STALE_SYNC_MS = 5 * 60 * 1000;
 
 const ENTITY_ALIASES: Record<string, string> = { movies: 'movie', persons: 'person' };
 
@@ -19,6 +20,8 @@ export function isSyncLockExpired(createdAt: Date, now: number = Date.now()): bo
 export async function acquireSyncLock(entity: string): Promise<{ id: number } | null> {
   const normalized = normalizeEntity(entity);
   const now = new Date();
+
+  await markStaleSyncsStopped(now.getTime());
 
   const active = await prisma.syncLog.findFirst({
     where: {
@@ -75,4 +78,42 @@ export async function isSyncCancellationRequested(syncLogId: number): Promise<bo
     select: { cancelRequested: true },
   });
   return log?.cancelRequested ?? false;
+}
+
+export async function touchSyncHeartbeat(syncLogId: number): Promise<void> {
+  await prisma.syncLog.update({
+    where: { id: syncLogId },
+    data: { lastHeartbeatAt: new Date() },
+  });
+}
+
+/**
+ * Mark running sync logs whose process is no longer alive (no recent heartbeat)
+ * as stopped, so orphaned rows don't block future syncs or the admin UI.
+ * Rows the admin asked to cancel are recorded as 'cancelled'; the rest as 'failed'.
+ */
+export async function markStaleSyncsStopped(now: number = Date.now()): Promise<number> {
+  const cutoff = new Date(now - STALE_SYNC_MS);
+  const stale = await prisma.syncLog.findMany({
+    where: {
+      status: 'running',
+      OR: [
+        { lastHeartbeatAt: null, startedAt: { lt: cutoff } },
+        { lastHeartbeatAt: { lt: cutoff } },
+      ],
+    },
+    select: { id: true, cancelRequested: true },
+  });
+
+  for (const s of stale) {
+    await prisma.syncLog.update({
+      where: { id: s.id },
+      data: {
+        status: s.cancelRequested ? 'cancelled' : 'failed',
+        endedAt: new Date(),
+      },
+    });
+  }
+
+  return stale.length;
 }

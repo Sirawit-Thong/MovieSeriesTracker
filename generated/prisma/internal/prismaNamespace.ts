@@ -5934,6 +5934,7 @@ export const SyncLogScalarFieldEnum = {
   duration: 'duration',
   details: 'details',
   cancelRequested: 'cancelRequested',
+  lastHeartbeatAt: 'lastHeartbeatAt',
   startedAt: 'startedAt',
   endedAt: 'endedAt'
 } as const

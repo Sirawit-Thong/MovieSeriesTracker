@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "prisma generate && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
@@ -26,6 +26,8 @@
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "latest",
     "@tailwindcss/postcss": "^4.3.3",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.0.0",
     "bcryptjs": "^3.0.3",
     "next": "latest",
     "next-auth": "^5.0.0-beta.32",

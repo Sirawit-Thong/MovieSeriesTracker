@@ -5,12 +5,16 @@ import {
   normalizeEntity,
   requestSyncCancellation,
   isSyncCancellationRequested,
+  touchSyncHeartbeat,
+  markStaleSyncsStopped,
 } from './sync-lock';
 
 const mocks = vi.hoisted(() => ({
   findFirst: vi.fn(),
   updateMany: vi.fn(),
   findUnique: vi.fn(),
+  update: vi.fn(),
+  findMany: vi.fn(),
 }));
 
 vi.mock('../db', () => ({
@@ -19,6 +23,8 @@ vi.mock('../db', () => ({
       findFirst: mocks.findFirst,
       updateMany: mocks.updateMany,
       findUnique: mocks.findUnique,
+      update: mocks.update,
+      findMany: mocks.findMany,
     },
   },
 }));
@@ -84,6 +90,8 @@ describe('sync cancellation helpers', () => {
     mocks.findFirst.mockReset();
     mocks.updateMany.mockReset();
     mocks.findUnique.mockReset();
+    mocks.update.mockReset();
+    mocks.findMany.mockReset();
   });
 
   it('requestSyncCancellation only touches a running sync log', async () => {
@@ -111,5 +119,56 @@ describe('sync cancellation helpers', () => {
 
     mocks.findUnique.mockResolvedValue(null);
     expect(await isSyncCancellationRequested(42)).toBe(false);
+  });
+});
+
+describe('sync heartbeat', () => {
+  beforeEach(() => {
+    mocks.update.mockReset();
+    mocks.findMany.mockReset();
+  });
+
+  it('touchSyncHeartbeat stamps the current time on the sync log', async () => {
+    mocks.update.mockResolvedValue({});
+    await touchSyncHeartbeat(7);
+    expect(mocks.update).toHaveBeenCalledWith({
+      where: { id: 7 },
+      data: { lastHeartbeatAt: expect.any(Date) },
+    });
+  });
+
+  it('markStaleSyncsStopped finalizes orphaned running syncs', async () => {
+    const now = Date.now();
+    mocks.findMany.mockResolvedValue([
+      { id: 1, cancelRequested: true },
+      { id: 2, cancelRequested: false },
+    ]);
+    const count = await markStaleSyncsStopped(now);
+    expect(count).toBe(2);
+    expect(mocks.findMany).toHaveBeenCalledWith({
+      where: {
+        status: 'running',
+        OR: [
+          { lastHeartbeatAt: null, startedAt: { lt: expect.any(Date) } },
+          { lastHeartbeatAt: { lt: expect.any(Date) } },
+        ],
+      },
+      select: { id: true, cancelRequested: true },
+    });
+    expect(mocks.update).toHaveBeenCalledWith({
+      where: { id: 1 },
+      data: { status: 'cancelled', endedAt: expect.any(Date) },
+    });
+    expect(mocks.update).toHaveBeenCalledWith({
+      where: { id: 2 },
+      data: { status: 'failed', endedAt: expect.any(Date) },
+    });
+  });
+
+  it('markStaleSyncsStopped leaves a fresh running sync untouched', async () => {
+    mocks.findMany.mockResolvedValue([]);
+    const count = await markStaleSyncsStopped(Date.now());
+    expect(count).toBe(0);
+    expect(mocks.update).not.toHaveBeenCalled();
   });
 });
