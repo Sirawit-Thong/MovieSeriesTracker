@@ -49,8 +49,8 @@ export async function generateMetadata(
       telephone: false,
     },
     icons: {
-      icon: '/icons/icon-192x192.svg',
-      apple: '/icons/icon-512x512.svg',
+      icon: '/icons/icon-192.png',
+      apple: '/icons/icon-512.png',
     },
     openGraph: {
       title: titles[locale] || titles.en,
