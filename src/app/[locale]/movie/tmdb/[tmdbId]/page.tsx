@@ -9,7 +9,7 @@ export default async function TmdbMoviePage({params}: TmdbMoviePageProps) {
   const {locale, tmdbId} = await params;
   const tmdbIdNum = Number(tmdbId);
 
-  if (isNaN(tmdbIdNum)) {
+  if (!Number.isInteger(tmdbIdNum)) {
     notFound();
   }
 

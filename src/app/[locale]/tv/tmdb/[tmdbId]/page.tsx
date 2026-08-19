@@ -1,4 +1,4 @@
-import {redirect} from 'next/navigation';
+import {redirect, notFound} from 'next/navigation';
 import {fetchOnMiss} from '@/lib/ingestion/on-demand';
 
 type TmdbTvPageProps = {
@@ -13,14 +13,14 @@ export default async function TmdbTvPage({params}: TmdbTvPageProps) {
   const {locale, tmdbId} = await params;
   const tmdbIdNum = Number(tmdbId);
 
-  if (isNaN(tmdbIdNum)) {
-    redirect(`/${locale}`);
+  if (!Number.isInteger(tmdbIdNum)) {
+    notFound();
   }
 
   const result = await fetchOnMiss('tv', tmdbIdNum);
 
   if (!result) {
-    redirect(`/${locale}`);
+    notFound();
   }
 
   redirect(`/${locale}/tv/${result.tmdbId}`);
