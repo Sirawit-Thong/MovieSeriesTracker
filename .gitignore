@@ -3,7 +3,7 @@ node_modules/
 .pnp
 .pnp.js
 
-# testing
+# testing & coverage
 coverage/
 
 # next.js
@@ -12,17 +12,29 @@ out/
 
 # production
 build/
+dist/
 
 # misc
 .DS_Store
+Thumbs.db
 *.pem
+*.bak
 
-# debug
+# debug & logs
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+debug-*.ts
 
 # env files
 .env
 .env*.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # vercel
 .vercel
@@ -31,15 +43,17 @@ npm-debug.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# prisma
+# prisma & local databases
 *.db
 *.db-journal
+*.sqlite
+*.sqlite3
 
-# opencode
+# local tools & MCP
 .tmp/
+.mcp.json
 
 # agent workspaces
 .superpowers/
 .playwright-mcp/
-
 .worktrees/
