@@ -513,12 +513,14 @@ export async function ensurePersonCredits(
   );
 
   const client = new TmdbClient();
+  const clientEn = new TmdbClient({language: 'en-US'});
 
   // Fetch movie credits, TV credits, and combined credits in parallel
-  const [movieCredits, tvCredits, personDetails] = await Promise.all([
+  const [movieCredits, tvCredits, personDetails, personDetailsEn] = await Promise.all([
     client.getPersonMovieCredits(tmdbPersonId),
     client.getPersonTvCredits(tmdbPersonId),
     client.getPersonDetails(tmdbPersonId, 'combined_credits'),
+    clientEn.getPersonDetails(tmdbPersonId, 'combined_credits').catch(() => null),
   ]);
 
   // Sync cast + crew credits (existing logic)
@@ -526,50 +528,108 @@ export async function ensurePersonCredits(
 
   // Sync combined credits (for "Known For" section)
   if (personDetails.combined_credits) {
-    await syncCombinedCredits(personId, personDetails.combined_credits);
+    await syncCombinedCredits(
+      personId,
+      personDetails.combined_credits,
+      personDetailsEn?.combined_credits ?? undefined,
+    );
   }
 }
 
 /**
+ * Check if a title is in Thai or English/Latin friendly characters.
+ * Returns false if it contains CJK (Chinese), Hangul (Korean), Kana (Japanese),
+ * Cyrillic, Arabic, etc. without containing any Thai characters.
+ */
+export function isThaiOrEnglishTitle(title: string | null | undefined): boolean {
+  if (!title || !title.trim()) return false;
+  // If it contains Thai characters, it's valid Thai
+  if (/[\u0E00-\u0E7F]/.test(title)) return true;
+  // If it contains non-Latin scripts (Chinese/Japanese/Korean, Cyrillic, Arabic, Devanagari, etc.)
+  const nonLatinRegex =
+    /[\u4E00-\u9FFF\u3400-\u4DBF\uAC00-\uD7AF\u1100-\u11FF\u3040-\u309F\u30A0-\u30FF\u0400-\u04FF\u0600-\u06FF\u0900-\u097F]/;
+  if (nonLatinRegex.test(title)) {
+    return false;
+  }
+  return true;
+}
+
+export type CombinedCreditsInput = {
+  cast: Array<{
+    id: number;
+    media_type: string;
+    character?: string | null;
+    credit_id?: string | null;
+    overview?: string | null;
+    popularity?: number | null;
+    poster_path?: string | null;
+    release_date?: string | null;
+    title?: string | null;
+    vote_average?: number | null;
+    vote_count?: number | null;
+    name?: string;
+    first_air_date?: string;
+  }>;
+  crew: Array<{
+    id: number;
+    media_type: string;
+    department?: string | null;
+    job?: string | null;
+    credit_id?: string | null;
+    overview?: string | null;
+    popularity?: number | null;
+    poster_path?: string | null;
+    release_date?: string | null;
+    title?: string | null;
+    vote_average?: number | null;
+    vote_count?: number | null;
+    name?: string;
+    first_air_date?: string;
+  }>;
+};
+
+/**
  * Sync combined credits into the person_combined_credits table.
  * These are used by the "Known For" and "Filmography" sections on the person detail page.
+ * If a title is not Thai or English (e.g. Chinese, Korean), it falls back to the English title.
  */
 export async function syncCombinedCredits(
   personId: number,
-  combinedCredits: {
-    cast: Array<{
-      id: number;
-      media_type: string;
-      character: string;
-      credit_id: string;
-      overview: string;
-      popularity: number;
-      poster_path: string | null;
-      release_date: string | null;
-      title: string | null;
-      vote_average: number;
-      vote_count: number;
-      name?: string;
-      first_air_date?: string;
-    }>;
-    crew: Array<{
-      id: number;
-      media_type: string;
-      department: string;
-      job: string;
-      credit_id: string;
-      overview: string;
-      popularity: number;
-      poster_path: string | null;
-      release_date: string | null;
-      title: string | null;
-      vote_average: number;
-      vote_count: number;
-      name?: string;
-      first_air_date?: string;
-    }>;
-  },
+  combinedCredits: CombinedCreditsInput,
+  fallbackCredits?: CombinedCreditsInput,
 ): Promise<void> {
+  const fallbackTitleMap = new Map<string, string>();
+  if (fallbackCredits) {
+    for (const cast of fallbackCredits.cast || []) {
+      const key = `${cast.media_type}-${cast.id}`;
+      const title = cast.title || cast.name;
+      if (title) fallbackTitleMap.set(key, title);
+    }
+    for (const crew of fallbackCredits.crew || []) {
+      const key = `${crew.media_type}-${crew.id}`;
+      const title = crew.title || crew.name;
+      if (title) fallbackTitleMap.set(key, title);
+    }
+  }
+
+  const resolveTitle = (item: {
+    media_type: string;
+    id: number;
+    title?: string | null;
+    name?: string;
+  }): string | null => {
+    const rawTitle = item.title || item.name || null;
+    if (isThaiOrEnglishTitle(rawTitle)) {
+      return rawTitle;
+    }
+    const key = `${item.media_type}-${item.id}`;
+    const fallbackTitle = fallbackTitleMap.get(key);
+    if (fallbackTitle) {
+      return fallbackTitle;
+    }
+    return rawTitle;
+  };
+
   const data: Array<{
     personId: number;
     mediaType: string;
@@ -603,7 +663,7 @@ export async function syncCombinedCredits(
       department: null,
       job: null,
       creditId: cast.credit_id || null,
-      title: cast.title || cast.name || null,
+      title: resolveTitle(cast),
       overview: cast.overview || null,
       popularity: cast.popularity ?? null,
       releaseDate: cast.release_date || cast.first_air_date || null,
@@ -627,7 +687,7 @@ export async function syncCombinedCredits(
       department: crew.department || null,
       job: crew.job || null,
       creditId: crew.credit_id || null,
-      title: crew.title || crew.name || null,
+      title: resolveTitle(crew),
       overview: crew.overview || null,
       popularity: crew.popularity ?? null,
       releaseDate: crew.release_date || crew.first_air_date || null,

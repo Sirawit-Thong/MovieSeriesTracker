@@ -59,12 +59,20 @@ const getPersonById = cache(async function getPersonById(id: number, locale: str
   if (isStub || creditsStale || !hasCombinedCredits) {
     const tmdbLanguage = locale === 'th' ? 'th-TH' : 'en-US';
     const client = new TmdbClient({language: tmdbLanguage});
-    const [personDetails2] = await Promise.all([
+    const clientEn = new TmdbClient({language: 'en-US'});
+    const [personDetails2, personDetailsEn] = await Promise.all([
       client.getPersonDetails(person.tmdbId, 'combined_credits'),
+      tmdbLanguage !== 'en-US'
+        ? clientEn.getPersonDetails(person.tmdbId, 'combined_credits').catch(() => null)
+        : Promise.resolve(null),
       syncPersonCredits(person.tmdbId, client),
     ]);
     if (personDetails2.combined_credits) {
-      await syncCombinedCredits(person.id, personDetails2.combined_credits);
+      await syncCombinedCredits(
+        person.id,
+        personDetails2.combined_credits,
+        personDetailsEn?.combined_credits ?? undefined,
+      );
     }
   }
 

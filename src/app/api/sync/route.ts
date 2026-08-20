@@ -64,12 +64,20 @@ export async function POST(request: Request) {
         if (dbId) {
           const tmdbLanguage = locale === 'th' ? 'th-TH' : 'en-US';
           const client = new TmdbClient({language: tmdbLanguage});
-          const [personDetails] = await Promise.all([
+          const clientEn = new TmdbClient({language: 'en-US'});
+          const [personDetails, personDetailsEn] = await Promise.all([
             client.getPersonDetails(tmdbId, 'combined_credits'),
+            tmdbLanguage !== 'en-US'
+              ? clientEn.getPersonDetails(tmdbId, 'combined_credits').catch(() => null)
+              : Promise.resolve(null),
             syncPersonCredits(tmdbId, client),
           ]);
           if (personDetails.combined_credits) {
-            await syncCombinedCredits(dbId, personDetails.combined_credits);
+            await syncCombinedCredits(
+              dbId,
+              personDetails.combined_credits,
+              personDetailsEn?.combined_credits ?? undefined,
+            );
           }
         }
       }
