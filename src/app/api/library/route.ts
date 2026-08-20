@@ -240,10 +240,16 @@ export async function GET(request: Request) {
     const q = search.toLowerCase();
     filtered = filtered.filter((a) => {
       if (a.entityType === 'MOVIE' && a.movie) {
-        return a.movie.title.toLowerCase().includes(q);
+        return (
+          a.movie.title.toLowerCase().includes(q) ||
+          (a.localizedTitle ? a.localizedTitle.toLowerCase().includes(q) : false)
+        );
       }
       if (a.entityType === 'TV' && a.tvSeries) {
-        return a.tvSeries.name.toLowerCase().includes(q);
+        return (
+          a.tvSeries.name.toLowerCase().includes(q) ||
+          (a.localizedTitle ? a.localizedTitle.toLowerCase().includes(q) : false)
+        );
       }
       return false;
     });

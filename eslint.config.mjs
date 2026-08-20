@@ -5,6 +5,7 @@ const eslintConfig = [
   ...nextConfig,
   prettierConfig,
   {
+    files: ['**/*.ts', '**/*.tsx'],
     rules: {
       '@typescript-eslint/no-unused-vars': ['warn', {argsIgnorePattern: '^_'}],
       '@typescript-eslint/no-explicit-any': 'warn',
@@ -19,6 +20,8 @@ const eslintConfig = [
       '*.config.*',
       '.superpowers/',
       '.playwright-mcp/',
+      '.worktrees/',
+      '.tmp/',
     ],
   },
 ];
