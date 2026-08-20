@@ -17,6 +17,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci --legacy-peer-deps
+      - run: npx prisma generate
       - run: npm run lint
 
   typecheck:
@@ -29,6 +30,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci --legacy-peer-deps
+      - run: npx prisma generate
       - run: npm run typecheck
 
   test:
@@ -41,6 +43,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci --legacy-peer-deps
+      - run: npx prisma generate
       - run: npm test
 
   build:
@@ -57,7 +60,8 @@ jobs:
       - run: npx prisma generate
       - run: npm run build
         env:
-          DATABASE_URL: file:./dev.db
-          NEXTAUTH_SECRET: ci-test-secret
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+          AUTH_SECRET: ci-test-secret-must-be-random-and-long-enough-12345
+          NEXTAUTH_SECRET: ci-test-secret-must-be-random-and-long-enough-12345
           NEXTAUTH_URL: http://localhost:3000
           TMDB_API_KEY: ci-test-key
