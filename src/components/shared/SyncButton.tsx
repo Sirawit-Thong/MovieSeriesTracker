@@ -1,7 +1,7 @@
 'use client';
 
 import {useState, useCallback} from 'react';
-import {useTranslations} from 'next-intl';
+import {useLocale, useTranslations} from 'next-intl';
 import {useRouter} from '@/i18n/navigation';
 
 type SyncButtonProps = {
@@ -11,6 +11,7 @@ type SyncButtonProps = {
 
 export default function SyncButton({type, tmdbId}: SyncButtonProps) {
   const t = useTranslations('Common');
+  const locale = useLocale();
   const router = useRouter();
   const [syncing, setSyncing] = useState(false);
   const [done, setDone] = useState(false);
@@ -24,7 +25,7 @@ export default function SyncButton({type, tmdbId}: SyncButtonProps) {
       const res = await fetch('/api/sync', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({type, tmdbId}),
+        body: JSON.stringify({type, tmdbId, locale}),
       });
 
       if (res.ok) {
@@ -37,7 +38,7 @@ export default function SyncButton({type, tmdbId}: SyncButtonProps) {
     } finally {
       setSyncing(false);
     }
-  }, [syncing, type, tmdbId, router]);
+  }, [syncing, type, tmdbId, locale, router]);
 
   return (
     <button

@@ -16,7 +16,7 @@ export async function POST(request: Request) {
     if (auth.response) return auth.response;
 
     const body = await request.json();
-    const {type, tmdbId} = body as {type?: string; tmdbId?: number};
+    const {type, tmdbId, locale} = body as {type?: string; tmdbId?: number; locale?: string};
 
     if (!type || !tmdbId) {
       return NextResponse.json(
@@ -62,7 +62,8 @@ export async function POST(request: Request) {
         // syncPersonCredits fully re-fetches: movie cast/crew, TV cast/crew
         // syncCombinedCredits fetches combined credits (used by Filmography component)
         if (dbId) {
-          const client = new TmdbClient({language: 'en-US'});
+          const tmdbLanguage = locale === 'th' ? 'th-TH' : 'en-US';
+          const client = new TmdbClient({language: tmdbLanguage});
           const [personDetails] = await Promise.all([
             client.getPersonDetails(tmdbId, 'combined_credits'),
             syncPersonCredits(tmdbId, client),
